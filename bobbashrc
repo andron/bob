@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# If a bob autocomplete file is available.
+if [ -f "$BOBAUTOCMPL" ]; then
+	source $BOBAUTOCMPL
+fi
+
+# Adopt the prompt to show what the main source for other software is.
+if [ -n "$RECIPEFILE" ]; then
+	__promptmsg=$RECIPEFILE
+elif [ -z "$RECIPEFILE" -a -n "$SOFTWARE_HOMES" ]; then
+	__promptmsg="softwarehomes"
+else
+	__promptmsg="n/a"
+fi
+
+export PS1="BoB(\j)($__promptmsg):${__bobBUILDTYPE}@\W \#> "
+
+# Safe aliases. Some people hurt themselves and sometimes others.
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+
+# "Information" aliases.
+alias ?='gmake buildshellinfo verbose_requirements_check=1;'
+alias ?ldpath='echo -ne "\nLD_LIBRARY_PATH:\n"; echo $LD_LIBRARY_PATH | tr ":" "\n";'
+alias ?path='echo -ne "\nPATH:\n"; echo $PATH | tr ":" "\n";'
+
+# Spelling aliases.
+alias mkae='make'
+alias nake='make'
+
+# We most often use a "run-script" to start things.
+RUNSCRIPT=${RUNSCRIPT:-./run}
+if [ -x "$RUNSCRIPT" ]; then
+	alias run='$RUNSCRIPT'
+else
+	echo "BOBSHELL: No run script ($RUNSCRIPT)"
+fi	
+
+
+# Wrapper around make that will make it behave more like recursive make when
+# used in a bob project.
+function make()
+{
+  # We also need to detect some special targets like test and clean and only
+  # clean/test that specific part of the dependency tree, we can do this by
+  # calling special module clean/test targets.
+  MAKE=$(which make)
+  MODULE_MAKE_TARGET=""
+
+  # Fast check to see if we are standing in the root of project, in that case
+  # we just build here with whatever argument user have supplied.
+  if [ -e Makefile ]; then
+    $MAKE $*
+  else
+    # Find out where makerules.mk and Makefile exists.
+    MAKERULES_DIR=$(find_makefile_dir $PWD makerules.mk)
+    MAKEFILE_DIR=$(find_makefile_dir $PWD Makefile)
+    # Removes warning when both directories are the same (bob does not create
+    # a module target for the base of the project)
+    if [ $MAKEFILE_DIR != $MAKERULES_DIR ]; then
+      if [ X$MAKERULES_DIR != X"" ]; then
+        # Creates a module target for that directory where we found
+        # makerules.mk.
+        MODULE_MAKE_TARGET="__module-"${MAKERULES_DIR##*\/}
+        echo "WrapperMake: Module target used ... '${MAKERULES_DIR##*\/}'"
+      else
+        echo "WrapperMake: No module target used"  
+      fi
+    fi
+
+    # If we have found a Makefile in any parent dir we need to change to that
+    # directory before running make.
+    if [ X$MAKEFILE_DIR != X"" ]; then
+      $MAKE -f $MAKEFILE_DIR/Makefile -C $MAKEFILE_DIR $MODULE_MAKE_TARGET $*
+    else
+      $MAKE $*
+    fi
+  fi
+}
+
+# Simple recursive function that walks up to "/" trying to find some specific
+# file, If it's found we return the directory containing the file.
+function find_makefile_dir()
+{
+  DIR=$1
+  FILE="$DIR/$2"
+  if [ X$DIR != X"" ]; then
+    if [ -e $FILE ]; then
+      echo $DIR
+    else
+      find_makefile_dir ${DIR%\/*} $2
+    fi
+  fi
+}

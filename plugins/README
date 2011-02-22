@@ -1,0 +1,32 @@
+# -*- mode:sh -*-
+
+# makeinit.mk
+#
+# Bob plugin (init) file. Definition of targets etc are put here. The file is
+# Included before all makerules.mk files are processed. Thus, if you want to
+# provide a variable for use in the makerules, here is the place to put it.
+#
+# Available usefull variables: 
+#   __name      - The name of the component as defined in the top makerules.mk
+#   __version   - The version ...
+#   __release   - The release ...
+#   __requires  - The requirements ...
+#   __bobRECIPE - The recipe file with absolute path provided by the user.
+#
+
+# makepostprocess.mk
+#
+# Included as the last file ever, after all makerules.mk files. Essentially have
+# the same functionallity as the init file and targets which needs information
+# from the makerules.mk files should be put here.
+#
+# Available usefull variables:
+#   __bobLIST_TARGETS  - All targets found in the component.
+#   __bobLIST_REQUIRES - All requirements found in the component.
+#   __<T>_libinternal  - The target <T>'s link libraries found WITHIN the component.
+#   __<T>_libexternal  - The target <T>'s link libraries NOT found within the component.
+#
+
+
+# makeheader.mk and makefooter.mk are very rarely used ...
+

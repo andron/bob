@@ -1,0 +1,58 @@
+# -*- mode:makefile; tab-width:2; -*-
+
+# Copyright (C) 2011, Saab AB
+# All rights reserved.
+#
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+
+# Alter the makefile list so that the 'last' file is the modules makerules
+# file and not the header or footer included by it.
+_MAKEFILE_LIST := $(filter-out $(HEADER) $(FOOTER),$(MAKEFILE_LIST))
+
+# Empty makefile list, we are only interested in the last included file, ever.
+MAKEFILE_LIST :=
+
+# Phony all makerules.mk
+.PHONY: $(lastword $(_MAKEFILE_LIST))
+
+# Work out the module name from the directory name.
+_MODULE := $(lastword $(subst /, ,$(dir $(lastword $(_MAKEFILE_LIST)))))
+
+# Source directory for the module, make SURE there is an / at the end.
+_SRCDIR := $(subst //,/,$(dir $(lastword $(_MAKEFILE_LIST)))/)
+$(_MODULE)_SRCDIR := $(_SRCDIR)
+
+# Object and other directories for the module.
+_OBJDIR := $(subst /./,/,$(OBJDIR)/$(_SRCDIR))
+$(_MODULE)_OBJDIR := $(_OBJDIR)
+
+# Clear module specific targets and dependencies...
+TARGETS :=
+SUBMODULES :=
+_CFLAGS :=
+_CXXFLAGS :=
+_DEFINES :=
+_LDFLAGS :=
+_LIBS :=
+_INCL :=
+
+# The full module name, i.e. the name reflects a complete path.
+_MODULE_FULLNAME := $(subst /,-,$(patsubst %/,%,$(_SRCDIR)))
+
+# These are used to control the insertion of moc and uic rules into the
+# module. Less such rules should hopefully speed up parsing. They are set in the
+# source checking part of the footer.
+HAVE_MOCFILES :=
+HAVE_FRMFILES :=
+
+# Use for module specific install files
+INSTALL_SBIN :=
+INSTALL_HEADERS :=
+
+ifdef BOBPLUGINS
+-include $(__bobPLUGINSHEADERS)
+endif

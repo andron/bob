@@ -1,0 +1,28 @@
+\documentclass[a4paper]{article}
+
+% Create a dvi-file from the man-page
+% % groff -Tdvi -man -o bob.dvi.
+% Then create a pdf file from the dvi file.
+% % dvipdf -D600 bob.dvi bob.pdf
+% The put the bob_man.pdf in this directory and run pdflatex.
+% % pdflatex bob_for_dummies.tex
+
+\usepackage{graphicx}
+\usepackage{pdfpages}
+
+\begin{document}
+
+\pagestyle{empty}
+
+\begin{center}
+\begin{figure}[hbt]
+\includegraphics{bob_for_dummies.png} \\
+\vspace*{0.2ex}
+{\tiny\textit{Illustration provided by: Stefan Ingvarsson}}
+\end{figure}
+\end{center}
+
+\includepdfset{pages=-}
+\includepdf{bob.pdf}
+
+\end{document}

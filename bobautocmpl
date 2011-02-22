@@ -1,0 +1,20 @@
+# -*- mode:sh -*-
+
+# Rudimentary autocompletion, just to get started.
+
+__bob_commands="all install software-install package rpm clean distclean help linkgraph requiregraph"
+
+complete -o bashdefault -o default -o nospace -F __bob_make make
+
+function __bob_make()
+{
+	local cmd=${COMP_WORDS[0]}
+	local cur=${COMP_WORDS[COMP_CWORD]}
+	local prv=${COMP_WORDS[COMP_CWORD-1]}
+	local num=${#COMP_WORDS[*]}
+
+	# Very simple completion.
+	COMPREPLY=($(compgen -W "$__bob_commands" -- $cur))	
+
+	return 0
+}
