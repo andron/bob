@@ -61,11 +61,13 @@ $(_MODULE).test:      test_$($(NAME)_FEATNAME)
 $(_MODULE).test.tmp:  test.tmp_$($(NAME)_FEATNAME)
 $(_MODULE).test.tdd:  test.tdd_$($(NAME)_FEATNAME)
 $(_MODULE).test.reg:  test.reg_$($(NAME)_FEATNAME)
+$(_MODULE).test.mod:  test.mod_$($(NAME)_FEATNAME)
 
 $(_MODULE).check:     check_$($(NAME)_FEATNAME)
 $(_MODULE).check.tmp: check.tmp_$($(NAME)_FEATNAME)
 $(_MODULE).check.tdd: check.tdd_$($(NAME)_FEATNAME)
 $(_MODULE).check.reg: check.reg_$($(NAME)_FEATNAME)
+$(_MODULE).check.mod: check.mod_$($(NAME)_FEATNAME)
 
 .PHONY:                         \
 	all_$($(NAME)_FEATNAME)       \
