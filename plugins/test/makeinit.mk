@@ -10,7 +10,7 @@
 
 
 # *** TEST VARIABLES ***
-__bob_test_classes := reg tdd mod tmp
+__bob_test_classes := reg tdd bdd mod tmp
 
 # *** TEST MACROS ***
 define __bob_test_templ

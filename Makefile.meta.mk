@@ -46,8 +46,8 @@ endif
 PASS_TARGETS := \
 	clean clean-tgt clean-obj distclean \
 	doc verify linkgraph versioninfo \
-	test   test.reg  test.tdd  test.mod  test.tmp \
-	check check.reg check.tdd check.mod check.tmp
+	test   test.reg  test.tdd  test.bdd  test.mod  test.tmp \
+	check check.reg check.tdd check.bdd check.mod check.tmp
 
 
 # Have cppcheck or not.
