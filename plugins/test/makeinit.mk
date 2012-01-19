@@ -36,7 +36,7 @@ check.%: __execute.%;
 # a _SCRIPT_SETUP and/or _SCRIPT_TEARDOWN is specified those gets sourced
 # accordingly. If the test needs argument those are passed via _ARGUMENTS.
 __execute.%: test.%
-	@echo "$(X_PREFIX) TEST=$<"
+	@echo "$(X_PREFIX) TEST=${$<_SRCDIR}$<"
 	-@if [ -z "$$BOBBUILDBASH" ]; then \
 		export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(TGTDIR):$(subst $(space),:,$(__bobLISTHOMELIBS)); fi; \
 	export _TGTDIR=$(TGTDIR); \
