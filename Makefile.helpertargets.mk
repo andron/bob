@@ -233,7 +233,7 @@ package: $$(__pkgdir)/$(__pkgfile)
 
 %.tar.gz: __excludetgtobj := $(if $(with_compiled),,--exclude '$(notdir $(TGTBASE))' --exclude '$(notdir $(OBJBASE))')
 %.tar.gz: __dependall     := $(if $(with_compiled),all)
-%.tar.gz: __pkgflags	    := --wildcards -pzcf
+%.tar.gz: __pkgflags      := --wildcards -pzcf
 %.tar.gz: $$(dir $$@)._INSTALL_DIRECTORY $$(__dependall) __always_build__
 	@if [ -L ../$(*F) ]; then                 \
 		rm -f ../$(*F); fi;                     \

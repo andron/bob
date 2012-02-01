@@ -73,10 +73,10 @@ endif
 # When the meta level is done, say something.
 $(MAIN_TARGETS):
 	@echo -e "\n" \
-		 "**************************************************\n"\
-		 " Meta stage $@, completed successfully\n"\
-		 " $$(date)\n"\
-		 "**************************************************\n"
+		"**************************************************\n"\
+		" Meta stage $@, completed successfully\n"\
+		" $$(date)\n"\
+		"**************************************************\n"
 
 # Disable zenity the which command can be slow, it has been so on Solaris.
 #	@if [ -n "$$(which zenity)" -a -n "$$DISPLAY" -a -n "$$with_zenity" ]; then \
@@ -176,11 +176,11 @@ $(foreach t,$(PASS_TARGETS),\
 #
 $(foreach n,$(LIST_NAMES),\
 $(foreach r,$($n_REQUIRES),\
-	$(eval r_n								:= $(call __get_name,$r))\
-	$(eval r_nv								:= $(call __get_VAR,$r,_VERSION))\
-	$(eval accepted						:= $(call __get_gt_feature,$r,$(r_nv)))\
-	$(eval available					:= $(call __get_feature,$(r_nv)))\
-	$(eval available_featname	:= $(call __get_compactFname,$(r_nv)))\
+	$(eval r_n                := $(call __get_name,$r))\
+	$(eval r_nv               := $(call __get_VAR,$r,_VERSION))\
+	$(eval accepted           := $(call __get_gt_feature,$r,$(r_nv)))\
+	$(eval available          := $(call __get_feature,$(r_nv)))\
+	$(eval available_featname := $(call __get_compactFname,$(r_nv)))\
 	$(if $(findstring $(r_n),$(LIST_NAMES)),\
 		$(if $(filter-out $(accepted),$(available)),\
 			$(eval missmatching_apilevel := yes)\

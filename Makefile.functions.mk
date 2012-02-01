@@ -321,9 +321,7 @@ endef
 define setup_resource_rules_qt3
 $(foreach i,$1, $(eval
 	$(foreach t,$($(i)_SRCS_RCC),\
-		$(warning qt3 resources not supported - $(i)_SRCS_RCC := $(t))
-	))
-)
+		$(warning qt3 resources not supported - $(i)_SRCS_RCC := $(t)))))
 endef
 # ------------------------------------------------------------------------------
 

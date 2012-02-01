@@ -33,12 +33,12 @@ override space := $(empty) $(empty)
 override comma := ,
 
 # Files used for various purposes.
-HEADER_BUILD	:= $(BOBHOME)/makeheader.mk
-FOOTER_BUILD	:= $(BOBHOME)/makefooter.mk
-HEADER_INFO		:= $(BOBHOME)/makeheader_info.mk
-FOOTER_INFO		:= $(BOBHOME)/makefooter_info.mk
-RULES					:= makerules.mk
-INFOS					:= makeinfo.mk
+HEADER_BUILD := $(BOBHOME)/makeheader.mk
+FOOTER_BUILD := $(BOBHOME)/makefooter.mk
+HEADER_INFO  := $(BOBHOME)/makeheader_info.mk
+FOOTER_INFO  := $(BOBHOME)/makefooter_info.mk
+RULES        := makerules.mk
+INFOS        := makeinfo.mk
 
 .PHONY: \
 	$(BOBHOME)/makeheader.mk \
@@ -174,17 +174,17 @@ $(foreach file,$(wildcard $(BOBHOME)/Makefile.compiler.*.mk),\
 		$(patsubst Makefile.compiler.%.mk,%,$(notdir $(file))))))))
 
 # Default values, unless explicitly set we use gcc and g++.
-CC				?= gcc
-CXX				?= g++
-COMPILER	?= gcc
+CC       ?= gcc
+CXX      ?= g++
+COMPILER ?= gcc
 $(if $(__bobtestcompiler),\
 	$(info $(PREFIX) Compiler is $(COMPILER) ($(origin COMPILER))))
 
 # Compiler version extraction flags. Notice the simplicity of open source
 # (What where Sun thinking?).
-__gcc_VERSIONFLAG	:= -dumpversion
-__CC_VERSIONFLAG	:= -V 2>&1|head -n1|$(__bobAWK) '{match($$0,"(C|C\\+\\+) ([^ ]+)",a);print a[2]}'
-COMPILER_VERSION	:= $(shell $(COMPILER) $(__$(COMPILER)_VERSIONFLAG))
+__gcc_VERSIONFLAG := -dumpversion
+__CC_VERSIONFLAG  := -V 2>&1|head -n1|$(__bobAWK) '{match($$0,"(C|C\\+\\+) ([^ ]+)",a);print a[2]}'
+COMPILER_VERSION  := $(shell $(COMPILER) $(__$(COMPILER)_VERSIONFLAG))
 # Ld version, this works for GNU ld and Sun ld, on Windows we need
 # updates.
 LINKER := $(LD)

@@ -10,8 +10,8 @@
 
 
 # Sort and strip to avoid duplicates, spaces and tabs.
-TARGETS			:= $(strip $(sort $(TARGETS)))
-SUBMODULES	:= $(strip $(sort $(SUBMODULES) test))
+TARGETS    := $(strip $(sort $(TARGETS)))
+SUBMODULES := $(strip $(sort $(SUBMODULES) test))
 
 # Skip all this stuff if there are not targets. Some might create makerules
 # files of this kind to tie together directories.
@@ -83,15 +83,15 @@ endif
 # @note: The <T>_LIBS variable is parsed to figure out which libraries are
 #        linked against, i.e. it needs special treatment.
 #
-$(foreach t,$(ALL_TARGETS),                                         \
-	$(eval $t_LIBS += $(_LIBS))                                     \
-	$(call __bob_append_src_objects,$t,$($(_MODULE)_OBJDIR))        \
-	$(call __bob_append_uic_objects,$t,$($(_MODULE)_OBJDIR))        \
-	$(call __bob_append_moc_objects,$t,$($(_MODULE)_OBJDIR))        \
-	$(call __bob_append_rcc_objects,$t,$($(_MODULE)_OBJDIR))        \
-	$(call setup_uic_depend_rules,$t,$($(_MODULE)_OBJDIR))          \
-	$(call setup_uic_depend_rules_srcs,$t,$($(_MODULE)_OBJDIR))     \
-	$(call setup_rcc_depend_rules,$t,$($(_MODULE)_OBJDIR))          \
+$(foreach t,$(ALL_TARGETS),                                   \
+	$(eval $t_LIBS += $(_LIBS))                                 \
+	$(call __bob_append_src_objects,$t,$($(_MODULE)_OBJDIR))    \
+	$(call __bob_append_uic_objects,$t,$($(_MODULE)_OBJDIR))    \
+	$(call __bob_append_moc_objects,$t,$($(_MODULE)_OBJDIR))    \
+	$(call __bob_append_rcc_objects,$t,$($(_MODULE)_OBJDIR))    \
+	$(call setup_uic_depend_rules,$t,$($(_MODULE)_OBJDIR))      \
+	$(call setup_uic_depend_rules_srcs,$t,$($(_MODULE)_OBJDIR)) \
+	$(call setup_rcc_depend_rules,$t,$($(_MODULE)_OBJDIR))      \
 	$(eval $(call setup_target,$t,$(_MODULE))))
 
 # Setup form (moc) rules for all targets. This macro takes all targets into
@@ -114,17 +114,17 @@ endif
 # problem with having the module as a phony target is that a target in the
 # module with the same name as the module will then also be phony... (later)
 .PRECIOUS: \
-	$($(_MODULE)_OBJDIR).stamp                             \
-	$($(_MODULE)_OBJDIR)%.o                                \
-	$($(_MODULE)_OBJDIR)%$(__moc-cpp)                      \
-	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__moc-cpp))     \
-	$($(_MODULE)_OBJDIR)%.moc.o                            \
-	$($(_MODULE)_OBJDIR)%$(__res-cpp)                      \
-	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__res-cpp))     \
-	$($(_MODULE)_OBJDIR)%$(__ui-h)                         \
-	$($(_MODULE)_OBJDIR)%$(__ui-cpp)                       \
-	$($(_MODULE)_OBJDIR)%$(__ui-moc-cpp)                   \
-	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-cpp))      \
+	$($(_MODULE)_OBJDIR).stamp                            \
+	$($(_MODULE)_OBJDIR)%.o                               \
+	$($(_MODULE)_OBJDIR)%$(__moc-cpp)                     \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__moc-cpp))    \
+	$($(_MODULE)_OBJDIR)%.moc.o                           \
+	$($(_MODULE)_OBJDIR)%$(__res-cpp)                     \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__res-cpp))    \
+	$($(_MODULE)_OBJDIR)%$(__ui-h)                        \
+	$($(_MODULE)_OBJDIR)%$(__ui-cpp)                      \
+	$($(_MODULE)_OBJDIR)%$(__ui-moc-cpp)                  \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-cpp))     \
 	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-moc-cpp))
 
 # Separate clean targets for each module.

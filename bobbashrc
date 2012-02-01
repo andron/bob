@@ -32,4 +32,4 @@ if [ -x "$RUNSCRIPT" ]; then
 	alias run='$RUNSCRIPT'
 else
 	echo "BOBSHELL: No run script ($RUNSCRIPT)"
-fi	
+fi

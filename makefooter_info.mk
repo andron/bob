@@ -10,19 +10,19 @@
 
 
 # Map information to project specific variables.
-$(NAME)_VERSION		:= $(VERSION)
-$(NAME)_RELEASE		:= $(RELEASE)
-$(NAME)_REQUIRES	:= $(REQUIRES)
+$(NAME)_VERSION  := $(VERSION)
+$(NAME)_RELEASE  := $(RELEASE)
+$(NAME)_REQUIRES := $(REQUIRES)
 ifeq "$(GROUP)" ""
-	$(NAME)_GROUP	:= other
+	$(NAME)_GROUP := other
 else
-	$(NAME)_GROUP	:= $(GROUP)
+	$(NAME)_GROUP := $(GROUP)
 endif
-$(NAME)_DIRECTORY	:= $(_MODULE)
+$(NAME)_DIRECTORY := $(_MODULE)
 
 # The feature level name, i.e. nameXY is very usefull for mapping targets to
 # each other in the main file. The directory is necessary as well.
-$(NAME)_FEATNAME	:= $(strip $(call __get_compactFname,$(NAME)-$(VERSION)))
+$(NAME)_FEATNAME := $(strip $(call __get_compactFname,$(NAME)-$(VERSION)))
 $($(NAME)_FEATNAME)_DIRECTORY := $(_MODULE)
 
 # Prefix is used for different purposes. For example, in meta build mode we want
@@ -67,11 +67,11 @@ $(_MODULE).check.tmp: check.tmp_$($(NAME)_FEATNAME)
 $(_MODULE).check.tdd: check.tdd_$($(NAME)_FEATNAME)
 $(_MODULE).check.reg: check.reg_$($(NAME)_FEATNAME)
 
-.PHONY: \
-	all_$($(NAME)_FEATNAME) \
-	build_$($(NAME)_FEATNAME) \
-	install_$($(NAME)_FEATNAME) \
-	clean_$($(NAME)_FEATNAME) \
+.PHONY:                         \
+	all_$($(NAME)_FEATNAME)       \
+	build_$($(NAME)_FEATNAME)     \
+	install_$($(NAME)_FEATNAME)   \
+	clean_$($(NAME)_FEATNAME)     \
 	distclean_$($(NAME)_FEATNAME) \
 	cppcheck_$($(NAME)_FEATNAME)
 
@@ -86,5 +86,5 @@ endif
 # Create lists for both name and featname for mapping the above variables.  The
 # lists are not used for footer processing, only for later processing to find
 # all available projects and stuff.
-LIST_NAMES				:= $(strip $(LIST_NAMES) $(NAME))
-LIST_FEATNAMES		:= $(strip $(LIST_FEATNAMES) $($(NAME)_FEATNAME))
+LIST_NAMES     := $(strip $(LIST_NAMES) $(NAME))
+LIST_FEATNAMES := $(strip $(LIST_FEATNAMES) $($(NAME)_FEATNAME))

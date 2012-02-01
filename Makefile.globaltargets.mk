@@ -105,18 +105,18 @@ $(DESTDIR)$(libdir)/%.a: $(TGTDIR)/%.a | $(DESTDIR)$(libdir)
 
 # *** DIRECTORY INSTALLS ***
 # How the actual directories are installed.
-$(DESTDIR)$(applicationsdir)	\
-$(DESTDIR)$(bindir)						\
-$(DESTDIR)$(datadir)					\
-$(DESTDIR)$(docdir)						\
-$(DESTDIR)$(includedir)				\
-$(DESTDIR)$(libdir)						\
-$(DESTDIR)$(libexecdir)				\
-$(DESTDIR)$(man1dir)					\
-$(DESTDIR)$(sbindir)					\
-$(DESTDIR)$(sysconfdir) 			\
-$(DESTDIR)$(localstatedir)		\
-$(TGTDIR)											\
+$(DESTDIR)$(applicationsdir) \
+$(DESTDIR)$(bindir)          \
+$(DESTDIR)$(datadir)         \
+$(DESTDIR)$(docdir)          \
+$(DESTDIR)$(includedir)      \
+$(DESTDIR)$(libdir)          \
+$(DESTDIR)$(libexecdir)      \
+$(DESTDIR)$(man1dir)         \
+$(DESTDIR)$(sbindir)         \
+$(DESTDIR)$(sysconfdir)      \
+$(DESTDIR)$(localstatedir)   \
+$(TGTDIR)                    \
 $(OBJDIR):
 	@echo "$(I_PREFIX) Directory $(subst $(builddir)/,,$@)"; \
 	$(INSTALL_DIRS) $@

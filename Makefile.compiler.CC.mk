@@ -16,25 +16,25 @@ __compiler_name := CC
 # the object directory is search for libraries, becasue all the
 # libraries built will end up there. Re-assignment is for handling +=
 # without overwriting user specified flag.
-override LDFLAGS:=-L$(TGTDIR) $(LDFLAGS)
+override LDFLAGS := -L$(TGTDIR) $(LDFLAGS)
 
 # Re-assign with := is to make sure the flags are treated as immediate
 # variabels by make. (Subsequent += will assign the value
 # immediately).
-CFLAGS:=$(CFLAGS)
-CXXFLAGS:=$(CXXFLAGS)
+CFLAGS   := $(CFLAGS)
+CXXFLAGS := $(CXXFLAGS)
 
 # Compiler flags for the different buildtypes
-__CC_release	:= -xO4 -DNDEBUG -DQT_NO_DEBUG
-__CC_pedantic	:= -xO4 -DNDEBUG -DQT_NO_DEBUG +w2
-__CC_debug		:= -g
-__CC_profiling 	:= -xa
+__CC_release   := -xO4 -DNDEBUG -DQT_NO_DEBUG
+__CC_pedantic  := -xO4 -DNDEBUG -DQT_NO_DEBUG +w2
+__CC_debug     := -g
+__CC_profiling := -xa
 
 # Add default compiler flags for all modes.
-CFLAGS		+=-KPIC -D'__attribute__(x)=' -D$(PLATFORM)
-CXXFLAGS	+=-KPIC -D'__attribute__(x)=' -D$(PLATFORM)
-CFLAGS		+= $(__CC_$(__bobBUILDTYPE))
-CXXFLAGS	+= $(__CC_$(__bobBUILDTYPE))
+CFLAGS   += -KPIC -D'__attribute__(x)=' -D$(PLATFORM)
+CXXFLAGS += -KPIC -D'__attribute__(x)=' -D$(PLATFORM)
+CFLAGS   += $(__CC_$(__bobBUILDTYPE))
+CXXFLAGS += $(__CC_$(__bobBUILDTYPE))
 # **********************************************************************
 
 
@@ -42,30 +42,30 @@ CXXFLAGS	+= $(__CC_$(__bobBUILDTYPE))
 # libraries that most modules use here, for conveniance.
 LIBS:=$(LIBS)
 
-COMPILERVERSIONFLAG	:= -V
-DYNAMICLIBFLAG		:= -G
+COMPILERVERSIONFLAG := -V
+DYNAMICLIBFLAG      := -G
 
-_D  := -D
-_I	:= -I
-_L	:= -L
+_D := -D
+_I := -I
+_L := -L
 
-__CC_rpathnolink	:= -Wl,-R
-__CC_rpath			:= -Wl,-R
-__bobRPATH			:= $(__CC_rpath$(__bobRPATHTYPE))
+__CC_rpathnolink := -Wl,-R
+__CC_rpath       := -Wl,-R
+__bobRPATH       := $(__CC_rpath$(__bobRPATHTYPE))
 
-SONAMEFLAG			:= -h<soname>
-WHOLEEXTRACTFLAG	:= -z allextract
-NO_WHOLEEXTRACTFLAG	:= -z defaultextract
-DYNAMICLINKFLAG		:= -Bdynamic
-STATICLINKFLAG		:= -Bstatic
-NETWORK_LIBS		:= -lsocket -lnsl
-MULTITHREADFLAG		:= -mt
+SONAMEFLAG          := -h<soname>
+WHOLEEXTRACTFLAG    := -z allextract
+NO_WHOLEEXTRACTFLAG := -z defaultextract
+DYNAMICLINKFLAG     := -Bdynamic
+STATICLINKFLAG      := -Bstatic
+NETWORK_LIBS        := -lsocket -lnsl
+MULTITHREADFLAG     := -mt
 
 
 # Other platform specific commands.
 # **********************************************************************
-AR			:= $(shell type -p ar)
-ARCREATE	:= $(CXX) -xar -o
+AR       := $(shell type -p ar)
+ARCREATE := $(CXX) -xar -o
 
 
 # Test target to detect compiler

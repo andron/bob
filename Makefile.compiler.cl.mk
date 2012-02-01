@@ -15,8 +15,8 @@ __compiler_name := cl
 # Re-assign and clear with := is to make sure the flags are treated as
 # immediate variabels by make. (Subsequent += will assign the value
 # immediately).
-CFLAGS		:= 
-CXXFLAGS	:= 
+CFLAGS   :=
+CXXFLAGS :=
 
 
 # Compiler flags for the different buildtypes
@@ -28,10 +28,10 @@ __cl_profiling := /O2 /Zi
 
 
 # Add default compiler flags for all modes.
-CFLAGS		+= /D "$(PLATFORM)"
-CXXFLAGS	+= /D "$(PLATFORM)"
-CFLAGS		+= $(__cl_$(__bobBUILDTYPE))
-CXXFLAGS	+= $(__cl_$(__bobBUILDTYPE))
+CFLAGS   += /D "$(PLATFORM)"
+CXXFLAGS += /D "$(PLATFORM)"
+CFLAGS   += $(__cl_$(__bobBUILDTYPE))
+CXXFLAGS += $(__cl_$(__bobBUILDTYPE))
 # **********************************************************************
 
 
@@ -41,9 +41,9 @@ CXXFLAGS	+= $(__cl_$(__bobBUILDTYPE))
 # the object directory is search for libraries, becasue all the
 # libraries built will end up there. Re-assignment is for handling +=
 # without overwriting user specified flag.
-__cllink_default		:= -L$(TGTDIR) $(LDFLAGS)
-__cllink_noundefined	:= -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
-override LDFLAGS		:= $(__cllink_$(__bobLINKTYPE))
+__cllink_default     := -L$(TGTDIR) $(LDFLAGS)
+__cllink_noundefined := -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
+override LDFLAGS     := $(__cllink_$(__bobLINKTYPE))
 # **********************************************************************
 
 
@@ -52,20 +52,20 @@ override LDFLAGS		:= $(__cllink_$(__bobLINKTYPE))
 LIBS := $(LIBS)
 
 COMPILERVERSIONFLAG := --version
-DYNAMICLIBFLAG			:= -shared
+DYNAMICLIBFLAG      := -shared
 
-_l	:= -l
-_o	:= /Fo
-_D	:= /D
-_I	:= /I
-_L	:= -L
+_l := -l
+_o := /Fo
+_D := /D
+_I := /I
+_L := -L
 
 ifeq "$(PLATFORM)" "Win32"
-SONAMEFLAG					:=
-WHOLEEXTRACTFLAG		:=
-NO_WHOLEEXTRACTFLAG	:=
-DYNAMICLINKFLAG			:=
-STATICLINKFLAG			:=
+SONAMEFLAG          :=
+WHOLEEXTRACTFLAG    :=
+NO_WHOLEEXTRACTFLAG :=
+DYNAMICLINKFLAG     :=
+STATICLINKFLAG      :=
 endif
 
 ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"

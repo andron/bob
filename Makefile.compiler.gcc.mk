@@ -14,8 +14,8 @@ __compiler_name := gcc
 
 # Re-assign and clear with := is to make sure the flags are treated as immediate
 # variabels by make. (Subsequent += will assign the value immediately).
-CFLAGS		:=
-CXXFLAGS	:=
+CFLAGS   :=
+CXXFLAGS :=
 
 # !!!OBS!!!
 # Currently mtune=generic is equal to mtune=i686. As soon as this changes,
@@ -36,10 +36,10 @@ __gcc_debug     := -O0 -ggdb3 -fno-inline -rdynamic -DDEBUG -DQT_DEBUG
 __gcc_profiling := -O2 -ggdb3 -pg -DDEBUG -DQT_DEBUG
 
 # Add default compiler flags for all modes.
-CFLAGS		+= -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
-CXXFLAGS	+= -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
-CFLAGS		+= $(__gcc_$(__bobBUILDTYPE))
-CXXFLAGS	+= $(__gcc_$(__bobBUILDTYPE))
+CFLAGS   += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
+CXXFLAGS += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
+CFLAGS   += $(__gcc_$(__bobBUILDTYPE))
+CXXFLAGS += $(__gcc_$(__bobBUILDTYPE))
 # **********************************************************************
 
 
@@ -49,9 +49,9 @@ CXXFLAGS	+= $(__gcc_$(__bobBUILDTYPE))
 # the object directory is search for libraries, becasue all the
 # libraries built will end up there. Re-assignment is for handling +=
 # without overwriting user specified flag.
-__gcclink_default		:= -L$(TGTDIR) $(LDFLAGS)
-__gcclink_noundefined	:= -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
-override LDFLAGS		:= $(__gcclink_$(__bobLINKTYPE))
+__gcclink_default     := -L$(TGTDIR) $(LDFLAGS)
+__gcclink_noundefined := -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
+override LDFLAGS      := $(__gcclink_$(__bobLINKTYPE))
 # **********************************************************************
 
 
@@ -60,44 +60,44 @@ override LDFLAGS		:= $(__gcclink_$(__bobLINKTYPE))
 LIBS := $(LIBS)
 
 COMPILERVERSIONFLAG := --version
-DYNAMICLIBFLAG			:= -shared
+DYNAMICLIBFLAG      := -shared
 
-_l	:= -l
-_o	:= -o
-_D	:= -D
-_I	:= -I
-_L	:= -L
+_l := -l
+_o := -o
+_D := -D
+_I := -I
+_L := -L
 
 ifeq "$(PLATFORM)" "Linux"
-override LDFLAGS		:= $(LDFLAGS) -Wl,--as-needed
-SONAMEFLAG					:= -Wl,-h<soname>
-WHOLEEXTRACTFLAG		:= -Wl,-whole-archive
-NO_WHOLEEXTRACTFLAG	:= -Wl,-no-whole-archive
-DYNAMICLINKFLAG			:= -Wl,-Bdynamic
-STATICLINKFLAG			:= -Wl,-Bstatic
+override LDFLAGS    := $(LDFLAGS) -Wl,--as-needed
+SONAMEFLAG          := -Wl,-h<soname>
+WHOLEEXTRACTFLAG    := -Wl,-whole-archive
+NO_WHOLEEXTRACTFLAG := -Wl,-no-whole-archive
+DYNAMICLINKFLAG     := -Wl,-Bdynamic
+STATICLINKFLAG      := -Wl,-Bstatic
 # Linux linker demands -rpath-link do find second order library dependencies
-override LDFLAGS		:= -Wl,-rpath-link=$(TGTDIR) $(LDFLAGS)
-__gcc_rpathnolink		:= -Wl,-rpath=
-__gcc_rpath					:= -Wl,-rpath-link=
+override LDFLAGS    := -Wl,-rpath-link=$(TGTDIR) $(LDFLAGS)
+__gcc_rpathnolink   := -Wl,-rpath=
+__gcc_rpath         := -Wl,-rpath-link=
 endif
 
 ifeq "$(PLATFORM)" "SunOS"
-SONAMEFLAG					:= -h<soname>
-WHOLEEXTRACTFLAG		:= -z allextract
-NO_WHOLEEXTRACTFLAG	:= -z defaultextract
-DYNAMICLINKFLAG			:= -Wl,-Bdynamic
-STATICLINKFLAG			:= -Wl,-Bstatic
-override LDFLAGS		:= -Wl,-R,$(TGTDIR) $(LDFLAGS)
-__gcc_rpathnolink		:= -Wl,-R,
-__gcc_rpath					:= -Wl,-R,
+SONAMEFLAG          := -h<soname>
+WHOLEEXTRACTFLAG    := -z allextract
+NO_WHOLEEXTRACTFLAG := -z defaultextract
+DYNAMICLINKFLAG     := -Wl,-Bdynamic
+STATICLINKFLAG      := -Wl,-Bstatic
+override LDFLAGS    := -Wl,-R,$(TGTDIR) $(LDFLAGS)
+__gcc_rpathnolink   := -Wl,-R,
+__gcc_rpath         := -Wl,-R,
 endif
 
 ifeq "$(PLATFORM)" "Win32"
-SONAMEFLAG					:=
-WHOLEEXTRACTFLAG		:=
-NO_WHOLEEXTRACTFLAG	:=
-DYNAMICLINKFLAG			:=
-STATICLINKFLAG			:=
+SONAMEFLAG          :=
+WHOLEEXTRACTFLAG    :=
+NO_WHOLEEXTRACTFLAG :=
+DYNAMICLINKFLAG     :=
+STATICLINKFLAG      :=
 endif
 
 
