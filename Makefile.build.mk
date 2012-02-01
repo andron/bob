@@ -122,7 +122,7 @@ version:
 	clean clean-obj clean-tgt .PRE_ALLTARGETS
 
 # The default all target, no rules.
-all: $(TGTDIR)
+all: | $(TGTDIR)
 
 # Functions for building rules, setting up dependencies etc.
 # ******************************************************************************
