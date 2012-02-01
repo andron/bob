@@ -28,7 +28,7 @@ buildshellinfo:
 	@printf " %-12s %s\n" "CFLAGS:"   "$(strip $(CFLAGS))"
 	@printf " %-12s %s\n" "LDFLAGS:"  "$(strip $(LDFLAGS))"
 bobshell: BOBSHELL_RESTRICTED ?=
-bobshell: 
+bobshell:
 	@if [ $$BOBBUILDBASH ]; then \
 		echo $$SHLVL; \
 		echo ; \
@@ -301,7 +301,7 @@ __pkgdir := $(shell rpm --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
 # if code is from trunk or a branch.
 $(__rpmspecfile): __release := \
 	$(if $(and $(wildcard .svn),$(shell svn info|egrep -e "^URL:.*(trunk|branches)")),$(__release)_r$(shell svnversion|sed 's/:/_/g'),$(__release))
-$(__rpmspecfile): awkvars := $(addprefix -v,$(foreach t,name version release,$t=$(__$t)))
+$(__rpmspecfile): awkvars := $(addprefix -v,$(foreach t,name version release group,$t=$(__$t)))
 $(__rpmspecfile): $(__rpmspecfile).in __always_build__
 	@if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) SPECFILE $@ : $(awkvars)"; \
@@ -321,7 +321,7 @@ rpm: RPM_BUILD_OPTION := -bb
 rpm: override RPM_BUILD_FLAGS += $(RPM_BUILD_OPTION)
 rpm: override RPM_BUILD_FLAGS += --define '_topdir $(RPM_USER_ROOT)'
 rpm: $(__rpmspecfile) | rpmenvironment
-	@if [ -e "$<" ]; then \
+	@+if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) RPMFILE : $(RPM_BUILD_FLAGS)"; \
 		rpmbuild $(RPM_BUILD_FLAGS) $(__rpmspecfile); fi
 

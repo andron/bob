@@ -13,6 +13,11 @@
 $(NAME)_VERSION		:= $(VERSION)
 $(NAME)_RELEASE		:= $(RELEASE)
 $(NAME)_REQUIRES	:= $(REQUIRES)
+ifeq "$(GROUP)" ""
+	$(NAME)_GROUP	:= other
+else
+	$(NAME)_GROUP	:= $(GROUP)
+endif
 $(NAME)_DIRECTORY	:= $(_MODULE)
 
 # The feature level name, i.e. nameXY is very usefull for mapping targets to

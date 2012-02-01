@@ -11,6 +11,18 @@
 
 # Default mode, i.e. just compile a single bob-project.
 
+
+# Directory configuration
+# ******************************************************************************
+TGTBASE := $(abspath $(builddir)/tgt)
+OBJBASE := $(abspath $(builddir)/obj)
+DOCBASE := $(abspath $(builddir)/doc)
+export TGTDIR := $(TGTBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
+export OBJDIR := $(OBJBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
+export DOCDIR := $(DOCBASE)/generated
+# ******************************************************************************
+
+
 # Extract version information by including the makerules.mk with empty header
 # and footer to prevent traversing the tree of makerules.mk files.
 HEADER :=
@@ -19,12 +31,25 @@ include $(RULES)
 __name     := $(NAME)
 __version  := $(VERSION)
 __release  := $(RELEASE)
+__group    := Other
 __requires := $(REQUIRES)
 # Revert variables back to real files.
 HEADER := $(HEADER_BUILD)
 FOOTER := $(FOOTER_BUILD)
 
-# Set a variable indicating that we are in build mode.
+# Before we build override __COMPONENTS_HOME.
+ifdef __COMPONENTS_HOME
+$(info $(W_PREFIX) Use the SOFTWARE_HOMES method instead of __COMPONENTS_HOME)
+$(info $(W_PREFIX) The __COMPONENTS_HOME variable clobbers the makerules.mk-files)
+$(shell sleep 3)
+endif
+ifdef __ALL_HOME
+ifdef __COMPONENTS_HOME
+$(info $(W_PREFIX) Both __ALL_HOME and __COMPONENTS_HOME are set, __ALL_HOME overrides.)
+endif
+override __COMPONENTS_HOME :=
+endif
+
 __bobBUILDSTAGE := 1
 
 # Default targets, which are all double-colon so that each module can add more
@@ -50,24 +75,31 @@ distclean:
 install: all
 
 # "Software install"
-software-install: __latest := $(__name)-$(__version)
-software-install: override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
-software-install: all
+software-prefix := $(component-prefix)
+software-install component-install: \
+	__latest := $(__name)-$(__version)
+software-install component-install: \
+	override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
+software-install component-install: all
 	@-$(MAKE) install prefix=$(prefix); \
 	cd $(prefix)/.. && rm -f latest && ln -sf $(__latest) latest
 
 
 # Doc targets
 # Simple doxygen implementation. If doxyfile is present run doxygen.
+ifdef __bob_have_feature_doxygen
 DOXYGEN_FILE ?= Doxyfile
 DOXYGEN_OPTS ?= 
 doc:
 	@if [ -r $(DOXYGEN_FILE) ]; then \
-		doxygen $(DOXYGEN_FILE); \
+		$(__bobDOXYGEN) $(DOXYGEN_FILE); \
 	else \
 		echo "No doxygen input file: $(DOXYGEN_FILE)"; \
 		echo "Create a $(DOXYGEN_FILE) using 'doxygen -g'"; \
 	fi;
+else
+doc:;
+endif
 distclean: clean-doc
 clean-doc:
 	@-$(RM) -rf $(DOCDIR)
@@ -94,11 +126,13 @@ all: $(TGTDIR)
 
 # Functions for building rules, setting up dependencies etc.
 # ******************************************************************************
+.PHONY: $(BOBHOME)/Makefile.functions.mk
 include $(BOBHOME)/Makefile.functions.mk
 
 
 # Include compiler file.
 # ******************************************************************************
+.PHONY: $(BOBHOME)/Makefile.compiler.$(COMPILER).mk
 include $(BOBHOME)/Makefile.compiler.$(COMPILER).mk
 
 
@@ -164,10 +198,12 @@ MAKEFILE_LIST :=
 
 # Include "global" target specifications.
 # ******************************************************************************
+.PHONY: $(BOBHOME)/Makefile.globaltargets.mk
 include $(BOBHOME)/Makefile.globaltargets.mk
 
 # Helper targets for various stuff.
 # ******************************************************************************
+.PHONY: $(BOBHOME)/Makefile.helpertargets.mk
 include $(BOBHOME)/Makefile.helpertargets.mk
 
 
@@ -204,11 +240,6 @@ endif
 # Do all post processing for plugins.
 # ******************************************************************************
 ifdef BOBPLUGINS
+MAKEFILE_LIST :=
 -include $(__bobPLUGINSPOSTS)
-endif
-
-
-# For debugging.
-ifdef __bobPARSEONLY
-$(error Done)
 endif

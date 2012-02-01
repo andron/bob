@@ -64,7 +64,7 @@ MULTITHREADFLAG		:= -mt
 
 # Other platform specific commands.
 # **********************************************************************
-AR			:= $(shell which ar)
+AR			:= $(shell type -p ar)
 ARCREATE	:= $(CXX) -xar -o
 
 

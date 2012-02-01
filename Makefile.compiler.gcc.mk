@@ -33,7 +33,7 @@ __gcc_release   := -O2 -g -DQT_NO_DEBUG
 __gcc_pedantic  := $(__gcc_release) -pedantic -Wshadow -Wconversion -Wlogical-op
 # More specialized
 __gcc_debug     := -O0 -ggdb3 -fno-inline -rdynamic -DDEBUG -DQT_DEBUG
-__gcc_profiling := -O2 -g -pg
+__gcc_profiling := -O2 -ggdb3 -pg -DDEBUG -DQT_DEBUG
 
 # Add default compiler flags for all modes.
 CFLAGS		+= -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
@@ -69,7 +69,7 @@ _I	:= -I
 _L	:= -L
 
 ifeq "$(PLATFORM)" "Linux"
-override LDFLAGS		:= $(LDFLAGS) --as-needed
+override LDFLAGS		:= $(LDFLAGS) -Wl,--as-needed
 SONAMEFLAG					:= -Wl,-h<soname>
 WHOLEEXTRACTFLAG		:= -Wl,-whole-archive
 NO_WHOLEEXTRACTFLAG	:= -Wl,-no-whole-archive
@@ -107,7 +107,7 @@ __bobRPATH := $(__gcc_rpath$(__bobRPATHTYPE))
 
 # Other platform specific commands.
 # **********************************************************************
-AR        := $(shell which ar)
+AR        := $(shell type -p ar)
 ARCREATE  := $(AR) -rcs
 
 

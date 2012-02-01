@@ -78,7 +78,7 @@ __bobRPATH := $(__cl_rpath$(__bobRPATHTYPE))
 
 # Other platform specific commands.
 # **********************************************************************
-AR        := $(shell which ar)
+AR        := $(shell type -p ar)
 ARCREATE  := $(AR) -rcs
 
 

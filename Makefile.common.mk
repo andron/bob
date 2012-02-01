@@ -153,6 +153,7 @@ __remove_buildinfo:
 buildinfo: export __name     := $(__name)
 buildinfo: export __version  := $(__version)
 buildinfo: export __release  := $(__release)
+buildinfo: export __group    := $(__group)
 buildinfo: export __hostname := $(HOST)
 buildinfo: export CXX      := $(CXX)
 buildinfo: export CXXFLAGS := $(CXXFLAGS)

@@ -8,12 +8,14 @@
 %_sourcedir     %{_rpmtopdir}/SOURCES
 %_specdir       %{_rpmtopdir}/SPECS
 %_srcrpmdir     %{_rpmtopdir}/SRPMS
+%_tmppath       %{_rpmtopdir}/TEMP
 %_vartmp        /var/tmp
-%_tmppath       %{_vartmp}/rpm-%{_me}
 %_prefix        /opt/saab
 %_sysconfdir    %{_prefix}/etc
+%_datarootdir   %{_prefix}/share
+%_datadir       %{_datarootdir}
 %_localstatedir %{_prefix}/var
-%__ncpus        %([ -f /usr/bin/getconf ] &&  N=$((`/usr/bin/getconf _NPROCESSORS_ONLN`));  echo "-j$N";)
-%__bobmake      %{__make} %{__ncpus} 
-%bobmakeinstall %{makeinstall} 
+%__ncpus        %(echo "")
+%__bobmake      %{__make}
+%bobmakeinstall %{makeinstall}
 %__rsync        /usr/bin/rsync

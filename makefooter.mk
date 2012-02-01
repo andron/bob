@@ -13,6 +13,11 @@
 TARGETS			:= $(strip $(sort $(TARGETS)))
 SUBMODULES	:= $(strip $(sort $(SUBMODULES) test))
 
+# Skip all this stuff if there are not targets. Some might create makerules
+# files of this kind to tie together directories.
+# TARGETS ----------------------------------------------------------------------
+ifneq "$(TARGETS)" ""
+
 # Prevent archive targets
 $(if $(filter lib%.a,$(TARGETS)),\
 	$(eval TARGETS := $(filter-out lib%.a,$(TARGETS)))\
@@ -43,9 +48,17 @@ endif
 
 
 # Save variables in module specific ones.
+ifneq "$(INSTALL_HEADERS)" ""
 $(_MODULE)_INSTALL_HEADERS := $(INSTALL_HEADERS)
+$(info $(W_PREFIX) INSTALL_HEADERS are deprecated, update $(_MODULE)/$(RULES))
+endif
+ifneq "$(INSTALL_SBIN)" ""
 $(_MODULE)_INSTALL_SBIN    := $(INSTALL_SBIN)
-$(_MODULE)_TARGETS         := $(addprefix $(TGTDIR)/,$(TARGETS))
+$(info $(W_PREFIX) INSTALL_SBIN is deprecated, update $(_MODULE)/$(RULES))
+endif
+
+
+$(_MODULE)_TARGETS := $(addprefix $(TGTDIR)/,$(TARGETS))
 
 
 # Check if variable DEFINES has been altered.
@@ -70,18 +83,21 @@ endif
 # @note: The <T>_LIBS variable is parsed to figure out which libraries are
 #        linked against, i.e. it needs special treatment.
 #
-$(foreach t,$(ALL_TARGETS),																				\
-	$(eval $t_LIBS += $(_LIBS))																			\
-	$(call __bob_append_src_objects,$t,$($(_MODULE)_OBJDIR))				\
-	$(call __bob_append_uic_objects,$t,$($(_MODULE)_OBJDIR))				\
-	$(call __bob_append_moc_objects,$t,$($(_MODULE)_OBJDIR))				\
-	$(call setup_uic_depend_rules,$t,$($(_MODULE)_OBJDIR))					\
-	$(call setup_uic_depend_rules_srcs,$t,$($(_MODULE)_OBJDIR))			\
+$(foreach t,$(ALL_TARGETS),                                         \
+	$(eval $t_LIBS += $(_LIBS))                                     \
+	$(call __bob_append_src_objects,$t,$($(_MODULE)_OBJDIR))        \
+	$(call __bob_append_uic_objects,$t,$($(_MODULE)_OBJDIR))        \
+	$(call __bob_append_moc_objects,$t,$($(_MODULE)_OBJDIR))        \
+	$(call __bob_append_rcc_objects,$t,$($(_MODULE)_OBJDIR))        \
+	$(call setup_uic_depend_rules,$t,$($(_MODULE)_OBJDIR))          \
+	$(call setup_uic_depend_rules_srcs,$t,$($(_MODULE)_OBJDIR))     \
+	$(call setup_rcc_depend_rules,$t,$($(_MODULE)_OBJDIR))          \
 	$(eval $(call setup_target,$t,$(_MODULE))))
 
 # Setup form (moc) rules for all targets. This macro takes all targets into
 # consideration and skips duplicate files.
 $(eval $(call setup_forms_rules_$(UI_STYLE),$(strip $(ALL_TARGETS)),$(_MODULE)))
+$(eval $(call setup_resource_rules_$(UI_STYLE),$(strip $(ALL_TARGETS)),$(_MODULE)))
 
 # Setup cppcheck targets.
 ifdef __bob_have_feature_cppcheck
@@ -98,16 +114,28 @@ endif
 # problem with having the module as a phony target is that a target in the
 # module with the same name as the module will then also be phony... (later)
 .PRECIOUS: \
-	$($(_MODULE)_OBJDIR).stamp														\
-	$($(_MODULE)_OBJDIR)%.o																\
-	$($(_MODULE)_OBJDIR)%$(__moc-cpp)											\
-	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__moc-cpp))		\
-	$($(_MODULE)_OBJDIR)%.moc.o														\
-	$($(_MODULE)_OBJDIR)%$(__ui-h)												\
-	$($(_MODULE)_OBJDIR)%$(__ui-cpp)											\
-	$($(_MODULE)_OBJDIR)%$(__ui-moc-cpp)									\
-	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-cpp)) 		\
+	$($(_MODULE)_OBJDIR).stamp                             \
+	$($(_MODULE)_OBJDIR)%.o                                \
+	$($(_MODULE)_OBJDIR)%$(__moc-cpp)                      \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__moc-cpp))     \
+	$($(_MODULE)_OBJDIR)%.moc.o                            \
+	$($(_MODULE)_OBJDIR)%$(__res-cpp)                      \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__res-cpp))     \
+	$($(_MODULE)_OBJDIR)%$(__ui-h)                         \
+	$($(_MODULE)_OBJDIR)%$(__ui-cpp)                       \
+	$($(_MODULE)_OBJDIR)%$(__ui-moc-cpp)                   \
+	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-cpp))      \
 	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-moc-cpp))
+
+# Separate clean targets for each module.
+$(eval $(call generate_clean_targets,$(_MODULE)))
+
+# TARGETS ----------------------------------------------------------------------
+else
+ifdef BOB.DEBUG
+$(info No targets in $($(_MODULE)_SRCDIR))
+endif
+endif
 
 # Phony target in module.
 .PHONY: \
@@ -119,12 +147,6 @@ endif
 # submodules to the module itself.
 all: __module-$(_MODULE)
 __module-$(_MODULE): $($(_MODULE)_TARGETS)
-
-# This causes circular deps, but can be used for lazy-make-command-users.
-#__module-$(_MODULE): $(addprefix __module-,$(wildcard $(filter-out test,$(SUBMODULES))))
-
-# Separate clean targets for each module.
-$(eval $(call generate_clean_targets,$(_MODULE)))
 
 # Install target will only be added for REAL targets not TEST targets. The
 # module's install target will be connected to the global install:
@@ -142,3 +164,14 @@ $(eval $(call generate_install_targets,$(_MODULE),$(ALL_TARGETS)))
 # mess up the ongoing header-content-footer section. The submodule names are
 # prepended with the current modules directory to become fully "pathed".
 $(eval $(call __bob_include_submodules,$(_MODULE),$(SUBMODULES)))
+
+ifdef BOB.VERBOSE
+$(info $(__bobPREFIX) @@ Processing $($(_MODULE)_SRCDIR) ...)
+else
+ifndef __bobSTARTEDPARSING
+__bobSTARTEDPARSING := true
+ifeq "$(MAKECMDGOALS)" ""
+$(info $(__bobPREFIX) @@ Processing buildfiles)
+endif
+endif
+endif

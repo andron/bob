@@ -11,12 +11,13 @@
 
 # Meta build differs from ordinary build, clean, distclean targets etc.
 
-# Assume we are in a meta-build project, i.e. a product build. Set headers to
-# information extraction headers.
-__subprojectfiles := \
-	$(wildcard $(addsuffix /$(RULES),$(wildcard *)))
-__subprojectfiles := \
-	$(filter-out $(addsuffix /$(RULES),$(__meta_skipsubdirs)),$(__subprojectfiles))
+# Find all sub-project makerules files.
+__subprojectrules := $(wildcard $(addsuffix /$(RULES),$(wildcard *)))
+# Find all sub-project info files, which contains build info.
+__subprojectinfos := $(wildcard $(addsuffix /$(INFOS),$(wildcard *)))
+# Filter out sub-projects from the makerules.mk list if they have an info file.
+__subprojectrules := \
+	$(filter-out $(subst $(INFOS),$(RULES),$(__subprojectinfos)),$(__subprojectrules))
 
 
 # Use different prefix in meta mode.
@@ -45,12 +46,8 @@ endif
 PASS_TARGETS := \
 	clean clean-tgt clean-obj distclean \
 	doc verify linkgraph versioninfo \
-	test   test.reg  test.tdd  test.tmp \
-	check check.reg check.tdd check.tmp \
-
-
-# All main targets for a meta build.
-MAIN_TARGETS := all install software-install $(PASS_TARGETS)
+	test   test.reg  test.tdd  test.mod  test.tmp \
+	check check.reg check.tdd check.mod check.tmp
 
 
 # Have cppcheck or not.
@@ -59,15 +56,15 @@ PASS_TARGETS += cppcheck
 endif
 
 
+# All main targets for a meta build.
+MAIN_TARGETS := all install software-install component-install $(PASS_TARGETS)
+
+
 # Have rpm or not.
 ifdef __bob_have_feature_rpm
 export RPM_USER_ROOT := $(abspath $(META_BUILD_ROOT)/rpm)
 MAIN_TARGETS += rpm
 endif
-
-
-# All main targets for a meta build.
-MAIN_TARGETS := all install software-install component-install $(PASS_TARGETS)
 
 
 # Make these phony targets so that Make won't look for files names like this.
@@ -99,9 +96,12 @@ help:
 
 # Include all sub-project files, using a info header for the parsing. Instead of
 # the normal build headers used by the build-stage.
+
 HEADER := $(HEADER_INFO)
 FOOTER := $(FOOTER_INFO)
-include $(__subprojectfiles)
+include $(__subprojectinfos)
+include $(__subprojectrules)
+
 
 # The list of targets which just gets forwarded the projects
 # version. I.e. target all depends on target all_<P>, where <P> is a project
@@ -123,6 +123,14 @@ $(addprefix build_,$(LIST_FEATNAMES)): build_%:
 # different dependecy trees when running in parallell.
 $(addprefix install_,$(LIST_FEATNAMES)): install_%: build_%
 	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) install prefix=$($*_PREFIX)
+
+# The component install depends on the complete build
+$(addprefix component-install_,$(LIST_FEATNAMES)): component-install_%: install
+	@echo
+	@echo "Target component-{install,prefix} is deprecated. Replace with software-{install,prefix}."
+	@echo
+	@sleep 5
+	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) component-install
 
 # The component install depends on the complete build
 $(addprefix software-install_,$(LIST_FEATNAMES)): software-install_%: install

@@ -30,8 +30,13 @@ $(_MODULE)_SRCDIR := $(_SRCDIR)
 _OBJDIR := $(subst /./,/,$(OBJDIR)/$(_SRCDIR))
 $(_MODULE)_OBJDIR := $(_OBJDIR)
 
+# Object and other directories for the module.
+_TGTDIR := $(TGTDIR)
+$(_MODULE)_TGTDIR := $(_TGTDIR)
+
 # Clear module specific targets and dependencies...
 TARGETS :=
+ALL_TARGETS :=
 SUBMODULES :=
 _CFLAGS :=
 _CXXFLAGS :=
@@ -55,4 +60,20 @@ INSTALL_HEADERS :=
 
 ifdef BOBPLUGINS
 -include $(__bobPLUGINSHEADERS)
+endif
+
+# Include the info file if such exist, and only if we are at the top level.
+ifeq "$(_MODULE_FULLNAME)" "."
+_MAKEFINFO := $(wildcard $(INFOS))
+ifneq "$(_MAKEFINFO)" ""
+# Header and footer files must be empty in this case, the contents of the info
+# file needs to have a header and a footer injections in the meta case for
+# processing.
+HEADER :=
+FOOTER :=
+include $(_MAKEFINFO)
+$(call setup_requires)
+HEADER := $(HEADER_BUILD)
+FOOTER := $(FOOTER_BUILD)
+endif
 endif

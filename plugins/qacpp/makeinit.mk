@@ -12,4 +12,8 @@
 # Default settings file for PRQA source code analyzer.
 qacpp: QACPPSETTINGS ?= settings.via
 # Reassign CXX to use a wrapper script.
-qacpp: CXX = "qaw qacpp -via $(QACPPSETTINGS) -cargs echo" 
+qacpp: CXX = qaw qacpp -via $(QACPPSETTINGS) -cargs echo
+# Rerun with the adjusted variables.
+qacpp:
+	@echo "$(__bobPREFIX) Running static code analysis"
+	@$(MAKE) -C . CXX="$(CXX)"

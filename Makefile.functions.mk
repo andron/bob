@@ -65,6 +65,7 @@ $(call check_target_sources_mocs,$1,$2)
 $(call check_target_sources_missing,$1,$2)
 $(call check_target_sources_missing_uis,$1,$2)
 $(call check_target_sources_missing_mocs,$1,$2)
+$(call check_target_sources_missing_rccs,$1,$2)
 $(if $(ERR_MISSING_FILES),$(error Missing files))
 endef
 
@@ -103,6 +104,15 @@ $(if $(call __bob_missing_files,$(FILES)),
 	$(warning Missing file(s): $(call __bob_missing_files,$(FILES)))
 	$(eval ERR_MISSING_FILES := yes))
 endef
+
+define check_target_sources_missing_rccs
+$(eval FILES := $(call __bob_dirprefix,$($2_SRCDIR),$($1_SRCS_RCC)))
+$(if $(call __bob_missing_files,$(FILES)),
+	$(warning Missing rcc-files for target $1 in $($2_SRCDIR)$(RULES))
+	$(warning Missing file(s): $(call __bob_missing_files,$(FILES)))
+	$(eval ERR_MISSING_FILES := yes))
+endef
+
 # ------------------------------------------------------------------------------
 
 
@@ -143,6 +153,7 @@ __ui-h_qt4         := ui_%.h
 __ui-cpp           := _ui.cpp
 __ui-moc-cpp       := _ui.moc.cpp
 __moc-cpp          := .moc.cpp
+__res-cpp          := .res.cpp
 __srcs_mocs_filter := %.h %.hh %.hpp %.qhh
 
 
@@ -171,6 +182,18 @@ endef
 
 define __bob_uic_objects
 $(notdir $(subst .cpp,.o,$(call __bob_uic_sources_$(UI_STYLE),$1)))
+endef
+
+define __bob_to_rcc_source
+$(patsubst %.qrc,%$(__res-cpp),$1)
+endef
+
+define __bob_rcc_sources_qt4
+$(call __bob_to_rcc_source,$($1_SRCS_RCC))
+endef
+
+define __bob_rcc_objects
+$(notdir $(subst .cpp,.o,$(call __bob_rcc_sources_$(UI_STYLE),$1)))
 endef
 
 define __bob_to_moc_source
@@ -205,6 +228,11 @@ endef
 define __bob_append_uic_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_uic_objects,$1)))
 endef
+
+define __bob_append_rcc_objects
+$(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_rcc_objects,$1)))
+endef
+
 # ------------------------------------------------------------------------------
 
 
@@ -243,6 +271,15 @@ $(if $(strip $($1_SRCS_FRM)), \
 		$(call __bob_dirprefix,$2,$(call __bob_moc_objects,$1)): \
 		$(call __bob_dirprefix,$2,$(call __bob_to_uic_header,$(notdir $($1_SRCS_FRM))))))
 endef
+
+ifeq "$(UI_STYLE)" "qt4"
+define setup_rcc_depend_rules
+$(if $(strip $($1_SRCS_RCC)), \
+	$(eval \
+		$(call __bob_dirprefix,$2,$(call __bob_rcc_objects,$1)): \
+		$(call __bob_dirprefix,$2,$(call __bob_to_rcc_source,$(notdir $($1_SRCS_RCC))))))
+endef
+endif
 # ------------------------------------------------------------------------------
 
 
@@ -255,20 +292,20 @@ define setup_forms_rules_qt3
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing $$(@F)"
+		@echo "$(C_PREFIX) [$2] Mocing $$(@F)"; \
 		$(MOC3) -f $$< $$(OUTPUT_OPTION))) \
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing header $$(@F)"
+		@echo "$(C_PREFIX) [$2] Uicing header $$(@F)"; \
 		$(UIC3) $$< $$(OUTPUT_OPTION))
 
 # Each ui-source file shall depend on its corresponding headerfile, which was
 # generated and put in the objectdir.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)"
+		@echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)"; \
 		$$(UIC3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
 
 # Each ui-moc-source file shall depend on its corresponding headerfile, which
@@ -277,8 +314,16 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # onces, and then the recipie must contain both commands.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_moc_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)"
+		@echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)"; \
 		$(MOC3) -f $$< $$(OUTPUT_OPTION)))
+endef
+
+define setup_resource_rules_qt3
+$(foreach i,$1, $(eval
+	$(foreach t,$($(i)_SRCS_RCC),\
+		$(warning qt3 resources not supported - $(i)_SRCS_RCC := $(t))
+	))
+)
 endef
 # ------------------------------------------------------------------------------
 
@@ -286,17 +331,26 @@ endef
 # $1: List of targets -- $2: Module name
 define setup_forms_rules_qt4
 # Each moc-file shall be moced and depend on its source file.
-$(foreach t,$(sort $(foreach i,$1,$($i_SRCS_MOC))),
-	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(t)))): \
-	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing mocable $$(@F) ($1)"
-		$(MOC4) $$(__bobALL_INTERNAL_INCLUDES) $$< $$(OUTPUT_OPTION))) \
-$(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
+$(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_MOC))),
+	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(f)))): \
+	$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
+		@echo "$(C_PREFIX) [$2] Mocing $$(@F) ($1)"; \
+		$(MOC4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
+$(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
-	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))): \
-		$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing UI-file $$(@F) ($1)"
+	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(f)))): \
+		$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
+		@echo "$(C_PREFIX) [$2] Uicing $$(@F) ($1)"; \
 		$(UIC4) $$< $$(OUTPUT_OPTION)))
+endef
+
+# $1: List of targets -- $2: Module name
+define setup_resource_rules_qt4
+$(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_RCC))),
+	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_rcc_source,$(notdir $(t)))): \
+	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $($2_OBJDIR)/.stamp
+		@echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)"; \
+		$(RCC4) $$< $$(OUTPUT_OPTION)))
 endef
 # ------------------------------------------------------------------------------
 
@@ -379,10 +433,12 @@ define __bob_install_include_files
 $(eval __all_src_include_files := \
 	$(subst ./,,$(shell $(__bobFIND) $($1_SRCDIR)include -type f -! -wholename "*/.svn/*")))
 $(eval __all_dst_include_files := \
-	$(addprefix $(DESTDIR)$(prefix)/,$(patsubst $($1_SRCDIR)%,%,$(__all_src_include_files))))
+	$(addprefix $(DESTDIR)$(includedir)/, \
+		$(patsubst include/%,%, \
+			$(patsubst $($1_SRCDIR)include/%,%,$(__all_src_include_files)))))
 __module-install-$1: __module-install-include-files-$1
 __module-install-include-files-$1: $(__all_dst_include_files)
-$(__all_dst_include_files): $(DESTDIR)$(prefix)/%:$($1_SRCDIR)%
+$(__all_dst_include_files): $(DESTDIR)$(includedir)/%:$($1_SRCDIR)include/%
 	@$(__bobINSTALL_HDR) $$< $$@
 endef
 # ------------------------------------------------------------------------------
@@ -405,7 +461,7 @@ $(foreach t,$1,\
 		$(eval __bob_$t_internal_includes := \
 			$(sort $(foreach dep,$(__bob_libinternal),$(foreach dir,$(__$(dep)_interfacedirs),$(_I)$(dir))))) \
 		$(eval __bob_$t_INCL += $(__bob_$t_internal_includes)) \
-		$(eval __bobALL_INTERNAL_INCLUDES := $(sort $(__bobALL_INTERNAL_INCLUDES) $(__bob_$t_internal_includes)))) \
+		$(eval __bobLISTALLINTINCL := $(sort $(__bobLISTALLINTINCL) $(__bob_$t_internal_includes)))) \
 	$(if $(__bob_libexternal),\
 		$(eval __bob_$t_externaldeps := $(__bob_libexternal))) \
 	$(eval $__bob_$t_INCL := $(sort $(__bob_$t_INCL))))
@@ -419,11 +475,11 @@ endef
 # ------------------------------------------------------------------------------
 define pp_setup_libbin_paths
 $(eval export __bobLISTHOMELIBS := \
-	$(abspath $(addsuffix /lib,$(sort $(__bobLISTHOMES)) $(__ALL_HOME))))\
+	$(abspath $(addsuffix /lib,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
 $(eval export __bobLISTHOMEBINS := \
-	$(abspath $(addsuffix /bin,$(sort $(__bobLISTHOMES)) $(__ALL_HOME))))\
+	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
 $(eval export __bobLISTHOMEINCL := \
-	$(addprefix $(_I),$(abspath $(addsuffix /include,$(sort $(__bobLISTHOMES) $(__ALL_HOME))))))
+	$(addprefix $(_I),$(abspath $(addsuffix /include,$(sort $(__bobLISTALLHOMES) $(__ALL_HOME))))))
 endef
 
 
@@ -450,9 +506,9 @@ endef
 # $1: Module name -- $2: List of submodules
 # ------------------------------------------------------------------------------
 define __bob_include_submodules
-$(if $2,$(foreach submodule,$(call __bob_dirprefix,$($1_SRCDIR),$2),
-$(eval MAKEFILE_LIST :=
--include $(wildcard $(addsuffix /$(RULES),$(submodule))))))
+$(eval __submodules := $(wildcard $(addsuffix /$(RULES),$(addprefix $($1_SRCDIR),$2))))
+.PHONY: $(__submodules)
+-include $(__submodules)
 endef
 # ------------------------------------------------------------------------------
 
@@ -486,7 +542,7 @@ $(foreach p,$(sort $(RECIPE_PROVIDES)),\
 		$($P_HOME)/include \
 		$(addsuffix /$p/$($P_VERSION)/include,$(INSTALLED_PATH))))) \
 		$($P_HOME))) \
-	$(eval __bobLISTHOMES += $($P_HOME)) \
+	$(eval __bobLISTALLHOMES += $($P_HOME)) \
 	$(if $(with_verbose),\
 		$(info $(V_PREFIX) $(shell printf "%-18s %s" "$P_HOME" "$($P_HOME)")))) \
 $(if $($(__name)_DEFINES),\
@@ -497,8 +553,8 @@ endef
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
 # cannot build this software and that is an error.
 # ------------------------------------------------------------------------------
-__bobLISTALLINCL :=
-__bobLISTALLLIBS :=
+__bob_ALLREQ_INCLPATH :=
+__bob_ALLREQ_LINKPATH :=
 define setup_requires
 $(if $(__bobDISABLECHECKREQUIREMENTS),,\
 $(if $(verbose_requirements_check),\
@@ -516,11 +572,6 @@ $(if $(__ALL_HOME),\
 	$(if $(and $(wildcard $(__ALL_HOME)/include),$(wildcard $(__ALL_HOME)/lib)),\
 		$(eval override __ALL_INCL := $(_I)$(__ALL_HOME)/include)\
 		$(eval override __ALL_LIBS := $(_L)$(__ALL_HOME)/lib $(__bobRPATH)$(__ALL_HOME)/lib)\
-		$(if $(with_allhomeprefix),\
-			$(eval override __ALLPRE_INCL := $(__ALL_INCL))\
-			$(eval override __ALLPRE_LIBS := $(__ALL_LIBS)),\
-			$(eval override __ALLSUF_INCL := $(__ALL_INCL))\
-			$(eval override __ALLSUF_LIBS := $(__ALL_LIBS))),\
 		$(warning __ALL_HOME defined but not valid, verify existance of subdirs lib and include!)))\
 $(foreach r,$(sort $(REQUIRES)),\
 	$(eval R := $(call __uc,$(call __get_name,$r)))\
@@ -533,11 +584,11 @@ $(foreach r,$(sort $(REQUIRES)),\
 			$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" \
 					"$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME"))),\
 		$(eval home := $($R_HOME))\
-		$(eval __bobLISTHOMES += $($R_HOME))\
+		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(_I)$(home)/include)\
 		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATH)$(home)/lib)\
-		$(eval export __bobLISTALLINCL += $($R_INCL))\
-		$(eval export __bobLISTALLLIBS += $($R_LIBS))\
+		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
+		$(eval export __bob_ALLREQ_LINKPATH += $($R_LIBS))\
 		$(if $(verbose_requirements_check),\
 			$(info $(shell printf "   %-28s %s" "$R_HOME ($(origin $R_HOME))" "$($R_HOME)"))))\
 	)\
@@ -557,33 +608,43 @@ endef
 # compile and link flags for the target. If inter module optimization is wanted
 # use a slighlty tweaked depedency setup
 #
-# If not defined, all found includes are used. Dangerous, but conveniant.
-#$(eval $1_INCL ?= $(__bobLISTALLINCL))
-#$(eval $1_LIBS ?= $(__bobLISTALLLIBS))
-#
 # $1: Target, $2: Module
 # ------------------------------------------------------------------------------
 define setup_target
 .PHONY: $1
 $1: $(TGTDIR)/$1
+# Transform _USES to include directives
+$(if $($1_USES),$(eval $1_INCL += $(foreach u,$($1_USES),$($(call __uc,$u)_INCL))))
+# Implicit _LINKPATH if _LINK
+$(if $($1_LINK),\
+	$(eval $1_LINK := $(addprefix $(_l),$($1_LINK))) \
+	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bob_ALLREQ_LINKPATH))))
 # Target .d-files
--include $(wildcard $(addsuffix *.d,$(addprefix $($2_OBJDIR),$(sort $(dir $($1_SRCS))))))
+__target_d_files := $(wildcard $(addsuffix *.d,$(addprefix $($2_OBJDIR),$(sort $(dir $($1_SRCS))))))
+.PHONY: $(__target_d_files)
+-include $(__target_d_files)
 # Target compile flags
-$(TGTDIR)/$1: __target_CFLAGS   = $(call __target_def,$1,$2) $(__ALLPRE_INCL) $(call __target_inc,$1,$2) $$($1_CFLAGS) $(_CFLAGS) $(__ALLSUF_INCL)
-$(TGTDIR)/$1: __target_CXXFLAGS = $(call __target_def,$1,$2) $(__ALLPRE_INCL) $(call __target_inc,$1,$2) $$($1_CXXFLAGS) $(_CXXFLAGS) $(__ALLSUF_INCL)
-$(TGTDIR)/$1: __target_LDFLAGS  = $(_L)$(TGTDIR) $(__ALLPRE_LIBS) $$($1_LDFLAGS) $(_LDFLAGS) $$($1_LIBS) $$($1_LINK) $(__ALLSUF_LIBS)
-$(TGTDIR)/$1: __target_GNATFLAGS= $$($1_GNATFLAGS)
+$(TGTDIR)/$1: __target_CFLAGS    = $(call __target_def,$1,$2) $(call __target_inc,$1,$2) $$($1_CFLAGS)   $(_CFLAGS)
+$(TGTDIR)/$1: __target_CXXFLAGS  = $(call __target_def,$1,$2) $(call __target_inc,$1,$2) $$($1_CXXFLAGS) $(_CXXFLAGS)
+$(TGTDIR)/$1: __target_LDFLAGS   = $(_L)$(TGTDIR) $$($1_LDFLAGS) $(_LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK)
+$(TGTDIR)/$1: __target_GNATFLAGS = $$($1_GNATFLAGS)
+# If inter-module optimization is wanted, only depend on the source files, else
+# ordinary deps on o-files.
+$(if $(or $(with_imopt),$(findstring imopt,$($1_FEATURES))),
+$(TGTDIR)/$1: $($1_SRCS)
+$(TGTDIR)/$1: __target_imopt_flags = $($1_CXXFLAGS) $($1_CFLAGS),
+$(TGTDIR)/$1: $($1_OBJS))
 # DSOs needs special care:
 # * Setup a variable for the DSOs interface directory.
 # * Setup the version variable if not set.
 # * Always create a corresponding archive.
 $(if $(filter %.so,$(filter-out %plugin.so,$1)),
-$(eval __$1_interfacedirs := $($2_SRCDIR)include $($2_SRCDIR)include_internal)
+$(eval __$1_interfacedirs := $(wildcard $($2_SRCDIR)include $($2_SRCDIR)include_internal))
 $(if $(findstring undefined,$(origin $1_VERSION)),$(eval $1_VERSION := $(__version)))
-$(if $(DISABLE_ARCHIVES),,\
+$(if $(AR),$(if $(DISABLE_ARCHIVES),,\
 	$(eval $(patsubst %.so,%.a,$1): $(TGTDIR)/$(patsubst %.so,%.a,$1)) \
 	$(eval $(TGTDIR)/$1: $(TGTDIR)/$(patsubst %.so,%.a,$1)) \
-	$(eval $(TGTDIR)/$(patsubst %.so,%.a,$1): $($1_OBJS))))
+	$(eval $(TGTDIR)/$(patsubst %.so,%.a,$1): $($1_OBJS)))))
 endef
 
 # Helpers for target include flags. Observe the order for internal and external
@@ -598,10 +659,11 @@ endef
 #
 # $1: Target, $2: Module
 define __target_inc
-$(_I)$($2_SRCDIR) \
-$(_I)$($2_SRCDIR)src \
-$(_I)$($2_SRCDIR)include_internal \
-$(_I)$($2_SRCDIR)include \
+$(addprefix $(_I), $(wildcard \
+	$($2_SRCDIR) \
+	$($2_SRCDIR)src \
+	$($2_SRCDIR)include \
+	$($2_SRCDIR)include_internal)) \
 $$(__bob_$1_INCL) \
 $(_I). \
 $($1_INCL) \
@@ -621,8 +683,8 @@ define setup_cppcheck
 $(foreach t,$1,
 cppcheck: $t.cppcheck
 $t.cppcheck:
-	@echo "$(X_PREFIX) $$(@F)"
-	$(__bobCPPCHECK) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($t_SRCS))
+	@echo "$(X_PREFIX) $$(@F)"; \
+	$(__bobCPPCHECK) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($2_SRCDIR))
 endef
 
 

@@ -13,6 +13,7 @@ ifdef dotfeatures
 $(eval _dotfeatures := $(sort $(subst $(comma),$(space),$(dotfeatures))))
 endif
 
+
 # Generate dot-code in stdout.
 # **********************************************************************
 ifdef __bobENABLEDOTCODE
@@ -42,7 +43,15 @@ endif
 ifdef __bobENABLEMETADOTCODE
 
 ifdef targets
-$(eval _dottargets := $(sort $(subst $(comma),$(space),$(targets))))
+$(sort, \
+$(eval n_targets := $(subst $(comma),$(space),$(targets))) \
+$(foreach t, $(n_targets), \
+	$(if $(findstring group_,$t), \
+		$(eval y = $(subst group_,,$t)) \
+		$(foreach p,$(LIST_NAMES), \
+			$(if $(findstring "__$($p_GROUP)__","__$y__"), \
+				$(eval _dottargets += $p),)), \
+		$(eval _dottargets += $t))))
 else
 $(eval _dottargets := $(sort $(LIST_NAMES)))
 endif
@@ -59,12 +68,35 @@ $(foreach t,$(_dottargets),\
 _dottargets := $(_dottargets2) $(_dotrequires)
 endif
 
+ifdef groups
+$(eval _groups := $(subst $(comma),$(space),$(groups)))
+endif
+
+ifdef _groups
+_dotgroups :=
+$(foreach target, $(_dottargets), \
+	$(eval cluster_$($(target)_GROUP)_TARGETS += $(target)) \
+	$(eval _dotgroups += $($(target)_GROUP)) \
+	$(foreach r, $($(target)_REQUIRES), \
+		$(eval required_target := $(word 1,$(subst -,$(space),$r))) \
+		$(eval $(required_target)_GROUP ?= external) \
+		$(eval _dotgroups += $($(required_target)_GROUP)) \
+		$(eval cluster_$($(required_target)_GROUP)_TARGETS += $(required_target)))) \
+$(eval _dotgroups := $(sort $(_dotgroups)))
+$(eval _dotgroups := $(_groups) $(_dotgroups))
+endif
+
+
 $(info // ------------------------------------------------------------)
 $(info // dot-code by BOB)
 $(info // ------------------------------------------------------------)
 $(call dot_print_header)
-$(call dot_print_nodes,$(_dottargets),_REQUIRES)
-$(call dot_print_edges,$(_dottargets),_REQUIRES)
+ifdef groups
+  $(call dot_print_cluster_nodes,$(_dottargets),_TARGETS, $(_dotgroups)) \
+  $(call dot_print_cluster_edges,$(_dottargets),_TARGETS, $(_dotgroups))
+else
+  $(call dot_print_target_nodes,$(_dottargets),_REQUIRES)
+  $(call dot_print_edges,$(_dottargets),_REQUIRES)
+endif
 $(call dot_print_footer)
-
 endif

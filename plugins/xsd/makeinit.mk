@@ -10,7 +10,7 @@
 
 
 # *** XSD VARIABLES ***
-XSDCXX ?= $(shell which xsd)
+XSDCXX ?= $(firstword $(wildcard $(shell type -p xsd) $(shell type -p xsdcxx)))
 
 # *** XSD MACROS ***
 # Create headers according to transformation rules.
@@ -38,26 +38,24 @@ $(DESTDIR)$(datadir)/schema/%.xsd:
 	$(call pretty_print_installation)
 	@$(INSTALL_DATA) $< $@
 
-# Add license text when we have a license.
+# Add license text by using these options in a nifty way.
 #
 # 	--cxx-prologue ...
 # 	--hxx-prologue ...
-#
-
 
 .PHONY: help-plugin-xsd
 help-plugin-xsd:
 	@echo -e \
 	"\n XSD schema generated source files                                      " \
 	"\n------------------------------------------------------------------------" \
-	"\n  To add a schema to a target assign <T>_XSD_SRCS. All schemas must"			 \
-	"\n  reside in directory 'schema' in the targets module directory. The"			 \
-	"\n  generated files are put in the corresponding directory below obj and"	 \
-	"\n  are named <schema_name>.xsd.h and <schema_name>.xsd.cpp."							 \
-	"\n"																																				 \
-	"\n  The generated header file must be included as:"												 \
-	"\n  #include \"schema/<schema_name>.xsd.h\""																 \
-	"\n"																																				 \
+	"\n  To add a schema to a target assign <T>_XSD_SRCS. All schemas must"      \
+	"\n  reside in directory 'schema' in the targets module directory. The"      \
+	"\n  generated files are put in the corresponding directory below obj and"   \
+	"\n  are named <schema_name>.xsd.h and <schema_name>.xsd.cpp."               \
+	"\n"                                                                         \
+	"\n  The generated header file must be included as:"                         \
+	"\n  #include \"schema/<schema_name>.xsd.h\""                                \
+	"\n"                                                                         \
 	"\n  Flags to xsd are added per target via <T>_XSDFLAGS, and via _XSDFLAGS"  \
 	"\n  for all targets in the current $(RULES)."                               \
 	"\n"

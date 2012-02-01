@@ -31,29 +31,22 @@
 # All object files must go into a different directory then the cpp-file, thus
 # the builtin implicit rules needs modification. The __target_CXXFLAGS are
 # dependents of each specific target which are setup by macros during parsing.
-$(OBJDIR)/%.o:$(OBJDIR)/%.cpp | $$(@D)/.stamp
-	@echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)"
-	$(COMPILE.cpp) $(__target_CXXFLAGS) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%.o:$(OBJDIR)/%.c | $$(@D)/.stamp
-	@echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)"
-	$(COMPILE.c) $(__target_CXXFLAGS) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%.o:%.cpp | $$(@D)/.stamp
-	@echo "$(C_PREFIX) [$(dir $<)] $(@F)"
-	$(COMPILE.cpp) $(__target_CXXFLAGS) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%.o:%.cc | $$(@D)/.stamp
-	@echo "$(C_PREFIX) [$(dir $<)] $(@F)"
-	$(COMPILE.cpp) $(__target_CXXFLAGS) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%.o:%.c | $$(@D)/.stamp
-	@echo "$(C_PREFIX) [$(dir $<)] $(@F)"
-	$(COMPILE.c) $(__target_CFLAGS) $(OUTPUT_OPTION) $<
-
+$(OBJDIR)/%.o:$(OBJDIR)/%.cpp | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+$(OBJDIR)/%.o:$(OBJDIR)/%.c   | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.c) $(__target_CXXFLAGS) $(_o) $@ $<
+$(OBJDIR)/%.o:%.cpp | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+$(OBJDIR)/%.o:%.cc  | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+$(OBJDIR)/%.o:%.c   | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.c) $(__target_CFLAGS) $(_o) $@ $<
 
 # *** SHARED PLUGIN LIBRARIES ***
 # Target for building plugins, almost as ordinary DSOs. Plugins does not have a
 # so-name containing the version number.
-$(TGTDIR)/%plugin.so:
-	@echo "$(L_PREFIX) Linking plugin $(notdir $@)"
-	$(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(OUTPUT_OPTION) $(SONAMEFLAG:<soname>=$(notdir $@)) $(filter %.o,$^) $(__target_LDFLAGS);
+$(TGTDIR)/%plugin.so: | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(L_PREFIX) Plugin  $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@ $(SONAMEFLAG:<soname>=$(notdir $@)) $(filter %.o,$^) $(__target_LDFLAGS);
 
 
 # *** SHARED LIBRARIES ***
@@ -63,50 +56,51 @@ $(TGTDIR)/%.so: SOMAJOR = $(word 1,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOMINOR = $(word 2,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOPATCH = $(word 3,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so:
-	@echo "$(L_PREFIX) Linking shared library $(notdir $@)"
-	$(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(OUTPUT_OPTION).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SOBASE).$(SOMAJOR)) $(filter %.o,$^) $(__target_LDFLAGS);
+	$(if $(__bobSILENT),echo "$(L_PREFIX) DSO     $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SOBASE).$(SOMAJOR)) $(filter %.o,$^) $(__target_LDFLAGS);
 	@[ -e $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) ] \
 	&& $(__bobLN) $(notdir $@).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $@.$(SOMAJOR) \
 	&& $(__bobLN) $(notdir $@).$(SOMAJOR) $@;
 
 
 # *** ARCHIVES ***
-$(TGTDIR)/%.a:
-	@echo "$(L_PREFIX) Creating archive $(notdir $@)"
-	$(ARCREATE) $@ $(filter %.o,$^)
+$(TGTDIR)/%.a: | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(L_PREFIX) Archive $(notdir $@)";) $(ARCREATE) $@ $(filter %.o,$^)
 
 
 # *** ADA EXECUTABLES ***
 # Target for building targets from ada files. This is a compile-and-link target,
 # thus; no corresponding compile rules exists.
-$(TGTDIR)/%: $$($$(notdir $$@)_SRCDIR)/%.adb $$(@D)/.stamp
-	@echo "$(L_PREFIX) Building and linking $(notdir $@)"
-	mkdir -p $($(@F)_OBJDIR)
-	cd $($(@F)_OBJDIR) && gnatmake -c $(GNATFLAGS) $(__target_GNATFLAGS) $($(@F)_INCL) $(_I)$(abspath $($(@F)_SRCDIR)) $(_I)$(abspath $($(@F)_SRCDIR))/include $(_I)$(abspath $($(@F)_SRCDIR))/include_internal $(__ALL_INCL) -gnato -gnatf -gnatn $(@F)
-	cd $($(@F)_OBJDIR) && gnatbind $(@F)
+$(TGTDIR)/%: $$($$(notdir $$@)_SRCDIR)/%.adb | $$(@D)._INSTALL_DIRECTORY
+	@echo "$(L_PREFIX) Building and linking $(notdir $@)"; \
+	mkdir -p $($(@F)_OBJDIR); \
+	cd $($(@F)_OBJDIR) && gnatmake -c $(GNATFLAGS) $(__target_GNATFLAGS) $($(@F)_INCL) $(_I)$(abspath $($(@F)_SRCDIR)) $(_I)$(abspath $($(@F)_SRCDIR))/include $(_I)$(abspath $($(@F)_SRCDIR))/include_internal $(__ALL_INCL) -gnato -gnatf -gnatn $(@F); \
+	cd $($(@F)_OBJDIR) && gnatbind $(@F); \
 	cd $($(@F)_OBJDIR) && gnatlink $(GNATFLAGS) $(__target_GNATFLAGS) -o $(abspath $@) $(@F).ali -L$(TGTDIR) $($(notdir $@)_LDFLAGS) $($(notdir $@)_LIBS) $($(notdir $@)_LINK) $(__ALL_LIBS)
 
 
 # *** EXECUTABLES ***
 # Target for building executables from .o-files and LIBS
-$(TGTDIR)/%:
-	@echo "$(L_PREFIX) Linking Executable $(notdir $@)"
-	$(LINK.cc) $(__target_IMOPTFLAGS) $(OUTPUT_OPTION) $(filter %.o,$^) $(__target_LDFLAGS)
+$(TGTDIR)/%: | $$(@D)._INSTALL_DIRECTORY
+	$(if $(__bobSILENT),echo "$(L_PREFIX) Exec    $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(_o) $@ $(filter %.o,$^) $(__target_LDFLAGS)
 
 
 # *** INSTALLS ***
+# Macro for pretty-printing installations
+define pretty_print_installation
+$(if $(__bobSILENT),@,@echo "$(I_PREFIX) $(subst $(builddir)/,,$< $(dir $@))";)
+endef
 # Target for installing stuff.
 $(DESTDIR)$(bindir)/%: $(TGTDIR)/% | $(DESTDIR)$(bindir)
-	@$(INSTALL_EXEC) $< $@;
+	$(call pretty_print_installation)$(INSTALL_EXEC) $< $@
 
 $(DESTDIR)$(sbindir)/%: $(TGTDIR)/% | $(DESTDIR)$(sbindir)
-	@$(INSTALL_EXEC) $< $@;
+	$(call pretty_print_installation)$(INSTALL_EXEC) $< $@
 
 $(DESTDIR)$(libdir)/%.so: $(TGTDIR)/%.so | $(DESTDIR)$(libdir)
-	@$(__bobRSYNC) $<* $(dir $@);
+	$(call pretty_print_installation)$(__bobRSYNC) $<* $(dir $@)
 
 $(DESTDIR)$(libdir)/%.a: $(TGTDIR)/%.a | $(DESTDIR)$(libdir)
-	@$(INSTALL_DATA) $< $@;
+	$(call pretty_print_installation)$(INSTALL_DATA) $< $@
 
 
 # *** DIRECTORY INSTALLS ***
@@ -124,11 +118,9 @@ $(DESTDIR)$(sysconfdir) 			\
 $(DESTDIR)$(localstatedir)		\
 $(TGTDIR)											\
 $(OBJDIR):
-	@echo "$(I_PREFIX) Creating directory $(subst $(builddir)/,,$@)"; \
-	$(INSTALL_DIRS) $@;
+	@echo "$(I_PREFIX) Directory $(subst $(builddir)/,,$@)"; \
+	$(INSTALL_DIRS) $@
 
 # *** Alternative version of directory install...
 %._INSTALL_DIRECTORY:
-	@if [ ! -d $* ]; then \
-	echo "$(I_PREFIX) Creating directory $*"; \
-	$(INSTALL_DIRS) $(patsubst %._INSTALL_DIRECTORY,%,$@); fi
+	@if [ ! -d $* ]; then $(INSTALL_DIRS) $*; fi

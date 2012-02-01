@@ -17,6 +17,8 @@ else
 BOBHOME := $(abspath $(BOBHOME))
 endif
 
+.PHONY: $(BOBHOME)/Makefile
+
 # Enabled plugins and plugin files.
 __bobPLUGINDIR := $(BOBHOME)/plugins
 BOBPLUGINS     := $(BOBPLUGINS) dotgraph test qacpp xsd
@@ -36,6 +38,7 @@ FOOTER_BUILD	:= $(BOBHOME)/makefooter.mk
 HEADER_INFO		:= $(BOBHOME)/makeheader_info.mk
 FOOTER_INFO		:= $(BOBHOME)/makefooter_info.mk
 RULES					:= makerules.mk
+INFOS					:= makeinfo.mk
 
 .PHONY: \
 	$(BOBHOME)/makeheader.mk \
@@ -45,9 +48,9 @@ RULES					:= makerules.mk
 # ******************************************************************************
 
 
-# Prefixes for output. The prefixes are used to present different types of
-# output. All prefixes are themselves prefixed with __bobPREFIX., which
-# contains the name of the current module.
+# Prefixes for output written by info or error. The prefixes are used to present
+# different types of output. All prefixes are themselves prefixed with
+# __bobPREFIX.
 # ******************************************************************************
 __bobPREFIX := $(space)[$(lastword $(subst /, ,$(dir $(realpath $(firstword $(MAKEFILE_LIST))))))]
 PREFIX   := $(__bobPREFIX)
@@ -64,6 +67,9 @@ V_PREFIX := $(__bobPREFIX) VV# Test output
 
 # Options and environment configuration.
 # ******************************************************************************
+# Store some makeflags into a bob variable.
+$(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
+$(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
 export PLATFORM ?= $(shell uname -s)
 
 
@@ -75,26 +81,19 @@ ifeq "$(SHELL)" ""
 $(error Cannot find bash! Bob must have a proper shell, sorry)
 endif
 
-# We use ifndef to make sure the shell command is NOT executed more then
-# necessary. It seems like rhs is expanded before ?= takes effect.
-ifndef __bobguard_INTERNAL_COMMANDS
-export __bobguard_INTERNAL_COMMANDS := 1
-export __bobRSYNC         ?= $(shell which rsync) -qcplr
-export __bobRSYNC_exclude := --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
-export __bobRPMBUILD      ?= $(shell which rpmbuild)
-export __bobCPPCHECK      ?= $(shell which cppcheck)
-export __bobTAR           ?= $(shell which tar)
-export __bobLN            ?= $(shell which ln) -sf
-export __bobFIND          ?= $(shell which find)
-export __bobAWK           ?= $(shell which gawk)
-export __bobSVN           ?= $(shell which svn)
-export __bobPRINTF        ?= $(shell which printf)
-export __bobINSTALL       ?= $(shell which install)
+export __bobRSYNC         ?= $(shell type -p rsync) -quplr
+export __bobRSYNC_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
+export __bobRPMBUILD      ?= $(shell type -p rpmbuild)
+export __bobCPPCHECK      ?= $(shell type -p cppcheck)
+export __bobTAR           ?= $(shell type -p tar)
+export __bobLN            ?= $(shell type -p ln) -sf
+export __bobFIND          ?= $(shell type -p find)
+export __bobAWK           ?= $(shell type -p gawk)
+export __bobSVN           ?= $(shell type -p svn)
+export __bobPRINTF        ?= $(shell type -p printf)
+export __bobDOXYGEN       ?= $(shell type -p doxygen)
+export __bobINSTALL       ?= $(shell type -p install)
 export __bobINSTALL_HDR   ?= $(__bobINSTALL) -Dm644
-endif
-
-ifndef __bobguard_EXTERNAL_COMMANDS
-export __bobguard_EXTERNAL_COMMANDS := 1
 export INSTALL            ?= $(__bobINSTALL)
 export INSTALL_EXEC       ?= $(INSTALL) -Dm755
 export INSTALL_DATA       ?= $(INSTALL) -Dm644
@@ -102,11 +101,11 @@ export INSTALL_DIRS       ?= $(INSTALL) -d
 export INSTALL_FILES      ?= $(__bobRSYNC) $(__bobRSYNC_exclude)
 export AWK                ?= $(__bobAWK)
 export TAR                ?= $(__bobTAR)
-export MOC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/moc))
-export UIC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/uic))
-export MOC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc))
-export UIC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic))
-endif
+export MOC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
+export UIC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/uic)  $(shell type -p uic-qt3))
+export MOC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc) $(shell type -p moc-qt4))
+export UIC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic) $(shell type -p uic-qt4))
+export RCC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc) $(shell type -p rcc-qt4))
 
 # Havings and no havings ...
 ifneq "$(__bobRPMBUILD)" ""
@@ -115,17 +114,18 @@ endif
 ifneq "$(__bobTAR)" ""
 override __bob_have_feature_tar := 1
 endif
-ifneq "$(__bobSVN)" ""
-override __bob_have_feature_svn := 1
+ifneq "$(__bobDOXYGEN)" ""
+override __bob_have_feature_doxygen := 1
 endif
 ifneq "$(__bobCPPCHECK)" ""
 override __bob_have_feature_cppcheck := 1
-export CPPCHECKFLAGS := -q -j4
+export CPPCHECKFLAGS ?= -q --enable=style --suppress="missingInclude"
 endif
 
 # Exception for SunOS.
 ifeq "$(PLATFORM)" "SunOS"
-INSTALL          := $(shell which ginstall)
+export INSTALL          := $(shell type -p ginstall)
+export __bobFIND        := $(shell type -p gfind)
 ifeq "$(firstword $(INSTALL))" "no"
 $(error No ginstall available)
 endif
@@ -227,43 +227,14 @@ __bobLINKTYPE := $(linktype)
 # ******************************************************************************
 
 
-
-# Directory configuration
-#
-# Specifying srcdir is highly unlikely. It is only used for printing out some
-# help. On the other hand setting builddir is most usefull. Pointing it to
-# /dev/shm could speed up builds on slow filesystems.
-#
-# TGTDIR and OBJDIR are the work horses, they depend on platform and buildtype
-# to make sure object files from different builds and platforms not get
-# intermixed. Building on multiple platforms at the same time shall be
-# possible.
-#
-# Porr mans distcc can be achived by logging in on two simliar systems,
-# e.g. Linux, and building a release. You will most likely bork some .o-files,
-# but hey, it might speed things up.
-#
+# Source and build directory base references, user setable.
 # ******************************************************************************
-ifndef __bobguard_DIRECTORIES
-export __bobguard_DIRECTORIES := 1
 override srcdir   := $(abspath $(if $(srcdir),$(srcdir),.))
 override builddir := $(abspath $(if $(builddir),$(builddir),.))
-export TGTBASE 		:= $(abspath $(builddir)/tgt)
-export OBJBASE 		:= $(abspath $(builddir)/obj)
-export DOCBASE 		:= $(abspath $(builddir)/doc)
-export TGTDIR  		:= $(TGTBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
-export OBJDIR  		:= $(OBJBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
-export DOCDIR  		:= $(DOCBASE)/generated
-endif
 # ******************************************************************************
-
 
 
 # Installation directory configuration
-#
-# The purpose is to mimic the GNU directory layout. But we use a company
-# default prefix.
-#
 # ******************************************************************************
 ifdef DESTDIR
 override DESTDIR := $(abspath $(DESTDIR))/
@@ -277,8 +248,6 @@ else
 prefix := /opt/saab
 endif
 
-ifndef __bobguard_INSTALL_DIRECTORIES
-export __bobguard_INSTALL_DIRECTORIES := 1
 export exec_prefix     ?= $(prefix)
 export bindir          ?= $(exec_prefix)/bin
 export sbindir         ?= $(exec_prefix)/sbin
@@ -293,7 +262,6 @@ export mandir          ?= $(datarootdir)/man
 export localstatedir   ?= $(prefix)/var
 export man1dir         ?= $(mandir)/man1
 export applicationsdir ?= $(datadir)/applications
-endif
 # ******************************************************************************
 
 
@@ -311,24 +279,55 @@ endif
 # ******************************************************************************
 # Default target is to say that there is no such target.
 .DEFAULT:
-	@echo " $(__bobPREFIX) No target ... \"$@\""
+	@echo " $(__bobPREFIX) No target \"$@\""
 # Default is to build the all entry, to which all default targets shall be
-# connected. Target 'install' depends on 'all' and so fort. (Though all is a
-# bad name, it should actually be build).
+# connected. Target 'install' depends on 'all'.
+ifdef BOB.TEST
+default: all test
+else
 default: all
+endif
 # ******************************************************************************
 
 
 # Common (generic) macros.
+.PHONY: $(BOBHOME)/Makefile.common.mk
 include $(BOBHOME)/Makefile.common.mk
 
 
-# If there is a makerules.mk file this is, or should be, a bob project. Then
-# perform an ordinary build. Else assume this is a meta build and use another
-# entry point.
+# Bob archive me target, put in a if-else to speed up the archiving procedure.
+# ******************************************************************************
+ifneq "$(filter bob.%,$(MAKECMDGOALS))" ""
+# Use different prefix when in info mode
+__bobPREFIX := " [bob]"
+bob.package:
+	@echo "$(__bobPREFIX) Creating BOB-package from $(BOBHOME)"; \
+	$(TAR) -C $${BOBHOME%/*} \
+		--exclude "*/.git*" \
+		--exclude "*/.svn*" \
+		--exclude "*~" \
+		-pzcf $(PWD)/$@.tar.gz $${BOBHOME##*/}
+
+bob.info:
+	@echo -e \
+	"$(__bobPREFIX) Path:    $(BOBHOME)\n"\
+	"$(__bobPREFIX) Plugins: $(strip $(sort $(BOBPLUGINS)))"
+
+else
+# Extract name, version and release, the N,V,R tuple, from the makerules.mk
+# file. If that file does not exist. Try finding makerules.mk files in
+# subdirectories, then start a meta build project.
 # ******************************************************************************
 ifneq "$(firstword $(wildcard $(RULES)))" ""
+.PHONY: $(BOBHOME)/Makefile.build.mk
 include $(BOBHOME)/Makefile.build.mk
 else
+.PHONY: $(BOBHOME)/Makefile.meta.mk
 include $(BOBHOME)/Makefile.meta.mk
 endif
+endif
+
+
+# Trival target to start parsing, used for performance testing.
+.PHONY: parseonly
+parseonly:;

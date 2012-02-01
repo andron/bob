@@ -9,14 +9,18 @@
 # without any warranty.
 
 
-# Allowed test classes. Regression, test-driven-development and temporary.
-__bob_test_classes := reg tdd tmp
+# *** TEST VARIABLES ***
+__bob_test_classes := reg tdd mod tmp
+
+# *** TEST MACROS ***
+define __bob_test_templ
+$(addsuffix .%,$(addprefix $1.,$(__bob_test_classes)))
+endef
 
 # Test and Check entries
 # ******************************************************************************
 # Test and check depends on the corresponding classes.
-test check: $(addprefix $$@.,$(__bob_test_classes))
-	@echo "$(X_PREFIX) $@ completed"
+test check: $(addprefix $$@.,$(__bob_test_classes));
 
 # The subclasses does nothing, different build target are just connected to it
 # in the plugin footer to trigger the build.
@@ -41,7 +45,7 @@ __execute.%: test.%
 	retval=0; \
 	test=$(TGTDIR)/$<; \
 	if [ -f $$test ]; then \
-		$$test $($<_ARGUMENTS); \
+		$(TST_WRAPPER) $$test $($<_ARGUMENTS); \
 		if [ $$? == 0 ]; then \
 			echo "$(X_PREFIX) `basename $$test`:OK"; \
 		else \
@@ -64,5 +68,4 @@ help-plugin-test:
 	@echo -e \
 	"\n TEST plugin"                                                             \
 	"\n------------------------------------------------------------------------" \
-	"\n  Test ..."                                                               \
 	"\n"
