@@ -69,7 +69,7 @@ _I := -I
 _L := -L
 
 ifeq "$(PLATFORM)" "Linux"
-override LDFLAGS    := $(LDFLAGS) -Wl,--as-needed
+override LDFLAGS    := $(LDFLAGS)
 SONAMEFLAG          := -Wl,-h<soname>
 WHOLEEXTRACTFLAG    := -Wl,-whole-archive
 NO_WHOLEEXTRACTFLAG := -Wl,-no-whole-archive
