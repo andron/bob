@@ -1,20 +1,103 @@
 # -*- mode:sh -*-
 
-# Rudimentary autocompletion, just to get started.
+# Basic autocompletion.
 
-__bob_commands="all install software-install package rpm clean distclean help linkgraph requiregraph"
+declare -a bobtargets
+bobtargets=(all install software-install package rpm clean distclean help linkgraph requiregraph)
 
-complete -o bashdefault -o default -o nospace -F __bob_make make
+declare -a bobtestclasses
+bobtestclasses=(tmp reg mod tdd bdd)
+for t in ${bobtestclasses[*]}; do
+	bobtargets+=(test.$t)
+	bobtargets+=(check.$t)
+done
 
-function __bob_make()
+declare -a bobvariables
+bobvariables=(SOFTWARE_HOMES=)
+
+complete -o bashdefault -o default -F __bob make
+
+function __bob_variable_compl()
+{
+	compopt -o nospace
+	COMPREPLY=($(compgen -W "$1" -- $cur))
+}
+
+function __bob_install()
+{
+	__bob_variable_compl "prefix="
+}
+
+function __bob_software_install()
+{
+	__bob_variable_compl "software-prefix="
+}
+
+function __bob_linkgraph()
+{
+	__bob_variable_compl "targets="
+}
+
+function __bob_requiregraph()
+{
+	__bob_variable_compl "targets= requires= groups="
+}
+
+function __bob_rpm()
+{
+	__bob_variable_compl "RPM_USER_ROOT= RPM_BUILD_DEFINES= RPM_BUILD_WITHS="
+}
+
+function __bob()
 {
 	local cmd=${COMP_WORDS[0]}
 	local cur=${COMP_WORDS[COMP_CWORD]}
 	local prv=${COMP_WORDS[COMP_CWORD-1]}
 	local num=${#COMP_WORDS[*]}
 
-	# Very simple completion.
-	COMPREPLY=($(compgen -W "$__bob_commands" -- $cur))	
+	local target
+	local c=1
+	while [ $c -lt $COMP_CWORD ]; do
+		local t=${COMP_WORDS[c]}
+		case "$t" in
+			"*=")
+				;;
+			*)
+				target=$t; break
+				;;
+		esac
+		c=$((++c))
+	done
 
-	return 0
+	if [ -n "$__bob_completion_debug" ]; then
+		echo -e "\n========================================"
+		echo "#cmd:$cmd"
+		echo "#cur:$cur"
+		echo "#prv:$prv"
+		echo "#CMP:$COMP_CWORD"
+		echo "#${COMP_WORDS[*]}"
+		echo "#$target"
+		echo -e "========================================"
+	fi
+
+	if [ -z "$target" ]; then
+		case "$cur" in
+			[[:upper:]]*)
+				compopt -o nospace
+				COMPREPLY=($(compgen -W "${bobvariables[*]}" -- $cur))
+				;;
+			[[:alpha:]]*)
+				compopt +o nospace
+				COMPREPLY=($(compgen -W "${bobtargets[*]}" -- $cur))
+				;;
+			*)
+				compopt +o nospace
+				COMPREPLY=($(compgen -W "${bobtargets[*]} ${bobvariables[*]}" -- $cur))
+				;;
+		esac
+		return
+	fi
+
+	local func=__bob_${target//-/_}
+	declare -f $func >/dev/null && $func && return
 }
