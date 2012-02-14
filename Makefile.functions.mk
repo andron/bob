@@ -260,11 +260,13 @@ endef
 
 # $1: List of targets -- $2: Module name
 define setup_resource_rules_qt4
+$(eval __PartName := $(if $(findstring .,$2),$(NAME),$2))
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_RCC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_rcc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $($2_OBJDIR)/.stamp
-		@echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)"; \
-		$(__bob.cmd.rcc4) $$< $$(OUTPUT_OPTION)))
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)";) \
+		grep file $$< | sed -e "s|<file>|$$@: $$(dir $$<)|" -e "s|</file>||" > $($2_OBJDIR)$(notdir $(t)).d; \
+		$(__bob.cmd.rcc4) -name $(__PartName) $$< $$(OUTPUT_OPTION)))
 endef
 # ******************************************************************************
 
