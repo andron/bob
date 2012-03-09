@@ -626,12 +626,8 @@ $(TGTDIR)/$1: __target_CFLAGS    = $(call __target_def,$1,$2) $(call __target_in
 $(TGTDIR)/$1: __target_CXXFLAGS  = $(call __target_def,$1,$2) $(call __target_inc,$1,$2) $$($1_CXXFLAGS) $(_CXXFLAGS)
 $(TGTDIR)/$1: __target_LDFLAGS   = $(_L)$(TGTDIR) $$($1_LDFLAGS) $(_LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK)
 $(TGTDIR)/$1: __target_GNATFLAGS = $$($1_GNATFLAGS)
-# If inter-module optimization is wanted, only depend on the source files, else
-# ordinary deps on o-files.
-$(if $(or $(with_imopt),$(findstring imopt,$($1_FEATURES))),
-$(TGTDIR)/$1: $($1_SRCS)
-$(TGTDIR)/$1: __target_imopt_flags = $($1_CXXFLAGS) $($1_CFLAGS),
-$(TGTDIR)/$1: $($1_OBJS))
+# Depend on .o-files
+$(TGTDIR)/$1: $($1_OBJS)
 # DSOs needs special care:
 # * Setup a variable for the DSOs interface directory.
 # * Setup the version variable if not set.
