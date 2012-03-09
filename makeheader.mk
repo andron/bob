@@ -44,6 +44,7 @@ _DEFINES :=
 _LDFLAGS :=
 _LIBS :=
 _INCL :=
+_LINK :=
 
 # The full module name, i.e. the name reflects a complete path.
 _MODULE_FULLNAME := $(subst /,-,$(patsubst %/,%,$(_SRCDIR)))
