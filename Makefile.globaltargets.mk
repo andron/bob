@@ -55,7 +55,7 @@ $(TGTDIR)/%.so: SOBASE  = $(if $(findstring file,$(origin $(notdir $@)_SOBASE)),
 $(TGTDIR)/%.so: SOMAJOR = $(word 1,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOMINOR = $(word 2,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOPATCH = $(word 3,$(subst ., ,$($(notdir $@)_VERSION)))
-$(TGTDIR)/%.so:
+$(TGTDIR)/%.so: | $$(@D)._INSTALL_DIRECTORY
 	$(if $(__bobSILENT),echo "$(L_PREFIX) DSO     $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SOBASE).$(SOMAJOR)) $(filter %.o,$^) $(__target_LDFLAGS);
 	@[ -e $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) ] \
 	&& $(__bob.cmd.ln) $(notdir $@).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $@.$(SOMAJOR) \
