@@ -209,20 +209,20 @@ define setup_forms_rules_qt3
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing $$(@F)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Mocing $$(@F)";) \
 		$(__bob.cmd.moc3) -f $$< $$(OUTPUT_OPTION))) \
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing header $$(@F)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Uicing header $$(@F)";) \
 		$(__bob.cmd.uic3) $$< $$(OUTPUT_OPTION))
 
 # Each ui-source file shall depend on its corresponding headerfile, which was
 # generated and put in the objectdir.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)";) \
 		$$(__bob.cmd.uic3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
 
 # Each ui-moc-source file shall depend on its corresponding headerfile, which
@@ -231,7 +231,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # onces, and then the recipie must contain both commands.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_moc_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)";) \
 		$(__bob.cmd.moc3) -f $$< $$(OUTPUT_OPTION)))
 endef
 
@@ -249,13 +249,13 @@ define setup_forms_rules_qt4
 $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(f)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Mocing $$(@F) ($1)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Mocing $$(@F) ($1)";) \
 		$(__bob.cmd.moc4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
 $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(f)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
-		@echo "$(C_PREFIX) [$2] Uicing $$(@F) ($1)"; \
+		$(if $(__bobSILENT),echo "$(C_PREFIX) [$2] Uicing $$(@F) ($1)";) \
 		$(__bob.cmd.uic4) $$< $$(OUTPUT_OPTION)))
 endef
 
