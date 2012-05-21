@@ -77,7 +77,8 @@ $(_MODULE).check.mod: check.mod_$($(NAME)_FEATNAME)
 	install_$($(NAME)_FEATNAME)   \
 	clean_$($(NAME)_FEATNAME)     \
 	distclean_$($(NAME)_FEATNAME) \
-	cppcheck_$($(NAME)_FEATNAME)
+	cppcheck_$($(NAME)_FEATNAME) \
+	$(_MODULE).%
 
 ifdef __bob_have_feature_cppcheck
 $(_MODULE).cppcheck: cppcheck_$($(NAME)_FEATNAME)
