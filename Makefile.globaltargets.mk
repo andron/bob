@@ -34,7 +34,7 @@
 $(OBJDIR)/%.o:$(OBJDIR)/%.cpp | $$(@D)._INSTALL_DIRECTORY
 	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
 $(OBJDIR)/%.o:$(OBJDIR)/%.c   | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.c) $(__target_CXXFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.c) $(__target_CFLAGS) $(_o) $@ $<
 $(OBJDIR)/%.o:%.cpp | $$(@D)._INSTALL_DIRECTORY
 	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
 $(OBJDIR)/%.o:%.cc  | $$(@D)._INSTALL_DIRECTORY
