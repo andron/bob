@@ -37,19 +37,6 @@ __requires := $(REQUIRES)
 HEADER := $(HEADER_BUILD)
 FOOTER := $(FOOTER_BUILD)
 
-# Before we build override __COMPONENTS_HOME.
-ifdef __COMPONENTS_HOME
-$(info $(W_PREFIX) Use the SOFTWARE_HOMES method instead of __COMPONENTS_HOME)
-$(info $(W_PREFIX) The __COMPONENTS_HOME variable clobbers the makerules.mk-files)
-$(shell sleep 3)
-endif
-ifdef __ALL_HOME
-ifdef __COMPONENTS_HOME
-$(info $(W_PREFIX) Both __ALL_HOME and __COMPONENTS_HOME are set, __ALL_HOME overrides.)
-endif
-override __COMPONENTS_HOME :=
-endif
-
 __bobBUILDSTAGE := 1
 
 # Default targets, which are all double-colon so that each module can add more
