@@ -170,10 +170,10 @@ endif
 # ******************************************************************************
 ifdef BOBPLUGINS
 __bob_plugins := $(addprefix $(__bobPLUGINDIR)/,$(BOBPLUGINS))
-override __bobPLUGINSINITS   := $(wildcard $(addsuffix /$(PLUGININIT),$(__bob_plugins)))
-override __bobPLUGINSHEADERS := $(wildcard $(addsuffix /$(PLUGINHEAD),$(__bob_plugins)))
-override __bobPLUGINSFOOTERS := $(wildcard $(addsuffix /$(PLUGINFOOT),$(__bob_plugins)))
-override __bobPLUGINSPOSTS   := $(wildcard $(addsuffix /$(PLUGINPOST),$(__bob_plugins)))
+override __bobPLUGINSINITS   := $(wildcard $(addsuffix /$(__bobPLUGININIT),$(__bob_plugins)))
+override __bobPLUGINSHEADERS := $(wildcard $(addsuffix /$(__bobPLUGINHEAD),$(__bob_plugins)))
+override __bobPLUGINSFOOTERS := $(wildcard $(addsuffix /$(__bobPLUGINFOOT),$(__bob_plugins)))
+override __bobPLUGINSPOSTS   := $(wildcard $(addsuffix /$(__bobPLUGINPOST),$(__bob_plugins)))
 .PHONY: $(__bobPLUGINSINITS) $(__bobPLUGINSHEADERS) $(__bobPLUGINSFOOTERS) $(__bobPLUGINSPOSTS)
 MAKEFILE_LIST :=
 -include $(__bobPLUGINSINITS)
@@ -190,18 +190,26 @@ $(if $(filter $(disablecheckfor) \
 	doc rpmenv buildinfo package distclean clean clean-% \
 	cm-% %.spec help% linkgraph% requiregraph%,$(MAKECMDGOALS)),\
 	$(eval __bobDISABLECHECKREQUIREMENTS := yes))
+# If distclean is requested disable further inclusion of makerules files.
 $(if $(filter distclean,$(MAKECMDGOALS)),\
 	$(eval RULES :=))
+
+
+# Include the first rules file, this is where the parsing begins.
+# ******************************************************************************
 MAKEFILE_LIST :=
 -include $(RULES)
 
 
-# Include "global" target specifications.
+# Include "global" target specifications. This file mostly includes targets
+# for compiling and linking, but also some target for creating directories and
+# other temporary artifacts.
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.globaltargets.mk
 include $(BOBHOME)/Makefile.globaltargets.mk
 
-# Helper targets for various stuff.
+# Helper targets for various stuff. Target for tar and rpm for example. This
+# could go into the globaltargets file.
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.helpertargets.mk
 include $(BOBHOME)/Makefile.helpertargets.mk
@@ -224,8 +232,6 @@ $(call pp_setup_prepost_dependency_targets,$(__bobLIST_TARGETS))
 
 # Include all .d-files. This is handled via setup_target.
 %.d:;
-#MAKEFILE_LIST :=
-#-include $(addsuffix .d,$(basename $(__bobLIST_ALLOBJECTS)))
 
 
 # Help targets, defined elsewhere to stay "non-gloggy". This part is placed

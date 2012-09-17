@@ -19,24 +19,6 @@
 
 # Helper macros
 # ------------------------------------------------------------------------------
-# Filter sources from various files which should not be there.  Currently only
-# %.a are filtered. A special case for constructing targets from only archives
-# was needed and those archives are not available at parse time and their
-# existence cannot therefore not be checked.
-#
-# $1: File list
-define __bob_filter_sources
-$(filter-out %.a,$1)
-endef
-
-# Returns a list of names which do not exist on disk as files. Used for finding
-# files which does not exist, obviously.
-#
-# $1: Name list (files)
-define __bob_missing_files
-$(subst //,/,$(filter-out $(wildcard $1),$1))
-endef
-
 # Append a directory name $1 before each name in $2, and make sure no dubble
 # slashes exist in the resulting paths.
 #

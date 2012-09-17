@@ -20,12 +20,12 @@ endif
 .PHONY: $(BOBHOME)/Makefile
 
 # Enabled plugins and plugin files.
-__bobPLUGINDIR := $(BOBHOME)/plugins
-BOBPLUGINS     := $(BOBPLUGINS) dotgraph test qacpp xsd
-PLUGININIT     := makeinit.mk
-PLUGINPOST     := makepostprocess.mk
-PLUGINHEAD     := makeheader.mk
-PLUGINFOOT     := makefooter.mk
+__bobPLUGINDIR  := $(BOBHOME)/plugins
+__bobPLUGININIT := makeinit.mk
+__bobPLUGINPOST := makepostprocess.mk
+__bobPLUGINHEAD := makeheader.mk
+__bobPLUGINFOOT := makefooter.mk
+BOBPLUGINS      := $(BOBPLUGINS) dotgraph test qacpp xsd
 
 # Other configuration variables.
 override empty :=
@@ -107,7 +107,8 @@ export MOC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc) $(shell
 export UIC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic) $(shell type -p uic-qt4))
 export RCC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc) $(shell type -p rcc-qt4))
 
-# Havings and no havings ...
+# Havings and no havings. The existance of some commands turns on some extra
+# targets, not really necessary for normal operaion.
 ifneq "$(__bobRPMBUILD)" ""
 override __bob_have_feature_rpm := 1
 endif
@@ -122,7 +123,7 @@ override __bob_have_feature_cppcheck := 1
 export CPPCHECKFLAGS ?= -q --enable=style --suppress="missingInclude"
 endif
 
-# Exception for SunOS.
+# Exceptions for SunOS.
 ifeq "$(PLATFORM)" "SunOS"
 export INSTALL          := $(shell type -p ginstall)
 export __bobFIND        := $(shell type -p gfind)

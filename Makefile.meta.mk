@@ -38,7 +38,7 @@ export prefix := $(abspath $(META_BUILD_ROOT)/install)
 BOBPLUGINS := dotgraph
 ifdef BOBPLUGINS
 BOBPLUGINS := $(addprefix $(__bobPLUGINDIR)/,$(BOBPLUGINS))
--include $(wildcard $(addsuffix /$(PLUGININIT),$(BOBPLUGINS)))
+-include $(wildcard $(addsuffix /$(__bobPLUGININIT),$(BOBPLUGINS)))
 endif
 
 
@@ -202,5 +202,5 @@ $(if $(missmatching_apilevel),\
 # Do all post processing for plugins
 # ******************************************************************************
 ifdef BOBPLUGINS
--include $(wildcard $(addsuffix /$(PLUGINPOST),$(BOBPLUGINS)))
+-include $(wildcard $(addsuffix /$(__bobPLUGINPOST),$(BOBPLUGINS)))
 endif
