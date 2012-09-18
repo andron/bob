@@ -61,13 +61,13 @@ distclean:
 # Install targets
 install: all
 
+
 # "Software install"
-software-prefix := $(component-prefix)
-software-install component-install: \
+software-install: \
 	__latest := $(__name)-$(__version)
-software-install component-install: \
+software-install: \
 	override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
-software-install component-install: all
+software-install: all
 	@-$(MAKE) install prefix=$(prefix); \
 	cd $(prefix)/.. && rm -f latest && ln -sf $(__latest) latest
 
@@ -105,7 +105,7 @@ version:
 
 # Mark all non-file targets as phony.
 .PHONY: \
-	all doc verify install software-install component-install distclean \
+	all doc verify install software-install distclean \
 	clean clean-obj clean-tgt .PRE_ALLTARGETS
 
 # The default all target, no rules.

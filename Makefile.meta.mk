@@ -57,7 +57,7 @@ endif
 
 
 # All main targets for a meta build.
-MAIN_TARGETS := all install software-install component-install $(PASS_TARGETS)
+MAIN_TARGETS := all install software-install $(PASS_TARGETS)
 
 
 # Have rpm or not.
@@ -124,15 +124,7 @@ $(addprefix build_,$(LIST_FEATNAMES)): build_%:
 $(addprefix install_,$(LIST_FEATNAMES)): install_%: build_%
 	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) install prefix=$($*_PREFIX)
 
-# The component install depends on the complete build
-$(addprefix component-install_,$(LIST_FEATNAMES)): component-install_%: install
-	@echo
-	@echo "Target component-{install,prefix} is deprecated. Replace with software-{install,prefix}."
-	@echo
-	@sleep 5
-	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) component-install
-
-# The component install depends on the complete build
+# The software install depends on the normal install.
 $(addprefix software-install_,$(LIST_FEATNAMES)): software-install_%: install
 	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) software-install
 
