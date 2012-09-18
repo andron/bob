@@ -248,20 +248,20 @@ else
 prefix := /opt/saab
 endif
 
-export exec_prefix     ?= $(prefix)
-export bindir          ?= $(exec_prefix)/bin
-export sbindir         ?= $(exec_prefix)/sbin
-export libdir          ?= $(exec_prefix)/lib
-export libexecdir      ?= $(exec_prefix)/libexec
-export sysconfdir      ?= $(prefix)/etc
-export includedir      ?= $(prefix)/include
-export datarootdir     ?= $(prefix)/share
-export datadir         ?= $(datarootdir)
-export docdir          ?= $(datarootdir)/doc
-export mandir          ?= $(datarootdir)/man
-export localstatedir   ?= $(prefix)/var
-export man1dir         ?= $(mandir)/man1
-export applicationsdir ?= $(datadir)/applications
+exec_prefix     ?= $(prefix)
+bindir          ?= $(exec_prefix)/bin
+sbindir         ?= $(exec_prefix)/sbin
+libdir          ?= $(exec_prefix)/lib
+libexecdir      ?= $(exec_prefix)/libexec
+sysconfdir      ?= $(prefix)/etc
+includedir      ?= $(prefix)/include
+datarootdir     ?= $(prefix)/share
+datadir         ?= $(datarootdir)
+docdir          ?= $(datarootdir)/doc
+mandir          ?= $(datarootdir)/man
+localstatedir   ?= $(prefix)/var
+man1dir         ?= $(mandir)/man1
+applicationsdir ?= $(datadir)/applications
 # ******************************************************************************
 
 
