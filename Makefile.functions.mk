@@ -389,11 +389,11 @@ endef
 # ------------------------------------------------------------------------------
 define pp_setup_libbin_paths
 $(eval export __bobLISTHOMELIBS := \
-	$(abspath $(addsuffix /lib,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
+	$(abspath $(addsuffix /lib,$(sort $(__bobLISTALLHOMES)))))\
 $(eval export __bobLISTHOMEBINS := \
-	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
+	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)))))\
 $(eval export __bobLISTHOMEINCL := \
-	$(addprefix $(_I),$(abspath $(addsuffix /include,$(sort $(__bobLISTALLHOMES) $(__ALL_HOME))))))
+	$(addprefix $(_I),$(abspath $(addsuffix /include,$(sort $(__bobLISTALLHOMES))))))
 endef
 
 
@@ -471,9 +471,6 @@ __bob_ALLREQ_INCLPATH :=
 __bob_ALLREQ_LINKPATH :=
 define setup_requires
 $(if $(__bobDISABLECHECKREQUIREMENTS),,\
-$(if $(verbose_requirements_check),\
-	$(info )\
-	$(info $(shell printf " Requirements:")))\
 $(if $(SOFTWARE_HOMES),\
 	$(foreach s,$(patsubst %/,%,$(subst :,$(space),$(SOFTWARE_HOMES))),\
 		$(foreach x,$(notdir $(wildcard $s/*)),\
@@ -481,37 +478,22 @@ $(if $(SOFTWARE_HOMES),\
 			$(if $($(homevariable)),,\
 				$(eval y := $(firstword $(dir $(wildcard $s/$x/include $s/$x/latest/include))))\
 				$(if $y,$(eval $(homevariable) := $y))))))\
-$(if $(__ALL_HOME),\
-	$(eval export __ALL_HOME) \
-	$(if $(and $(wildcard $(__ALL_HOME)/include),$(wildcard $(__ALL_HOME)/lib)),\
-		$(eval override __ALL_INCL := $(_I)$(__ALL_HOME)/include)\
-		$(eval override __ALL_LIBS := $(_L)$(__ALL_HOME)/lib $(__bobRPATH)$(__ALL_HOME)/lib)\
-		$(warning __ALL_HOME defined but not valid, verify existance of subdirs lib and include!)))\
 $(foreach r,$(sort $(REQUIRES)),\
 	$(eval R := $(call __uc,$(call __get_name,$r)))\
 	$(if $(findstring undefined,$(origin $R_HOME)),\
-		$(if $(__ALL_HOME),\
-			$(eval $R_HOME := )\
-			$(if $(verbose_requirements_check),\
-				$(info $(shell printf "   %-28s %s" "$R_HOME ($(origin $R_HOME))" "$(__ALL_HOME)"))),\
-			$(eval requirement_verification_error := yes)\
-			$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" \
-					"$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME"))),\
+		$(eval requirement_verification_error := yes)\
+		$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" "$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME")),\
 		$(eval home := $($R_HOME))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(_I)$(home)/include)\
 		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATH)$(home)/lib)\
 		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
-		$(eval export __bob_ALLREQ_LINKPATH += $($R_LIBS))\
-		$(if $(verbose_requirements_check),\
-			$(info $(shell printf "   %-28s %s" "$R_HOME ($(origin $R_HOME))" "$($R_HOME)"))))\
-	)\
+		$(eval export __bob_ALLREQ_LINKPATH += $($R_LIBS))))\
 $(if $(requirement_verification_error),\
 	$(info $(W_PREFIX) ********************************************************************)\
 	$(info $(W_PREFIX) There are missing build requirements, see the messages above.)\
 	$(info $(W_PREFIX) You must either provide _HOME-variables pointing to already built)\
-	$(info $(W_PREFIX) software or the source itself for it to be built now. Use a recipe)\
-	$(info $(W_PREFIX) or provide the _HOME-variables on the command line.)\
+	$(info $(W_PREFIX) software or the source itself.)\
 	$(info $(W_PREFIX) ********************************************************************)\
 	$(error Missing build requirements error)))
 endef
