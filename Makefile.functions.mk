@@ -397,15 +397,6 @@ $(eval export __bobLISTHOMEINCL := \
 endef
 
 
-# Create dependency from all targets to a postbuild target.
-#
-# $1: List of targets
-# ----------------------------------------------------------------------
-define pp_setup_prepost_dependency_targets
-$(eval $(call __bob_dirprefix,$(TGTDIR),$1): | .PRE_ALLTARGETS)
-endef
-
-
 # For including submodules from a... not submodule. But which could be a
 # submodule itself when related to another parent module... also fix so
 # submodule know which is the current module, i.e. its parent module, which

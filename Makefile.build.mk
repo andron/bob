@@ -106,7 +106,7 @@ version:
 # Mark all non-file targets as phony.
 .PHONY: \
 	all doc verify install software-install distclean \
-	clean clean-obj clean-tgt .PRE_ALLTARGETS
+	clean clean-obj clean-tgt
 
 # The default all target, no rules.
 all: | $(TGTDIR)
@@ -211,10 +211,6 @@ $(call pp_setup_target_link_dependencies,$(__bobLIST_TARGETS))
 
 # Setup all and export all bin and lib paths
 $(call pp_setup_libbin_paths)
-
-# Setup pre and post deps target for doing stuff... of various kind.
-.PRE_ALLTARGETS:
-$(call pp_setup_prepost_dependency_targets,$(__bobLIST_TARGETS))
 
 
 # Include all .d-files. This is handled via setup_target.
