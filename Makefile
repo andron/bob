@@ -71,7 +71,7 @@ V_PREFIX := $(__bobPREFIX) VV# Test output
 $(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
 $(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
 export PLATFORM ?= $(shell uname -s)
-
+export MACHINE  ?= $(shell uname -m)
 
 # External programs configuration.
 # ******************************************************************************
@@ -134,97 +134,40 @@ endif
 # ******************************************************************************
 
 
-# We must know the compiler. Default to gcc, i.e. if make says CC is a default
-# variable (meaning it has not been explicitly set) we pick gcc as our
-# designated source-code mangler. If CC equals CC it cannot have been set
-# explicitly and CC is choosen. If CC is the default, gcc will be picked
-# anyways. Thus this will be consistent, gcc will be picked unless another
-# compiler is set explicitly.
+# Compiler, build and linktypes.
 # ******************************************************************************
-ifneq "$(origin CC)" "default"
-$(info $(PREFIX) Overriding compiler CC=$(CC))
-__bobtestcompiler := 1
-else
-CC=gcc
-endif
-
-ifneq "$(origin CXX)" "default"
-$(info $(PREFIX) Overriding compiler CXX=$(CXX))
-__bobtestcompiler := 1
-else
-CXX=g++
-endif
-
-
-# Try detecting compiler. This will probably only work for gcc and sparcworks on
-# Linux and SunOS.
-#
-# This will have to go away...
-#
-# Issue: Both sparcworks and gcc uses cc as their C-compiler. This can give some
-# strange behaviours if both g++, gcc and cc is in the path. Setting CXX=g++
-# might fail the test since cc might not be gcc cc but Sparcworks cc. In that
-# case neither C-compile nor C++-compile test will succeed, resulting in the use
-# of default compiler gcc.
-$(if $(__bobtestcompiler),\
-$(info $(PREFIX) Testing compiler ...)\
-$(foreach file,$(wildcard $(BOBHOME)/Makefile.compiler.*.mk),\
-	$(if $(COMPILER),,\
-	$(eval rval := $(shell $(MAKE) CC=$(CC) CXX=$(CXX) -f $(file) __bobdetectcompiler >/dev/null 2>&1 && echo ok)) \
-	$(if $(rval),$(eval override COMPILER := \
-		$(patsubst Makefile.compiler.%.mk,%,$(notdir $(file))))))))
-
-# Default values, unless explicitly set we use gcc and g++.
-CC       ?= gcc
-CXX      ?= g++
-COMPILER ?= gcc
-$(if $(__bobtestcompiler),\
-	$(info $(PREFIX) Compiler is $(COMPILER) ($(origin COMPILER))))
-
-# Compiler version extraction flags. Notice the simplicity of open source
-# (What where Sun thinking?).
-__gcc_VERSIONFLAG := -dumpversion
-__CC_VERSIONFLAG  := -V 2>&1|head -n1|$(__bobAWK) '{match($$0,"(C|C\\+\\+) ([^ ]+)",a);print a[2]}'
-COMPILER_VERSION  := $(shell $(COMPILER) $(__$(COMPILER)_VERSIONFLAG))
-# Ld version, this works for GNU ld and Sun ld, on Windows we need
-# updates.
-LINKER := $(LD)
-# ******************************************************************************
-
-
-# Build and Link type settings. The user can set buildtype and linktype on the
-# command line to adjust the compiler and link flags.
-#
-# This needs a rework. What should be the default buildtypes if any?
-#
-# ******************************************************************************
-# Build type
+# Default to using gcc, (changing is easy). Default buildtype SHALL always be
+# release. The reason for that is that the simplest and most non-altered build
+# process shall produce a releaseable software product, not a developer debug
+# invested built monster.
+compiler  ?= gcc
 buildtype ?= release
-
-# Santity check the value of buildtype.
-__bobBUILDTYPES := release debug profiling pedantic
-$(if $(findstring $(buildtype),$(__bobBUILDTYPES)),,\
-	$(info $(W_PREFIX) Unknown buildtype "$(buildtype)") \
-	$(info $(PREFIX) Available buildtypes are: $(__bobBUILDTYPES)) \
-	$(error Unknown buildtype $(buildtype)))
-
-# Map the userspace variable name to a bob interal name which can be held more
-# static over time, and which might be less possible for a user to use.
-export __bobBUILDTYPE := $(buildtype)
-
-
-# Link type
-linktype ?= default
-
-# Santity check
-__bobLINKTYPES := default noundefined
-$(if $(findstring $(linktype),$(__bobLINKTYPES)),,\
-	$(info $(W_PREFIX) Unknown linktype "$(linktype)") \
-	$(info $(PREFIX) Available linktypes are: $(__bobLINKTYPES)) \
-	$(error Unknown linktype $(linktype)))
-
+linktype  ?= default
 # Map to "private" variable.
-__bobLINKTYPE := $(linktype)
+export __bobCOMPILER  := $(compiler)
+export __bobBUILDTYPE := $(buildtype)
+export __bobLINKTYPE  := $(linktype)
+
+# Include compiler file, complain if it does not exist.
+__bob_compiler_file := $(wildcard $(BOBHOME)/Makefile.compiler.$(compiler).mk)
+ifdef __bob_compiler_file
+include $(__bob_compiler_file)
+else
+__bob_available_compilers := \
+	$(patsubst Makefile.compiler.%.mk,%,$(notdir $(wildcard $(BOBHOME)/Makefile.compiler.*.mk)))
+$(info $(W_PREFIX) Available compilers are $(__bob_available_compilers))
+$(error Unknown compiler $(__bobCOMPILER))
+endif
+
+# Santity check the buildtype.
+$(if $(findstring $(__bobBUILDTYPE),$(COMPILER_BUILDTYPES)),,\
+	$(info $(W_PREFIX) Available buildtypes for $(__bobCOMPILER) are: $(COMPILER_BUILDTYPES)) \
+	$(error Unknown buildtype $(__bobBUILDTYPE)))
+
+# Sanity check the linktype.
+$(if $(findstring $(__bobLINKTYPE),$(COMPILER_LINKTYPES)),,\
+	$(info $(W_PREFIX) Available linktypes for $(__bobCOMPILER) are: $(COMPILER_LINKTYPES)) \
+	$(error Unknown linktype $(__bobLINKTYPES)))
 # ******************************************************************************
 
 

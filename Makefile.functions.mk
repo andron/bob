@@ -477,7 +477,7 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval home := $($R_HOME))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(_I)$(home)/include)\
-		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATH)$(home)/lib)\
+		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATHLINKFLAG)$(home)/lib)\
 		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
 		$(eval export __bob_ALLREQ_LINKPATH += $($R_LIBS))))\
 $(if $(requirement_verification_error),\

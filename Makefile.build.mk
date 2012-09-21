@@ -17,8 +17,8 @@
 TGTBASE := $(abspath $(builddir)/tgt)
 OBJBASE := $(abspath $(builddir)/obj)
 DOCBASE := $(abspath $(builddir)/doc)
-export TGTDIR := $(TGTBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
-export OBJDIR := $(OBJBASE)/$(PLATFORM)/$(buildtype)_$(COMPILER)
+export TGTDIR := $(TGTBASE)/$(PLATFORM)/$(__bobBUILDTYPE)_$(__bobCOMPILER)
+export OBJDIR := $(OBJBASE)/$(PLATFORM)/$(__bobBUILDTYPE)_$(__bobCOMPILER)
 export DOCDIR := $(DOCBASE)/generated
 # ******************************************************************************
 
@@ -115,13 +115,6 @@ all: | $(TGTDIR)
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.functions.mk
 include $(BOBHOME)/Makefile.functions.mk
-
-
-# Include compiler file.
-# ******************************************************************************
-.PHONY: $(BOBHOME)/Makefile.compiler.$(COMPILER).mk
-include $(BOBHOME)/Makefile.compiler.$(COMPILER).mk
-
 
 # Include a recipe file
 # ******************************************************************************
