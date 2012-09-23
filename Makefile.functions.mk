@@ -464,6 +464,9 @@ endef
 __bob_ALLREQ_INCLPATH :=
 __bob_ALLREQ_LINKPATH :=
 define setup_requires
+$(call setup)
+endef
+define setup
 $(if $(__bobDISABLECHECKREQUIREMENTS),,\
 $(if $(SOFTWARE_HOMES),\
 	$(foreach s,$(patsubst %/,%,$(subst :,$(space),$(SOFTWARE_HOMES))),\
