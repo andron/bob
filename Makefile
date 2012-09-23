@@ -178,12 +178,21 @@ $(if $(findstring $(__bobLINKTYPE),$(COMPILER_LINKTYPES)),,\
 # The source directory is actually pwd, and for a software project (module) it
 # is the top directory holding the source code etc. Setting this to something
 # else may have little or no practical use.
-override srcdir   := $(abspath $(if $(srcdir),$(srcdir),.))
+ifdef srcdir
+override srcdir := $(abspath $(srcdir))
+else
+srcdir := $(abspath .)
+endif
+
 # The build directory is the base directory for object and target artifacts
 # directories. The feature is that this can be pointed to /var/tmp (or
 # similiar) while still having the code checked out on a "safe but slow"
 # NFS-filesystem.
-override builddir := $(abspath $(if $(builddir),$(builddir),.))
+ifdef builddir
+override builddir := $(abspath $(builddir))
+else
+builddir := $(abspath .)
+endif
 # ******************************************************************************
 
 
@@ -192,7 +201,7 @@ override builddir := $(abspath $(if $(builddir),$(builddir),.))
 ifdef DESTDIR
 override DESTDIR := $(abspath $(DESTDIR))/
 else
-override DESTDIR :=
+DESTDIR :=
 endif
 
 ifdef prefix
