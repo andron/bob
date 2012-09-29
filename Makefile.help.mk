@@ -169,10 +169,3 @@ help-targets:
 		echo "   $$idx. $$i"; \
 		idx=`expr $$idx + 1`; \
 	done
-
-
-help-modules-verbatim:
-	@echo $(filter-out .,$(__bobLIST_MODULES))
-
-help-modules-clean:
-	@echo $(filter-out .,$(__bobLIST_ALLCLEAN))

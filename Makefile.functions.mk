@@ -272,22 +272,6 @@ endef
 # ******************************************************************************
 
 
-# Generate clean rules for a separate module. The first module becomes clean--
-# but that will not be noticed by anyone ... clean is the correct target for
-# cleaning everything.
-#
-# $1: Module name
-# ******************************************************************************
-define generate_clean_targets
-$(eval __bobcleantarget := $(subst /,-,$(patsubst /%/,%,$(subst $(OBJDIR),,$($1_OBJDIR)))))
-$(eval __bobLIST_ALLCLEAN := $(__bobLIST_ALLCLEAN) $(__bobcleantarget))
-clean-$(__bobcleantarget):
-	@echo "$(T_PREFIX) Cleaning module $1"
-	@-$(RM) -r $($1_OBJDIR)
-endef
-# ******************************************************************************
-
-
 # Generate install rules. Which are actually dependencies on the destination
 # files. Rules for "copying" files to this destination is specified elsewhere
 # (are global), which is not a problem because there can only be ONE destination

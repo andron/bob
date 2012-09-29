@@ -125,9 +125,6 @@ endif
 	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-cpp))     \
 	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-moc-cpp))
 
-# Separate clean targets for each module.
-$(eval $(call generate_clean_targets,$(_MODULE)))
-
 # TARGETS ----------------------------------------------------------------------
 else
 ifdef BOB.DEBUG
