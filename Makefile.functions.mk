@@ -61,7 +61,7 @@ endef
 # foo_append_object $1: Module name -- $2: Directory name
 # ******************************************************************************
 define __bob_src_objects
-$(addsuffix .o,$(basename $(filter %.c %.cc %.cpp,$(sort $($1_SRCS)))))
+$(addsuffix .o,$(basename $(filter %.c %.cc %.cpp,$($1_SRCS))))
 endef
 
 __ui-h_qt3         := %.h
@@ -132,7 +132,7 @@ endef
 
 # $1: Target -- $2: Module objectdir
 define __bob_append_src_objects
-$(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_src_objects,$1)))
+$(eval $1_OBJS += $(addprefix $(OBJDIR)/,$(call __bob_src_objects,$1)))
 endef
 
 # $1: Target -- $2: Module objectdir
@@ -148,6 +148,14 @@ endef
 # $1: Target -- $2: Module objectdir
 define __bob_append_rcc_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_rcc_objects,$1)))
+endef
+
+
+# Expand source file wildcard patterns. Also verifies the existence of files.
+#
+# $1: Target -- $2: Module source directory.
+define __bob_expand_src_wildcard
+$(eval $1_SRCS := $(patsubst $(srcdir)/%,%,$(sort $(wildcard $(abspath $(addprefix $2,$(filter-out /%,$($1_SRCS))))))))
 endef
 # ******************************************************************************
 
@@ -183,7 +191,7 @@ endef
 define setup_uic_depend_rules_srcs
 $(if $(strip $($1_SRCS_FRM)), \
 	$(eval \
-		$(call __bob_dirprefix,$2,$(call __bob_src_objects,$1)) \
+		$(call __bob_src_objects,$1) \
 		$(call __bob_dirprefix,$2,$(call __bob_moc_objects,$1)): \
 		$(call __bob_dirprefix,$2,$(call __bob_to_uic_header,$(notdir $($1_SRCS_FRM))))))
 endef
