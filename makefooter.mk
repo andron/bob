@@ -70,6 +70,7 @@ endif
 
 # Call a lot of macros to check, hmm... "stuff"
 $(foreach t,$(ALL_TARGETS),                                   \
+	$(eval $t_INCL += $(_INCL))                                 \
 	$(eval $t_LIBS += $(_LIBS))                                 \
 	$(eval $t_USES += $(_USES))                                 \
 	$(eval $t_LINK += $(_LINK))                                 \

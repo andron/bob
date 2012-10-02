@@ -542,8 +542,7 @@ $(addprefix $(_I), $(wildcard \
 	$($2_SRCDIR)include_internal)) \
 $$(__bob_$1_INCL) \
 $(_I). \
-$($1_INCL) \
-$(_INCL)
+$($1_INCL)
 endef
 # Helper for target defines flags
 # $1: Target, $2: Module
