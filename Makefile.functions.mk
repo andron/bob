@@ -461,8 +461,8 @@ endef
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
 # cannot build this software and that is an error.
 # ******************************************************************************
-__bob_ALLREQ_INCLPATH :=
-__bob_ALLREQ_LINKPATH :=
+__bobALLREQINCL :=
+__bobALLREQLINK :=
 define setup_requires
 $(call setup)
 endef
@@ -484,8 +484,8 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(_I)$(home)/include)\
 		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATHLINKFLAG)$(home)/lib)\
-		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
-		$(eval export __bob_ALLREQ_LINKPATH += $($R_LIBS))))\
+		$(eval export __bobALLREQINCL += $($R_INCL))\
+		$(eval export __bobALLREQLINK += $($R_LIBS))))\
 $(if $(requirement_verification_error),\
 	$(info $(W_PREFIX) ********************************************************************)\
 	$(info $(W_PREFIX) There are missing build requirements, see the messages above.)\
@@ -511,7 +511,7 @@ $(if $($1_USES),$(eval $1_INCL += $(foreach u,$($1_USES),$($(call __uc,$u)_INCL)
 # Implicit _LINKPATH if _LINK
 $(if $($1_LINK),\
 	$(eval $1_LINK := $(addprefix $(_l),$($1_LINK))) \
-	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bob_ALLREQ_LINKPATH))))
+	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bobALLREQLINK))))
 # Target .d-files
 __target_d_files := $(wildcard $(addsuffix *.d,$(addprefix $($2_OBJDIR),$(sort $(dir $($1_SRCS))))))
 .PHONY: $(__target_d_files)
