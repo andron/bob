@@ -47,17 +47,7 @@ ifdef BOBPLUGINS
 endif
 
 
-# Save variables in module specific ones.
-ifneq "$(INSTALL_HEADERS)" ""
-$(_MODULE)_INSTALL_HEADERS := $(INSTALL_HEADERS)
-$(info $(W_PREFIX) INSTALL_HEADERS are deprecated, update $(_MODULE)/$(RULES))
-endif
-ifneq "$(INSTALL_SBIN)" ""
-$(_MODULE)_INSTALL_SBIN    := $(INSTALL_SBIN)
-$(info $(W_PREFIX) INSTALL_SBIN is deprecated, update $(_MODULE)/$(RULES))
-endif
-
-
+# Save module targets, with path.
 $(_MODULE)_TARGETS := $(addprefix $(TGTDIR)/,$(TARGETS))
 
 

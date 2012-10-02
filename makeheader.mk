@@ -55,10 +55,6 @@ _MODULE_FULLNAME := $(subst /,-,$(patsubst %/,%,$(_SRCDIR)))
 HAVE_MOCFILES :=
 HAVE_FRMFILES :=
 
-# Use for module specific install files
-INSTALL_SBIN :=
-INSTALL_HEADERS :=
-
 ifdef BOBPLUGINS
 -include $(__bobPLUGINSHEADERS)
 endif
