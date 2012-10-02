@@ -127,15 +127,12 @@ endef
 
 # $1: Target -- $2: Module objectdir -- $3: Objects
 define __bob_append_objects
-$(eval $1_OBJS += $(call __bob_dirprefix,$2,$(filter-out /%,$3))) \
-$(if $(filter test.%,$1),\
-	$(eval $1_OBJS += $(call __bob_dirprefix,$(OBJDIR),$(filter /%,$3))))
+$(eval $1_OBJS += $(call __bob_dirprefix,$2,$(filter-out /%,$3)))
 endef
 
 # $1: Target -- $2: Module objectdir
 define __bob_append_src_objects
-$(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_src_objects,$1))) \
-$(eval __bobLIST_ALLOBJECTS += $($1_OBJS))
+$(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_src_objects,$1)))
 endef
 
 # $1: Target -- $2: Module objectdir
