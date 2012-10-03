@@ -43,18 +43,18 @@ __bobBUILDSTAGE := 1
 # rules to the same target if they need to. Neither clean nor install should
 # need any such rules... but who knows.
 clean-tgt:
-	@-$(RM) -rf $(TGTBASE)
+	@-$(__bobRMDIR) $(TGTBASE)
 clean-obj:
-	@-$(RM) -rf $(OBJBASE)
+	@-$(__bobRMDIR) $(OBJBASE)
 
 clean: clean-tgt clean-obj
 
 $(if $(__bobFIND), \
-	$(eval FINDRM := $(__bobFIND) . \( -name "*~" -or -name "\#*" \) -print -exec rm -f {} \;),\
+	$(eval FINDRM := $(__bobFIND) . \( -name "*~" -or -name "\#*" \) -print -exec $(__bobRM) {} \;),\
 	$(eval FINDRM := echo Command \'find\' not available))
 distclean:
 	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"; \
-	$(RM) -rf $(TGTBASE) $(OBJBASE); \
+	$(__bobRMDIR) $(TGTBASE) $(OBJBASE); \
 	$(FINDRM)
 
 
@@ -69,7 +69,7 @@ software-install: \
 	override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
 software-install: all
 	@-$(MAKE) install prefix=$(prefix); \
-	cd $(prefix)/.. && rm -f latest && ln -sf $(__latest) latest
+	cd $(prefix)/.. && $(__bobRM) latest && $(__bobLN) $(__latest) latest
 
 
 # Doc targets
@@ -89,7 +89,7 @@ doc:;
 endif
 distclean: clean-doc
 clean-doc:
-	@-$(RM) -rf $(DOCDIR)
+	@-$(__bobRMDIR) $(DOCDIR)
 
 ifdef __bob_have_feature_cppcheck
 cppcheck:;

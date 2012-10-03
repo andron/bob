@@ -149,7 +149,7 @@ __buildinfofile := buildinfo.txt
 distclean clean: __remove_buildinfo
 .PHONY: __remove_buildinfo
 __remove_buildinfo:
-	@rm -f $(__buildinfofile)
+	@$(__bobRM) $(__buildinfofile)
 buildinfo: export __name     := $(__name)
 buildinfo: export __version  := $(__version)
 buildinfo: export __release  := $(__release)

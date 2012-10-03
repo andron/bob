@@ -72,7 +72,7 @@ requiregraph.dot: __always__
 # Add rule to distclean to remove dotfiles.
 distclean: __remove_dot_and_ps_files
 __remove_dot_and_ps_files:
-	@-$(RM) linkgraph.* requiregraph.*
+	@-$(__bobRM) linkgraph.* requiregraph.*
 
 
 # From dot to some types of files, we will not support all that dot does.

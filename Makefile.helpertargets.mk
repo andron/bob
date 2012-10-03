@@ -69,7 +69,7 @@ distclean clean: __remove_packagefile
 __remove_packagefile:
 	@if [ -e $(__pkgdir)/$(__pkgfile) ]; then \
 		echo "$(T_PREFIX) Removing package file ..."; \
-		$(RM) $(__pkgdir)/$(__pkgfile); \
+		$(__bobRM) $(__pkgdir)/$(__pkgfile); \
 	fi;
 
 # The package target depends on the package file, of course. Though the package
@@ -123,7 +123,7 @@ $(error Must have tar)
 endif
 
 ifndef RPM_USER_ROOT
-RPM_USER_ROOT := $(shell rpm --eval %_topdir)
+RPM_USER_ROOT := $(shell $(__bobRPM) --eval %_topdir)
 endif
 
 # The rpm specfile shall have the same name as the project.
@@ -131,7 +131,7 @@ __rpmspecfile := $(__name).spec
 
 # Reset package if we have rpm. Obs do not move this line above the tar package
 # definition section.
-__pkgdir := $(shell rpm --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
+__pkgdir := $(shell $(__bobRPM) --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
 
 # Target rpm is like package just a bit more complex. Depends on package file,
 # but also on some flags being defined. RELEASENAME and RPMFLAGS.
@@ -153,7 +153,7 @@ $(__rpmspecfile): $(__rpmspecfile).in __always_build__
 # Remove the specfile when doing clean or distclean
 distclean clean: __remove_specfile
 __remove_specfile:
-	@$(RM) $(__rpmspecfile)
+	@$(__bobRM) $(__rpmspecfile)
 
 comma := ,
 rpm: $(__pkgdir)/$(__pkgfile)
@@ -182,7 +182,7 @@ rpmenvironment: $(__rpmmacrofile) $(__rpmdirectories)
 
 # Clean rpm environment. Mostly for debugging.
 rpmenvironment.clean:
-	@$(RM) -rf $(__rpmmacrofile) $(__rpmdirectories)
+	@$(__bobRMDIR) $(__rpmmacrofile) $(__rpmdirectories)
 
 .PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 

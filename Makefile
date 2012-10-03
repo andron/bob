@@ -86,27 +86,28 @@ endif
 export __bobRSYNC         ?= $(shell type -p rsync) -quplr
 export __bobRSYNC_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
 export __bobRPMBUILD      ?= $(shell type -p rpmbuild)
+export __bobRPM           ?= $(shell type -p rpm)
 export __bobCPPCHECK      ?= $(shell type -p cppcheck)
 export __bobTAR           ?= $(shell type -p tar)
 export __bobLN            ?= $(shell type -p ln) -sf
 export __bobFIND          ?= $(shell type -p find)
-export __bobAWK           ?= $(shell type -p gawk)
+export __bobAWK           ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
+export __bobRM            ?= $(shell type -p rm) -f
+export __bobRMDIR         ?= $(shell type -p rm) -rf
 export __bobPRINTF        ?= $(shell type -p printf)
 export __bobDOXYGEN       ?= $(shell type -p doxygen)
 export __bobINSTALL       ?= $(shell type -p install)
 export __bobINSTALL_HDR   ?= $(__bobINSTALL) -Dm644
+export __bobMOC3          ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
+export __bobUIC3          ?= $(firstword $(wildcard $(QT_HOME)/bin/uic)  $(shell type -p uic-qt3))
+export __bobMOC4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc) $(shell type -p moc-qt4))
+export __bobUIC4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic) $(shell type -p uic-qt4))
+export __bobRCC4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc) $(shell type -p rcc-qt4))
 export INSTALL            ?= $(__bobINSTALL)
 export INSTALL_EXEC       ?= $(INSTALL) -Dm755
 export INSTALL_DATA       ?= $(INSTALL) -Dm644
 export INSTALL_DIRS       ?= $(INSTALL) -d
 export INSTALL_FILES      ?= $(__bobRSYNC) $(__bobRSYNC_exclude)
-export AWK                ?= $(__bobAWK)
-export TAR                ?= $(__bobTAR)
-export MOC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
-export UIC3               ?= $(firstword $(wildcard $(QT_HOME)/bin/uic)  $(shell type -p uic-qt3))
-export MOC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc) $(shell type -p moc-qt4))
-export UIC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic) $(shell type -p uic-qt4))
-export RCC4               ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc) $(shell type -p rcc-qt4))
 
 # Havings and no havings. The existance of some commands turns on some extra
 # targets, not really necessary for normal operaion.
@@ -263,7 +264,7 @@ ifneq "$(filter bob.%,$(MAKECMDGOALS))" ""
 __bobPREFIX := " [bob]"
 bob.package:
 	@echo "$(__bobPREFIX) Creating BOB-package from $(BOBHOME)"; \
-	$(TAR) -C $${BOBHOME%/*} \
+	$(__bobTAR) -C $${BOBHOME%/*} \
 		--exclude "*/.git*" \
 		--exclude "*/.svn*" \
 		--exclude "*~" \

@@ -87,7 +87,7 @@ distclean: __remove_meta_install_dir
 __remove_meta_install_dir:
 	@-foo=$(META_BUILD_ROOT); \
 	echo "$(__bobPREFIX) Removing temporary install directory $${foo##$(PWD)\/}"; \
-	$(RM) -rf $(META_BUILD_ROOT)
+	$(__bobRMDIR) $(META_BUILD_ROOT)
 
 help:
 	@echo "$(__bobPREFIX) Help not available in meta mode, yet"

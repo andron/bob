@@ -217,20 +217,20 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing $$(@F)"; \
-		$(MOC3) -f $$< $$(OUTPUT_OPTION))) \
+		$(__bobMOC3) -f $$< $$(OUTPUT_OPTION))) \
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing header $$(@F)"; \
-		$(UIC3) $$< $$(OUTPUT_OPTION))
+		$(__bobUIC3) $$< $$(OUTPUT_OPTION))
 
 # Each ui-source file shall depend on its corresponding headerfile, which was
 # generated and put in the objectdir.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)"; \
-		$$(UIC3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
+		$$(__bobUIC3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
 
 # Each ui-moc-source file shall depend on its corresponding headerfile, which
 # was generated and put in the objectdir. Same as the rule above just another
@@ -239,7 +239,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_moc_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)"; \
-		$(MOC3) -f $$< $$(OUTPUT_OPTION)))
+		$(__bobMOC3) -f $$< $$(OUTPUT_OPTION)))
 endef
 
 define setup_resource_rules_qt3
@@ -257,13 +257,13 @@ $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(f)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing $$(@F) ($1)"; \
-		$(MOC4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
+		$(__bobMOC4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
 $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(f)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing $$(@F) ($1)"; \
-		$(UIC4) $$< $$(OUTPUT_OPTION)))
+		$(__bobUIC4) $$< $$(OUTPUT_OPTION)))
 endef
 
 # $1: List of targets -- $2: Module name
@@ -272,7 +272,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_RCC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_rcc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $($2_OBJDIR)/.stamp
 		@echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)"; \
-		$(RCC4) $$< $$(OUTPUT_OPTION)))
+		$(__bobRCC4) $$< $$(OUTPUT_OPTION)))
 endef
 # ******************************************************************************
 
