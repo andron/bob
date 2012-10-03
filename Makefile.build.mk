@@ -167,7 +167,7 @@ endif
 # are available for usage in the makerules.mk-files.
 # ******************************************************************************
 $(if $(filter $(disablecheckfor) \
-	doc rpmenv buildinfo package distclean clean clean-% \
+	doc rpmenvironment rpmenvironment.% buildinfo package distclean clean clean-% \
 	%.spec help% linkgraph% requiregraph%,$(MAKECMDGOALS)),\
 	$(eval __bobDISABLECHECKREQUIREMENTS := yes))
 # If distclean is requested disable further inclusion of makerules files.

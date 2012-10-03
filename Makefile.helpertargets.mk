@@ -113,30 +113,28 @@ endif
 # installed on the system.
 ifdef __bob_have_feature_rpm
 
+# Check prerequisites
+ifeq "$(__bobAWK)" ""
+$(error Must have gawk)
+endif
+
+ifeq "$(__bobTAR)" ""
+$(error Must have tar)
+endif
+
 ifndef RPM_USER_ROOT
 RPM_USER_ROOT := $(shell rpm --eval %_topdir)
 endif
 
-# Warning
-ifeq "$(origin RPM_BUILD_FLAGS)" "command line"
-$(info $(W_PREFIX) Due to a bug in make+bash RPM_BUILD_FLAGS will not work as expected.)
-$(info $(W_PREFIX) Use RPM_BUILD_DEFINES=key=value,key=value,... for sending defines.)
-$(info $(W_PREFIX) Use RPM_BUILD_OPTION=-bb|-ba|-bs... for sending build option.)
-$(error out-of-control-error)
-endif
-
+# The rpm specfile shall have the same name as the project.
 __rpmspecfile := $(__name).spec
 
 # Reset package if we have rpm. Obs do not move this line above the tar package
 # definition section.
 __pkgdir := $(shell rpm --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
 
-# Rpm is like package just a bit more complex. Depends on package file, but also
-# on some flags being defined. RELEASENAME and RPMFLAGS.
-#
-# RPM_RELEASE is just for setting a extra name in the release tag, if
-# applicable. Having moved the NVR into the makerules.mk file setting release
-# more automatically is simpler now then before.
+# Target rpm is like package just a bit more complex. Depends on package file,
+# but also on some flags being defined. RELEASENAME and RPMFLAGS.
 #
 # RPM_BUILD_FLAGS is still necessary. It must be possible to send in just any
 # type of flag to the rpm-command. Besides, RPMFLAGS is also used for forcing a
@@ -168,7 +166,7 @@ rpm: override RPM_BUILD_FLAGS += --define '_topdir $(RPM_USER_ROOT)'
 rpm: $(__rpmspecfile) | rpmenvironment
 	@+if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) RPMFILE : $(RPM_BUILD_FLAGS)"; \
-		rpmbuild $(RPM_BUILD_FLAGS) $(__rpmspecfile); fi
+		$(__bobRPMBUILD) $(RPM_BUILD_FLAGS) $(__rpmspecfile); fi
 
 # RPM build environment in users home and all the directories needed.  Some
 # directories must exist for the rpmbuild command to work. Install these.
@@ -178,11 +176,15 @@ $(__rpmdirectories):
 __rpmmacrofile := $(HOME)/.rpmmacros
 $(__rpmmacrofile): $(BOBHOME)/rpmmacros
 	$(INSTALL) -T $< $@
-rpmenv rpmenvironment: $(__rpmmacrofile) $(__rpmdirectories)
-clean-rpmenv clean-rpmenvironment:
+
+# Target for installing macro file and directories.
+rpmenvironment: $(__rpmmacrofile) $(__rpmdirectories)
+
+# Clean rpm environment. Mostly for debugging.
+rpmenvironment.clean:
 	@$(RM) -rf $(__rpmmacrofile) $(__rpmdirectories)
 
-.PHONY: rpmenv rpmenvironment clean-rpmenv clean-rpmenvironment __remove_specfile
+.PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 
 endif
 # ******************************************************************************
