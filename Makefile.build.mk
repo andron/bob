@@ -168,7 +168,7 @@ endif
 # ******************************************************************************
 $(if $(filter $(disablecheckfor) \
 	doc rpmenv buildinfo package distclean clean clean-% \
-	cm-% %.spec help% linkgraph% requiregraph%,$(MAKECMDGOALS)),\
+	%.spec help% linkgraph% requiregraph%,$(MAKECMDGOALS)),\
 	$(eval __bobDISABLECHECKREQUIREMENTS := yes))
 # If distclean is requested disable further inclusion of makerules files.
 $(if $(filter distclean,$(MAKECMDGOALS)),\

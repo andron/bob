@@ -91,7 +91,6 @@ export __bobTAR           ?= $(shell type -p tar)
 export __bobLN            ?= $(shell type -p ln) -sf
 export __bobFIND          ?= $(shell type -p find)
 export __bobAWK           ?= $(shell type -p gawk)
-export __bobSVN           ?= $(shell type -p svn)
 export __bobPRINTF        ?= $(shell type -p printf)
 export __bobDOXYGEN       ?= $(shell type -p doxygen)
 export __bobINSTALL       ?= $(shell type -p install)
