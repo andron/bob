@@ -21,6 +21,35 @@ echo | cat <<EOF
 # (Some variables have been filtered out)
 #
 EOF
+
+
+# Check for changes if version control is Git.
+echo | cat <<EOF
+
+
+#
+# Version control
+#
+# Git
+EOF
+git rev-parse --git-dir > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+	git whatchanged -1 -- .
+	echo
+	echo "# Workspace changes ..."
+	git diff --numstat
+	echo "# ----------------------------------------------------------------------"
+fi
+
+
+# Print environment.
+echo | cat <<EOF
+
+
+#
+# Environment
+#
+EOF
 env | \
 	sort | \
-	egrep -v "^__|^SSH|^MAIL|^SHELL=|^DISPLAY=|^LS_COLORS=|^GNOME|^GDM|^DBUS_SESSION"
+	egrep -v "^__|^SSH|^MAIL|^SHELL=|^DISPLAY=|^LS_COLORS=|^GNOME|^GDM|^DBUS_SESSION|^GPG"
