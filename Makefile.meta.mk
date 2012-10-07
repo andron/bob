@@ -144,48 +144,20 @@ $(foreach t,$(PASS_TARGETS),\
 	$(eval $(call pass_through_targets,$t)))
 
 
-#
-# !!!Do the api-to-api sanity matching!!! Rewrite, not in use, untested.
-#
+# REQUIREMENT DEPENDENCY CHECKING
 # ******************************************************************************
 # For every project/subproject/submodule whatever go through every requirement
-# and extract the available level and the accepted level. Filtering out the
-# accepted level from available level should result in a empty string. If the
-# string is not empty emit an a warning en set missmatching_apilevel to yes for
-# later checking.  If successfull, then create a rule which connect the build
-# part to the install part of the requirement. This connection cannot be done in
-# the footer since we do not know all available projects at that time and can
-# thus not do any checking whether or not the required interface is available.
-#
-# Here build, install etc are connected to the respective required interface
-# install target. !!!This is a crucial part, this connects projects to each
-# other. It is the last eval in the code block below!!!
-#
-# The first if-clause prevents deps to be setup against projects which are not
-# buildable. E.g. Qt, Xerces and other external software.
-#
+# and extract the available level and connect that requirements install stage
+# if the requirement is buildable to the build rpm and install target of the
+# requiree.  The if findstring-clause prevents dependencies to be setup
+# against projects which are not buildable. E.g. Qt, Boost etc.
 $(foreach n,$(LIST_NAMES),\
-$(foreach r,$($n_REQUIRES),\
-	$(eval r_n                := $(call __get_name,$r))\
-	$(eval r_nv               := $(call __get_VAR,$r,_VERSION))\
-	$(eval accepted           := $(call __get_gt_feature,$r,$(r_nv)))\
-	$(eval available          := $(call __get_feature,$(r_nv)))\
-	$(eval available_featname := $(call __get_compactFname,$(r_nv)))\
-	$(if $(findstring $(r_n),$(LIST_NAMES)),\
-		$(if $(filter-out $(accepted),$(available)),\
-			$(eval missmatching_apilevel := yes)\
-			$(info $(W_PREFIX) INTERFACE ERROR: $n -> $r != $(r_nv)),\
-			$(eval $(addsuffix $($n_FEATNAME),build_ rpm_ install_): install_$(available_featname))))))
-
-# Diplay error, and abort.
-$(if $(missmatching_apilevel),\
-	$(info $(W_PREFIX) ********************************************************************)\
-	$(info $(W_PREFIX) There are missmatching interfaces between software in this setup.)\
-	$(info $(W_PREFIX) This will/should never compile, and therefore the build is aborted.)\
-	$(info $(W_PREFIX) See the above warnings for information about conflicting software.)\
-	$(info $(W_PREFIX) (If you are of another opinion, get your interfaces right!))\
-	$(info $(W_PREFIX) ********************************************************************)\
-	$(error Miss-matching interfaces error))
+	$(foreach r,$($n_REQUIRES),\
+		$(eval r_n                := $(call __get_name,$r))\
+		$(eval r_nv               := $(call __get_available_name_version,$r))\
+		$(eval available_featname := $(call __get_compactFname,$(r_nv)))\
+		$(if $(findstring $(r_n),$(LIST_NAMES)),\
+			$(eval $(addsuffix $($n_FEATNAME),build_ rpm_ install_): install_$(available_featname)))))
 # ******************************************************************************
 
 

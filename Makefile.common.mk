@@ -139,6 +139,12 @@ define __get_VAR
 $(call __get_name,$1)-$($(strip $(call __get_name,$1))$2)
 endef
 
+#
+# Get name-version string from _VERSION-variable.
+define __get_available_name_version
+$(eval tmp := $(call __get_name,$1)-$($(strip $(call __get_name,$1))_VERSION)) \
+$(if $(tmp),$(tmp),none)
+endef
 # ******************************************************************************
 
 
