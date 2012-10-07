@@ -79,64 +79,33 @@ $(subst $(space),,$(wordlist 1,3,$(tmp)))
 endef
 
 #
-#
-#
-# $1:
+# Get name from a NVR-tuple (foo-1.2.3-1).
 define __get_name
-$(eval tmp := $(word 1,$(subst -, ,$(subst ., ,$1))))\
-$(if $(tmp),$(tmp),none)
+$(eval tmp := $(word 1,$(subst -, ,$(subst ., ,$1)))) $(if $(tmp),$(tmp),none)
 endef
 
 #
-#
-#
-# $1:
+# Get version from a NVR-tuple.
 define __get_version
-$(eval tmp := $(word 2,$(subst -,$1)))\
-$(if $(tmp),$(tmp),none)
+$(eval tmp := $(word 2,$(subst -, ,$1))) $(if $(tmp),$(tmp),none)
 endef
 
 #
-#
-#
-# $1:
+# Get api-level from a NVR-tuple.
 define __get_api
-$(eval tmp := $(word 2,$(subst -, ,$(subst ., ,$1))))\
-$(if $(tmp),$(tmp),0)
+$(eval tmp := $(word 1,$(subst ., ,$(call __get_version,$1)))) $(if $(tmp),$(tmp),0)
 endef
 
 #
-#
-#
-# $1:
+# Get feature-level from a NVR-tuple.
 define __get_feature
-$(eval tmp := $(word 3,$(subst -, ,$(subst ., ,$1))))\
-$(if $(tmp),$(tmp),0)
+$(eval tmp := $(word 2,$(subst ., ,$(call __get_version,$1)))) $(if $(tmp),$(tmp),0)
 endef
 
 #
-#
-#
-# $1: Needed -- $2: Provided
-define __get_gt_feature
-$(lastword $(call sortn,$(call __get_feature,$1) $(call __get_feature,$2)))
-endef
-
-#
-#
-#
-# $1: First string -- $2: Second string
-define __does_apimatch
-$(if $(findstring $(call __get_name,$1),$(call __get_name,$2)),\
-$(if $(findstring $(call __get_api,$1), $(call __get_api,$2)),yes))
-endef
-
-#
-# Get the _VERSION variable for the name. This is not a generic target.
-#
-# $1: Version string or partial version string.
-define __get_VAR
-$(call __get_name,$1)-$($(strip $(call __get_name,$1))$2)
+# Get patch-level from a NVR-tuple.
+define __get_feature
+$(eval tmp := $(word 3,$(subst ., ,$(call __get_version,$1)))) $(if $(tmp),$(tmp),0)
 endef
 
 #
@@ -146,30 +115,3 @@ $(eval tmp := $(call __get_name,$1)-$($(strip $(call __get_name,$1))_VERSION)) \
 $(if $(tmp),$(tmp),none)
 endef
 # ******************************************************************************
-
-
-# Environment handling
-# ******************************************************************************
-# Create the file buildinfo.txt (always, so the file will be overwritten)
-__buildinfofile := buildinfo.txt
-distclean clean: __remove_buildinfo
-.PHONY: __remove_buildinfo
-__remove_buildinfo:
-	@$(__bobRM) $(__buildinfofile)
-buildinfo: export __name     := $(__name)
-buildinfo: export __version  := $(__version)
-buildinfo: export __release  := $(__release)
-buildinfo: export __group    := $(__group)
-buildinfo: export __hostname := $(HOST)
-buildinfo: export CXX      := $(CXX)
-buildinfo: export CXXFLAGS := $(CXXFLAGS)
-buildinfo: export CC       := $(CC)
-buildinfo: export CFLAGS   := $(CFLAGS)
-buildinfo: export CPPFLAGS := $(CPPFLAGS)
-buildinfo: export LD       := $(LD)
-buildinfo: export LDFLAGS  := $(LDFLAGS)  
-buildinfo: export DEFINES  := $(DEFINES)
-buildinfo: $(__buildinfofile)
-	$(BOBHOME)/buildinfo.sh > $<
-
-.PHONY: __remove_buildinfo
