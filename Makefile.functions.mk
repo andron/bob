@@ -18,8 +18,8 @@
 #
 
 # Helper macros
-# ------------------------------------------------------------------------------
-# Append a directory name $1 before each name in $2, and make sure no dubble
+# ******************************************************************************
+# Append a directory name $1 before each name in $2, and make sure no double
 # slashes exist in the resulting paths.
 #
 # $1: Directory name -- $2: Name list to be prepended
@@ -49,7 +49,7 @@ $(if $(diff1), \
 	$(error Variable reassignment error, DEFINES in $($1_SRCDIR)$(RULES))) \
 $(eval export DEFINES := $(sort $(DEFINES)))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Filters for creating object files from various source files and then a program
@@ -59,7 +59,7 @@ endef
 # 
 # foo_objects: $1: Module name
 # foo_append_object $1: Module name -- $2: Directory name
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define __bob_src_objects
 $(addsuffix .o,$(basename $(filter %.c %.cc %.cpp,$(sort $($1_SRCS)))))
 endef
@@ -132,24 +132,27 @@ $(if $(filter test.%,$1),\
 	$(eval $1_OBJS += $(call __bob_dirprefix,$(OBJDIR),$(filter /%,$3))))
 endef
 
+# $1: Target -- $2: Module objectdir
 define __bob_append_src_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_src_objects,$1))) \
 $(eval __bobLIST_ALLOBJECTS += $($1_OBJS))
 endef
 
+# $1: Target -- $2: Module objectdir
 define __bob_append_moc_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_moc_objects,$1)))
 endef
 
+# $1: Target -- $2: Module objectdir
 define __bob_append_uic_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_uic_objects,$1)))
 endef
 
+# $1: Target -- $2: Module objectdir
 define __bob_append_rcc_objects
 $(eval $1_OBJS += $(call __bob_append_objects,$1,$2,$(call __bob_rcc_objects,$1)))
 endef
-
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # If a target got forms (_SRCS_FRM) all its "foo"-object files must depend on
@@ -166,7 +169,7 @@ endef
 # uic-headers seems enough.
 #
 # $1: Target -- $2: Module objectdir
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define setup_uic_depend_rules
 $(if $($1_SRCS_FRM),\
 	$(eval \
@@ -196,7 +199,7 @@ $(if $(strip $($1_SRCS_RCC)), \
 		$(call __bob_dirprefix,$2,$(call __bob_to_rcc_source,$(notdir $($1_SRCS_RCC))))))
 endef
 endif
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # QT-forms build rules setup, for the current module, all targets. Both uic and
@@ -239,7 +242,7 @@ $(foreach i,$1, $(eval
 	$(foreach t,$($(i)_SRCS_RCC),\
 		$(warning qt3 resources not supported - $(i)_SRCS_RCC := $(t)))))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # $1: List of targets -- $2: Module name
@@ -266,7 +269,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_RCC))),
 		@echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)"; \
 		$(RCC4) $$< $$(OUTPUT_OPTION)))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Generate clean rules for a separate module. The first module becomes clean--
@@ -274,7 +277,7 @@ endef
 # cleaning everything.
 #
 # $1: Module name
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define generate_clean_targets
 $(eval __bobcleantarget := $(subst /,-,$(patsubst /%/,%,$(subst $(OBJDIR),,$($1_OBJDIR)))))
 $(eval __bobLIST_ALLCLEAN := $(__bobLIST_ALLCLEAN) $(__bobcleantarget))
@@ -282,7 +285,7 @@ clean-$(__bobcleantarget):
 	@echo "$(T_PREFIX) Cleaning module $1"
 	@-$(RM) -r $($1_OBJDIR)
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Generate install rules. Which are actually dependencies on the destination
@@ -292,7 +295,7 @@ endef
 # to set the varible PLUGINSCATEGORY which will be part of the directory name.
 #
 # $1: Module name -- $2: Targets
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define generate_install_targets
 $(eval PLUGINS_SHAREDIR ?= $(__name))
 $(eval plugindir := $(datadir)/$(PLUGINS_SHAREDIR)/plugins)
@@ -355,7 +358,7 @@ __module-install-include-files-$1: $(__all_dst_include_files)
 $(__all_dst_include_files): $(DESTDIR)$(includedir)/%:$($1_SRCDIR)include/%
 	@$(__bobINSTALL_HDR) $$< $$@
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Setup targets dependencies, specified by their link-time depedencies. The
@@ -364,7 +367,7 @@ endef
 # library targets becomes dependencies to the current target being processed.
 #
 # $1: List of targets
-# ----------------------------------------------------------------------------
+# ******************************************************************************
 define pp_setup_target_link_dependencies
 $(foreach t,$1,\
 	$(eval __bob_libinternal := $(sort $(filter $(patsubst $(_l)%,lib%.so,$($t_LIBS) $($t_LINK)),$1)))\
@@ -386,7 +389,7 @@ endef
 # basedirs (homes) can come from either recipe or environment.
 #
 # $: N/A
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define pp_setup_libbin_paths
 $(eval export __bobLISTHOMELIBS := \
 	$(abspath $(addsuffix /lib,$(sort $(__bobLISTALLHOMES)))))\
@@ -409,17 +412,17 @@ endef
 # in effect at the moment.
 #
 # $1: Module name -- $2: List of submodules
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define __bob_include_submodules
 $(eval __submodules := $(wildcard $(addsuffix /$(RULES),$(addprefix $($1_SRCDIR),$2))))
 .PHONY: $(__submodules)
 -include $(__submodules)
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Utilize the variables from a recipe.
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define __bob_setup_recipe
 $(if $(RECIPE_PROVIDES),,\
 	$(info $(W_PREFIX) Recipe does not provide/enable any subprojects!) \
@@ -457,7 +460,7 @@ endef
 
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
 # cannot build this software and that is an error.
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 __bob_ALLREQ_INCLPATH :=
 __bob_ALLREQ_LINKPATH :=
 define setup_requires
@@ -496,7 +499,7 @@ endef
 # use a slighlty tweaked depedency setup
 #
 # $1: Target, $2: Module
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define setup_target
 .PHONY: $1
 $1: $(TGTDIR)/$1
@@ -557,7 +560,7 @@ endef
 define __target_def
 $(addprefix $(_D),$(sort $($1_DEFINES) $(DEFINES)))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 # Cppcheck.
 #
@@ -583,31 +586,31 @@ endef
 # shall only be called from "user space".
 #
 # $1: Directory -- $2: Source specification
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define getsource
 $(if $1,$(eval dir:=$1),$(eval dir:=.)) \
 $(call __bob_dirprefix,$(dir),$(notdir $(wildcard $(_SRCDIR)$(dir)/$2)))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Same as getsource but recursive.
 #
 # $1: Directory -- $2: Source specification
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define getsource_recursive
 $(if $1,$(eval dir:=$1),$(eval dir:=.)) \
 $(shell $(__bobFIND) $(dir) -name "$2")
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Get all moc sources
 #
 # $1: Directory -- $2: Source specification
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 define getmocable
 $(if $1,$(eval dir:=$1),$(eval dir:=.)) \
 $(call __bob_dirprefix,$(dir),$(notdir $(shell egrep -sl "^[[:space:]]*Q_OBJECT" $(_SRCDIR)$(dir)/$2)))
 endef
-# ------------------------------------------------------------------------------
+# ******************************************************************************

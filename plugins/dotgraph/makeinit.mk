@@ -52,7 +52,7 @@ help-plugin-dotgraph:
 
 
 # Dotgraph generation
-# **********************************************************************
+# ******************************************************************************
 .PHONY: linkgraph requiregraph dotgraphdummy __remove_dot_and_ps_files __always__
 dotgraphdummy:;
 
@@ -89,7 +89,7 @@ __remove_dot_and_ps_files:
 	fi
 
 # Dot code macros
-# ------------------------------------------------------------------------
+# ******************************************************************************
 
 # Print the dot header and footer.
 # 

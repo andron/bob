@@ -78,12 +78,10 @@ $(MAIN_TARGETS):
 		" $$(date)\n"\
 		"**************************************************\n"
 
-# Disable zenity the which command can be slow, it has been so on Solaris.
-#	@if [ -n "$$(which zenity)" -a -n "$$DISPLAY" -a -n "$$with_zenity" ]; then \
-#		zenity --info --text "Meta stage $@ completed successfully for:\n$$(pwd)\n$$(date)"; fi
 
 # This can become quite parallell, so we use low resolution as a precaution.
 .LOW_RESOLUTION_TIME: $(MAIN_TARGETS)
+
 
 distclean: __remove_meta_install_dir
 __remove_meta_install_dir:
@@ -103,7 +101,7 @@ include $(__subprojectinfos)
 include $(__subprojectrules)
 
 
-# The list of targets which just gets forwarded the projects
+# The list of targets which just gets forwarded without the projects
 # version. I.e. target all depends on target all_<P>, where <P> is a project
 # name.
 $(MAIN_TARGETS): $$(addprefix $$@_,$(LIST_FEATNAMES))

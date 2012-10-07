@@ -188,8 +188,8 @@ MAKEFILE_LIST :=
 .PHONY: $(BOBHOME)/Makefile.globaltargets.mk
 include $(BOBHOME)/Makefile.globaltargets.mk
 
-# Helper targets for various stuff. Target for tar and rpm for example. This
-# could go into the globaltargets file.
+
+# Helper targets for various stuff.
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.helpertargets.mk
 include $(BOBHOME)/Makefile.helpertargets.mk

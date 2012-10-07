@@ -205,7 +205,7 @@ endif
 
 
 # Tar file generating target.
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 # Generic rule for making a tar.gz file. Uses package destdir as base for all
 # its operations. Which must be specified by the dependee target. I.e. the
 # target that depends on a tar.gz file must define the variable.  (It is very
@@ -257,11 +257,11 @@ package: $$(__pkgdir)/$(__pkgfile)
 	if [ ! -r $@ ]; then echo "$(W_PREFIX) failed to create $@"; exit 1; fi;
 
 endif
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Package/Rpm target
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 # Rules for build and creating rpm files. Requires a rpmbuild command to be
 # installed on the system.
 ifdef __bob_have_feature_rpm
@@ -340,7 +340,7 @@ clean-rpmenv clean-rpmenvironment:
 .PHONY: rpmenv rpmenvironment clean-rpmenv clean-rpmenvironment __remove_specfile
 
 endif
-# ------------------------------------------------------------------------------
+# ******************************************************************************
 
 
 # Phony target to depend upon if target must always be triggered.

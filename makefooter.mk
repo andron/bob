@@ -14,14 +14,14 @@ TARGETS    := $(strip $(sort $(TARGETS)))
 SUBMODULES := $(strip $(sort $(SUBMODULES) test))
 
 # Skip all this stuff if there are not targets. Some might create makerules
-# files of this kind to tie together directories.
+# files of this kind to tie directories together.
 # TARGETS ----------------------------------------------------------------------
 ifneq "$(TARGETS)" ""
 
 # Prevent archive targets
 $(if $(filter lib%.a,$(TARGETS)),\
 	$(eval TARGETS := $(filter-out lib%.a,$(TARGETS)))\
-	$(info $(W_PREFIX) Archives are deprecated, update $(_MODULE)/$(RULES)))
+	$(info $(W_PREFIX) Archives are created automatically, update $(_MODULE)/$(RULES)))
 
 # Copy target to all targets list so that different processing can be done
 # depending on plugins and such stuff. Operations which should be untouched by
@@ -79,10 +79,6 @@ $(if $(findstring qt4,$(__bobLIST_REQUIRES)),\
 endif
 
 # Call a lot of macros to check, hmm... "stuff"
-#
-# @note: The <T>_LIBS variable is parsed to figure out which libraries are
-#        linked against, i.e. it needs special treatment.
-#
 $(foreach t,$(ALL_TARGETS),                                   \
 	$(eval $t_LIBS += $(_LIBS))                                 \
 	$(eval $t_LINK += $(_LINK))                                 \
@@ -110,7 +106,7 @@ endif
 #UI_STYLE :=
 
 # Module rules
-# ----------------------------------------------------------------------------
+# ******************************************************************************
 # The stamp file is precious, and the module name itself should be phony. A
 # problem with having the module as a phony target is that a target in the
 # module with the same name as the module will then also be phony... (later)

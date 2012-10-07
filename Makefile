@@ -40,11 +40,12 @@ FOOTER_INFO  := $(BOBHOME)/makefooter_info.mk
 RULES        := makerules.mk
 INFOS        := makeinfo.mk
 
+# Make these files phony, we don't want make to consider these.
 .PHONY: \
-	$(BOBHOME)/makeheader.mk \
-	$(BOBHOME)/makefooter.mk \
-	$(BOBHOME)/makeheader_info.mk \
-	$(BOBHOME)/makefooter_info.mk
+	$(HEADER_BUILD) \
+	$(FOOTER_BUILD) \
+	$(HEADER_INFO) \
+	$(FOOTER_INFO)
 # ******************************************************************************
 
 
@@ -72,6 +73,7 @@ $(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
 $(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
 export PLATFORM ?= $(shell uname -s)
 export MACHINE  ?= $(shell uname -m)
+
 
 # External programs configuration.
 # ******************************************************************************
@@ -173,7 +175,14 @@ $(if $(findstring $(__bobLINKTYPE),$(COMPILER_LINKTYPES)),,\
 
 # Source and build directory base references, user setable.
 # ******************************************************************************
+# The source directory is actually pwd, and for a software project (module) it
+# is the top directory holding the source code etc. Setting this to something
+# else may have little or no practical use.
 override srcdir   := $(abspath $(if $(srcdir),$(srcdir),.))
+# The build directory is the base directory for object and target artifacts
+# directories. The feature is that this can be pointed to /var/tmp (or
+# similiar) while still having the code checked out on a "safe but slow"
+# NFS-filesystem.
 override builddir := $(abspath $(if $(builddir),$(builddir),.))
 # ******************************************************************************
 
@@ -209,10 +218,10 @@ applicationsdir ?= $(datadir)/applications
 # ******************************************************************************
 
 
-# Fix recipe path. The recipe is a file taken on the command line, and might as
-# such not always exist, and due to technical problems the base path were the
-# file is used might vary, thus we must provide an absolute path as soon as
-# possible.
+# Fix recipe path. The recipe is a file taken on the command line, and might
+# as such not always exist, and due to technical problems the base path were
+# the file is actually used might vary because of meta or build mode. thus we
+# must provide an absolute path as soon as possible.
 # ******************************************************************************
 ifdef recipe
 MAKEOVERRIDES := $(patsubst recipe=%,recipe=$(abspath $(recipe)),$(MAKEOVERRIDES))
@@ -225,8 +234,8 @@ endif
 .DEFAULT:
 	@echo " $(__bobPREFIX) No target \"$@\""
 # Default is to build the all entry, to which all default targets shall be
-# connected. Target 'install' depends on 'all'.
-ifdef BOB.TEST
+# connected. Target 'install' depends on 'all' etc.
+ifdef BOB.BUILD_TEST
 default: all test
 else
 default: all
