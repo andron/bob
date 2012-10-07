@@ -14,27 +14,13 @@
 # all those goes into Makefile.functions.mk.
 #
 
+
 # Bob shell for building and running.
-#
-# $(1): Module name
-# ------------------------------------------------------------------------------
-.PHONY: bobshell buildshellinfo
-buildshellinfo:
-	@echo
-	@printf " %-12s %s\n" "Project:"  "$(__name)-$(__version)-$(__release)"
-	@printf " %-12s %s\n" "Requires:" "$(sort $(REQUIRES))"
-	@printf " %-12s %s\n" "DEFINES:"  "$(strip $(DEFINES)")
-	@printf " %-12s %s\n" "CXXFLAGS:" "$(strip $(CXXFLAGS))"
-	@printf " %-12s %s\n" "CFLAGS:"   "$(strip $(CFLAGS))"
-	@printf " %-12s %s\n" "LDFLAGS:"  "$(strip $(LDFLAGS))"
-bobshell: BOBSHELL_RESTRICTED ?=
+# ******************************************************************************
+bobshell: BOBSHELL_BASH_ARGV ?=
 bobshell:
 	@if [ $$BOBBUILDBASH ]; then \
-		echo $$SHLVL; \
-		echo ; \
-		echo "Ups, you must run 'make $@' from a level 1 shell. (SHLVL > 1)"; \
-		echo "In this case you are running a $@ within a $@."; \
-		echo ; \
+		echo -e "\nYou are already inside a $@ environment.\n"; \
 		exit 0; \
 	else \
 		LD_LIBRARY_PATH=$(abspath $(TGTDIR)):$$LD_LIBRARY_PATH:$${__bobLISTHOMELIBS// /:}; \
@@ -45,10 +31,37 @@ bobshell:
 		export BOBBUILDBASH=1; \
 		export RECIPEFILE=$(recipe); \
 		export MAKELEVEL=0; \
-		bash --noprofile --rcfile $(BOBHOME)/bobbashrc $(BOBSHELL_RESTRICTED); \
-		echo " ... done with recipe $(recipe)"; \
+		bash --noprofile --rcfile $(BOBHOME)/bobbashrc $(BOBSHELL_BASH_ARGV); \
 	fi;
-# ------------------------------------------------------------------------
+.PHONY: bobshell
+# ******************************************************************************
+
+
+# Build environment extraction.
+# ******************************************************************************
+# Create buildinfo.txt (phony, so the file will always be overwritten)
+__buildinfofile := buildinfo.txt
+distclean clean: __remove_buildinfofile
+__remove_buildinfofile:
+	@$(__bobRM) $(__buildinfofile)
+buildinfo: export __name     := $(__name)
+buildinfo: export __version  := $(__version)
+buildinfo: export __release  := $(__release)
+buildinfo: export __group    := $(__group)
+buildinfo: export __hostname := $(HOST)
+buildinfo: export CXX      := $(CXX)
+buildinfo: export CXXFLAGS := $(CXXFLAGS)
+buildinfo: export CC       := $(CC)
+buildinfo: export CFLAGS   := $(CFLAGS)
+buildinfo: export CPPFLAGS := $(CPPFLAGS)
+buildinfo: export LD       := $(LD)
+buildinfo: export LDFLAGS  := $(LDFLAGS)
+buildinfo: export DEFINES  := $(DEFINES)
+buildinfo: $(__buildinfofile)
+$(__buildinfofile):
+	$(BOBHOME)/buildinfo.sh > $@
+.PHONY: buildinfo __remove_buildinfofile $(__buildinfofile)
+# ******************************************************************************
 
 
 # Tar file generating target.
