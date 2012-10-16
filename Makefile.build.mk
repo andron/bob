@@ -206,7 +206,7 @@ $(call pp_setup_target_link_dependencies,$(__bobLIST_TARGETS))
 $(call pp_setup_libbin_paths)
 
 
-# Include all .d-files. This is handled via setup_target.
+# Empty target for .d-files. Including is handled via setup_target macro.
 %.d:;
 
 
