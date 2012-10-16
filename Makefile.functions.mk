@@ -49,6 +49,14 @@ $(if $(diff1), \
 	$(error Variable reassignment error, DEFINES in $($1_SRCDIR)$(RULES))) \
 $(eval export DEFINES := $(sort $(DEFINES)))
 endef
+
+# Target .d-files
+#
+# $1: Target name -- $2: Target object directory
+define __bob_target_dfiles
+$(wildcard $(addprefix $2,$(addsuffix .d,$(basename $(sort $($1_SRCS))))))
+endef
+
 # ******************************************************************************
 
 
@@ -500,7 +508,7 @@ $(if $($1_LINK),\
 	$(eval $1_LINK := $(addprefix $(_l),$($1_LINK))) \
 	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bobALLREQLINK))))
 # Target .d-files
-__target_d_files := $(wildcard $(addsuffix *.d,$(addprefix $($2_OBJDIR),$(sort $(dir $($1_SRCS))))))
+$(eval __target_d_files := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
 .PHONY: $(__target_d_files)
 -include $(__target_d_files)
 # Target compile flags
