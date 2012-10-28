@@ -51,10 +51,6 @@ endif
 $(_MODULE)_TARGETS := $(addprefix $(TGTDIR)/,$(TARGETS))
 
 
-# Check if variable DEFINES has been altered.
-$(call __bob_check_defines_flag)
-
-
 # Append module defines to each target defines.
 $(if $(_DEFINES),$(foreach t,$(ALL_TARGETS),$(eval $t_DEFINES += $(_DEFINES))))
 

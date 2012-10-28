@@ -131,9 +131,6 @@ include $(__bobRECIPE)
 # Parse the recipe and make *some* magic happen, not to much this time, to not
 # confuse user etc.
 $(call __bob_setup_recipe)
-# This will store the newly included defines (and such stuff). Further calls to
-# this function will cause an error if defines have been modified or removed.
-$(call __bob_check_defines_flag)
 endif
 
 

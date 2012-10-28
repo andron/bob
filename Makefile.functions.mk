@@ -32,24 +32,6 @@ define __bob_clean_path
 $(subst /./,/,$(subst //,/,$1))
 endef
 
-# Check the environment variable DEFINES. First call stores the value and then
-# subsequent calls checks if anything has been removed. Removing define flags
-# should not be allowed. I.e. only += is allowed.
-#
-# - no args -
-define __bob_check_defines_flag
-$(if $(__bobDEFINES), \
-	$(eval diff1 := $(filter-out $(sort $(DEFINES)), $(sort $(__bobDEFINES)))) \
-	$(eval diff2 := $(filter-out $(sort $(__bobDEFINES)), $(sort $(DEFINES)))), \
-	$(if $(DEFINES), \
-		$(eval __bobDEFINES := $(sort $(DEFINES))))) \
-$(if $(diff1), \
-	$(info DEFINES modified in $($1_SRCDIR)$(RULES), removed "$(diff1)") \
-	$(info DEFINES can only be appended to using "+=".) \
-	$(error Variable reassignment error, DEFINES in $($1_SRCDIR)$(RULES))) \
-$(eval export DEFINES := $(sort $(DEFINES)))
-endef
-
 # Target .d-files
 #
 # $1: Target name -- $2: Target object directory
