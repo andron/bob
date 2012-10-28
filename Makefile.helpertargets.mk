@@ -176,6 +176,7 @@ rpm: override RPM_BUILD_FLAGS := \
 rpm: RPM_BUILD_OPTION := -bb
 rpm: override RPM_BUILD_FLAGS += $(RPM_BUILD_OPTION)
 rpm: override RPM_BUILD_FLAGS += --define '_topdir $(RPM_USER_ROOT)'
+rpm: override RPM_BUILD_FLAGS += $(if $(__bob.buildarch),--target=$(__bob.buildarch))
 rpm: $(__rpmspecfile) | rpmenvironment
 	@+if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) RPMFILE : $(RPM_BUILD_FLAGS)"; \

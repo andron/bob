@@ -136,6 +136,14 @@ endif
 # ******************************************************************************
 
 
+# Build architecture
+# ******************************************************************************
+# Variable buildarch have no default, default is to use machine arch. Its use
+# is mostly/only for building 32-bit software on 64-bit machines.
+export __bob.buildarch ?= $(buildarch)
+# ******************************************************************************
+
+
 # Compiler, build and linktypes.
 # ******************************************************************************
 # Default to using gcc, (changing is easy). Default buildtype SHALL always be

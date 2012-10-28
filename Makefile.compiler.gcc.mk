@@ -31,11 +31,14 @@ __buildtype_release   := -O2 -g -DNO_DEBUG -DQT_NO_DEBUG
 __buildtype_debug     := -O0 -ggdb3 -fno-inline -rdynamic -DDEBUG -DQT_DEBUG
 __buildtype_pedantic  := $(__buildtype_release) -pedantic
 __buildtype_profiling := -O2 -ggdb3 -pg -DDEBUG -DQT_DEBUG
+# Build architecture
+__buildarch_i686      := -m32
+__buildarch_x86_64    := -m64
 # Re-assign and clear with := is to make sure the flags are treated as
 # immediate variabels by make. (Subsequent += will assign the value
 # immediately).
-CFLAGS   :=
-CXXFLAGS :=
+CFLAGS   := $(__buildarch_$(__bob.buildarch))
+CXXFLAGS := $(__buildarch_$(__bob.buildarch))
 # Add default compiler flags for all modes.
 CFLAGS   += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
 CXXFLAGS += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
