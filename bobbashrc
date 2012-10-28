@@ -14,7 +14,7 @@ else
 	__promptmsg="n/a"
 fi
 
-export PS1="BoB(\j)($__promptmsg):${__bobBUILDTYPE}@\W \#> "
+export PS1="BoB(\j)($__promptmsg):${__bob.buildtype}@\W \#> "
 
 # Safe aliases. Some people hurt themselves and sometimes others.
 alias cp='cp -i'

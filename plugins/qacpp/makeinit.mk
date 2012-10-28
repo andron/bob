@@ -15,5 +15,5 @@ qacpp: QACPPSETTINGS ?= settings.via
 qacpp: CXX = qaw qacpp -via $(QACPPSETTINGS) -cargs echo
 # Rerun with the adjusted variables.
 qacpp:
-	@echo "$(__bobPREFIX) Running static code analysis"
+	@echo "$(__bob.prefix) Running static code analysis"
 	@$(MAKE) -C . CXX="$(CXX)"

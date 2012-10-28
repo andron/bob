@@ -40,8 +40,8 @@ CXXFLAGS :=
 CFLAGS   += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
 CXXFLAGS += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
 # Add buildtype flags.
-CFLAGS   += $(__buildtype_$(__bobBUILDTYPE))
-CXXFLAGS += $(__buildtype_$(__bobBUILDTYPE))
+CFLAGS   += $(__buildtype_$(__bob.buildtype))
+CXXFLAGS += $(__buildtype_$(__bob.buildtype))
 # ********************************************************************************
 
 # Link types
@@ -53,7 +53,7 @@ CXXFLAGS += $(__buildtype_$(__bobBUILDTYPE))
 __linktype_default     := -L$(TGTDIR) $(LDFLAGS)
 __linktype_noundefined := -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
 LDFLAGS :=
-LDFLAGS += $(__linktype_$(__bobLINKTYPE))
+LDFLAGS += $(__linktype_$(__bob.linktype))
 # ********************************************************************************
 
 # Target architecture

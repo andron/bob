@@ -51,18 +51,18 @@ INFOS        := makeinfo.mk
 
 # Prefixes for output written by info or error. The prefixes are used to present
 # different types of output. All prefixes are themselves prefixed with
-# __bobPREFIX.
+# __bob.prefix.
 # ******************************************************************************
-__bobPREFIX := $(space)[$(lastword $(subst /, ,$(dir $(realpath $(firstword $(MAKEFILE_LIST))))))]
-PREFIX   := $(__bobPREFIX)
-D_PREFIX := $(__bobPREFIX) //# Debug
-W_PREFIX := $(__bobPREFIX) !!# Warning
-C_PREFIX := $(__bobPREFIX) **# Compile
-L_PREFIX := $(__bobPREFIX) ==# Link
-I_PREFIX := $(__bobPREFIX) >># Install
-T_PREFIX := $(__bobPREFIX)   # Text output
-X_PREFIX := $(__bobPREFIX) TT# Test output
-V_PREFIX := $(__bobPREFIX) VV# Test output
+__bob.prefix := $(space)[$(lastword $(subst /, ,$(dir $(realpath $(firstword $(MAKEFILE_LIST))))))]
+PREFIX   := $(__bob.prefix)
+D_PREFIX := $(__bob.prefix) //# Debug
+W_PREFIX := $(__bob.prefix) !!# Warning
+C_PREFIX := $(__bob.prefix) **# Compile
+L_PREFIX := $(__bob.prefix) ==# Link
+I_PREFIX := $(__bob.prefix) >># Install
+T_PREFIX := $(__bob.prefix)   # Text output
+X_PREFIX := $(__bob.prefix) TT# Test output
+V_PREFIX := $(__bob.prefix) VV# Test output
 # ******************************************************************************
 
 
@@ -146,9 +146,9 @@ compiler  ?= gcc
 buildtype ?= release
 linktype  ?= default
 # Map to "private" variable.
-export __bobCOMPILER  := $(compiler)
-export __bobBUILDTYPE := $(buildtype)
-export __bobLINKTYPE  := $(linktype)
+export __bob.compiler  := $(compiler)
+export __bob.buildtype := $(buildtype)
+export __bob.linktype  := $(linktype)
 
 # Include compiler file, complain if it does not exist.
 __bob_compiler_file := $(wildcard $(BOBHOME)/Makefile.compiler.$(compiler).mk)
@@ -158,18 +158,18 @@ else
 __bob_available_compilers := \
 	$(patsubst Makefile.compiler.%.mk,%,$(notdir $(wildcard $(BOBHOME)/Makefile.compiler.*.mk)))
 $(info $(W_PREFIX) Available compilers are $(__bob_available_compilers))
-$(error Unknown compiler $(__bobCOMPILER))
+$(error Unknown compiler $(__bob.compiler))
 endif
 
 # Santity check the buildtype.
-$(if $(findstring $(__bobBUILDTYPE),$(COMPILER_BUILDTYPES)),,\
-	$(info $(W_PREFIX) Available buildtypes for $(__bobCOMPILER) are: $(COMPILER_BUILDTYPES)) \
-	$(error Unknown buildtype $(__bobBUILDTYPE)))
+$(if $(findstring $(__bob.buildtype),$(COMPILER_BUILDTYPES)),,\
+	$(info $(W_PREFIX) Available buildtypes for $(__bob.compiler) are: $(COMPILER_BUILDTYPES)) \
+	$(error Unknown buildtype $(__bob.buildtype)))
 
 # Sanity check the linktype.
-$(if $(findstring $(__bobLINKTYPE),$(COMPILER_LINKTYPES)),,\
-	$(info $(W_PREFIX) Available linktypes for $(__bobCOMPILER) are: $(COMPILER_LINKTYPES)) \
-	$(error Unknown linktype $(__bobLINKTYPES)))
+$(if $(findstring $(__bob.linktype),$(COMPILER_LINKTYPES)),,\
+	$(info $(W_PREFIX) Available linktypes for $(__bob.compiler) are: $(COMPILER_LINKTYPES)) \
+	$(error Unknown linktype $(__bob.linktypeS)))
 # ******************************************************************************
 
 
@@ -241,7 +241,7 @@ endif
 # ******************************************************************************
 # Default target is to say that there is no such target.
 .DEFAULT:
-	@echo " $(__bobPREFIX) No target \"$@\""
+	@echo " $(__bob.prefix) No target \"$@\""
 # Default is to build the all entry, to which all default targets shall be
 # connected. Target 'install' depends on 'all' etc.
 ifdef BOB.BUILD_TEST
@@ -261,9 +261,9 @@ include $(BOBHOME)/Makefile.common.mk
 # ******************************************************************************
 ifneq "$(filter bob.%,$(MAKECMDGOALS))" ""
 # Use different prefix when in info mode
-__bobPREFIX := " [bob]"
+__bob.prefix := " [bob]"
 bob.package:
-	@echo "$(__bobPREFIX) Creating BOB-package from $(BOBHOME)"; \
+	@echo "$(__bob.prefix) Creating BOB-package from $(BOBHOME)"; \
 	$(__bobTAR) -C $${BOBHOME%/*} \
 		--exclude "*/.git*" \
 		--exclude "*/.svn*" \
@@ -272,8 +272,8 @@ bob.package:
 
 bob.info:
 	@echo -e \
-	"$(__bobPREFIX) Path:    $(BOBHOME)\n"\
-	"$(__bobPREFIX) Plugins: $(strip $(sort $(BOBPLUGINS)))"
+	"$(__bob.prefix) Path:    $(BOBHOME)\n"\
+	"$(__bob.prefix) Plugins: $(strip $(sort $(BOBPLUGINS)))"
 
 else
 # Extract name, version and release, the N,V,R tuple, from the makerules.mk

@@ -21,7 +21,7 @@ __subprojectrules := \
 
 
 # Use different prefix in meta mode.
-__bobPREFIX := " [bob]"
+__bob.prefix := " [bob]"
 
 
 # Default prefix for installation of everything.
@@ -86,11 +86,11 @@ $(MAIN_TARGETS):
 distclean: __remove_meta_install_dir
 __remove_meta_install_dir:
 	@-foo=$(META_BUILD_ROOT); \
-	echo "$(__bobPREFIX) Removing temporary install directory $${foo##$(PWD)\/}"; \
+	echo "$(__bob.prefix) Removing temporary install directory $${foo##$(PWD)\/}"; \
 	$(__bobRMDIR) $(META_BUILD_ROOT)
 
 help:
-	@echo "$(__bobPREFIX) Help not available in meta mode, yet"
+	@echo "$(__bob.prefix) Help not available in meta mode, yet"
 
 # Include all sub-project files, using a info header for the parsing. Instead of
 # the normal build headers used by the build-stage.

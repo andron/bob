@@ -153,12 +153,12 @@ $(eval $(call generate_install_targets,$(_MODULE),$(ALL_TARGETS)))
 $(eval $(call __bob_include_submodules,$(_MODULE),$(SUBMODULES)))
 
 ifdef BOB.VERBOSE
-$(info $(__bobPREFIX) @@ Processing $($(_MODULE)_SRCDIR) ...)
+$(info $(__bob.prefix) @@ Processing $($(_MODULE)_SRCDIR) ...)
 else
 ifndef __bobSTARTEDPARSING
 __bobSTARTEDPARSING := true
 ifeq "$(MAKECMDGOALS)" ""
-$(info $(__bobPREFIX) @@ Processing buildfiles)
+$(info $(__bob.prefix) @@ Processing buildfiles)
 endif
 endif
 endif

@@ -38,8 +38,8 @@ CXXFLAGS :=
 CFLAGS   += -KPIC -D'__attribute__(x)=' -D$(PLATFORM)
 CXXFLAGS += -KPIC -D'__attribute__(x)=' -D$(PLATFORM)
 # Add buildtype flags
-CFLAGS   += $(__buildtype_$(__bobBUILDTYPE))
-CXXFLAGS += $(__buildtype_$(__bobBUILDTYPE))
+CFLAGS   += $(__buildtype_$(__bob.buildtype))
+CXXFLAGS += $(__buildtype_$(__bob.buildtype))
 # ********************************************************************************
 
 # Link types
@@ -50,7 +50,7 @@ CXXFLAGS += $(__buildtype_$(__bobBUILDTYPE))
 # specified flag.
 __linktype_default := -L$(TGTDIR) $(LDFLAGS)
 LDFLAGS :=
-LDFLAGS += $(__linktype_$(__bobLINKTYPE))
+LDFLAGS += $(__linktype_$(__bob.linktype))
 # ********************************************************************************
 
 # Target architecture
