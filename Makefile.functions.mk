@@ -207,20 +207,20 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing $$(@F)"; \
-		$(__bobMOC3) -f $$< $$(OUTPUT_OPTION))) \
+		$(__bob.cmd.moc3) -f $$< $$(OUTPUT_OPTION))) \
 $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing header $$(@F)"; \
-		$(__bobUIC3) $$< $$(OUTPUT_OPTION))
+		$(__bob.cmd.uic3) $$< $$(OUTPUT_OPTION))
 
 # Each ui-source file shall depend on its corresponding headerfile, which was
 # generated and put in the objectdir.
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing implementation $$(@F)"; \
-		$$(__bobUIC3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
+		$$(__bob.cmd.uic3) $($2_SRCDIR)$(t) -i $$< $$(OUTPUT_OPTION))
 
 # Each ui-moc-source file shall depend on its corresponding headerfile, which
 # was generated and put in the objectdir. Same as the rule above just another
@@ -229,7 +229,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_FRM))),\
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_moc_source,$(notdir $(t)))): \
 		$(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(t)))) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing uiced header $$(@F)"; \
-		$(__bobMOC3) -f $$< $$(OUTPUT_OPTION)))
+		$(__bob.cmd.moc3) -f $$< $$(OUTPUT_OPTION)))
 endef
 
 define setup_resource_rules_qt3
@@ -247,13 +247,13 @@ $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_MOC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_moc_source,$(notdir $(f)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Mocing $$(@F) ($1)"; \
-		$(__bobMOC4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
+		$(__bob.cmd.moc4) $$(foreach t,$1,$(call __target_inc,$$(t),$2) $$($$(t)_INCL_MOC)) $$< $$(OUTPUT_OPTION))) \
 $(foreach f,$(sort $(foreach t,$1,$($(t)_SRCS_FRM))),\
 # Each ui-header file shall depend on its corresponding .ui-file
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_uic_header,$(notdir $(f)))): \
 		$(call __bob_dirprefix,$($2_SRCDIR),$(f)) $$$$(@D)/.stamp
 		@echo "$(C_PREFIX) [$2] Uicing $$(@F) ($1)"; \
-		$(__bobUIC4) $$< $$(OUTPUT_OPTION)))
+		$(__bob.cmd.uic4) $$< $$(OUTPUT_OPTION)))
 endef
 
 # $1: List of targets -- $2: Module name
@@ -262,7 +262,7 @@ $(foreach t,$(sort $(foreach i,$1,$($(i)_SRCS_RCC))),
 	$(eval $(call __bob_dirprefix,$($2_OBJDIR),$(call __bob_to_rcc_source,$(notdir $(t)))): \
 	$(call __bob_dirprefix,$($2_SRCDIR),$(t)) $($2_OBJDIR)/.stamp
 		@echo "$(C_PREFIX) [$2] Rccing resource $$(@F) ($1)"; \
-		$(__bobRCC4) $$< $$(OUTPUT_OPTION)))
+		$(__bob.cmd.rcc4) $$< $$(OUTPUT_OPTION)))
 endef
 # ******************************************************************************
 
@@ -325,7 +325,7 @@ endef
 define __bob_install_include_files
 .PHONY: __module-install-include-files-$1
 $(eval __all_src_include_files := \
-	$(subst ./,,$(shell $(__bobFIND) $($1_SRCDIR)include -type f -! -wholename "*/.svn/*")))
+	$(subst ./,,$(shell $(__bob.cmd.find) $($1_SRCDIR)include -type f -! -wholename "*/.svn/*")))
 $(eval __all_dst_include_files := \
 	$(addprefix $(DESTDIR)$(includedir)/, \
 		$(patsubst include/%,%, \
@@ -333,7 +333,7 @@ $(eval __all_dst_include_files := \
 __module-install-$1: __module-install-include-files-$1
 __module-install-include-files-$1: $(__all_dst_include_files)
 $(__all_dst_include_files): $(DESTDIR)$(includedir)/%:$($1_SRCDIR)include/%
-	@$(__bobINSTALL_HDR) $$< $$@
+	@$(__bob.cmd.install_hdr) $$< $$@
 endef
 # ******************************************************************************
 
@@ -549,7 +549,7 @@ $(foreach t,$1,
 cppcheck: $t.cppcheck
 $t.cppcheck:
 	@echo "$(X_PREFIX) $$(@F)"; \
-	$(__bobCPPCHECK) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($2_SRCDIR))
+	$(__bob.cmd.cppcheck) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($2_SRCDIR))
 endef
 
 
@@ -579,7 +579,7 @@ endef
 # ******************************************************************************
 define getsource_recursive
 $(if $1,$(eval dir:=$1),$(eval dir:=.)) \
-$(shell $(__bobFIND) $(dir) -name "$2")
+$(shell $(__bob.cmd.find) $(dir) -name "$2")
 endef
 # ******************************************************************************
 

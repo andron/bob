@@ -58,8 +58,8 @@ $(TGTDIR)/%.so: SOPATCH = $(word 3,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so:
 	$(if $(__bobSILENT),echo "$(L_PREFIX) DSO     $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SOBASE).$(SOMAJOR)) $(filter %.o,$^) $(__target_LDFLAGS);
 	@[ -e $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) ] \
-	&& $(__bobLN) $(notdir $@).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $@.$(SOMAJOR) \
-	&& $(__bobLN) $(notdir $@).$(SOMAJOR) $@;
+	&& $(__bob.cmd.ln) $(notdir $@).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $@.$(SOMAJOR) \
+	&& $(__bob.cmd.ln) $(notdir $@).$(SOMAJOR) $@;
 
 
 # *** ARCHIVES ***
@@ -97,7 +97,7 @@ $(DESTDIR)$(sbindir)/%: $(TGTDIR)/% | $(DESTDIR)$(sbindir)
 	$(call pretty_print_installation)$(INSTALL_EXEC) $< $@
 
 $(DESTDIR)$(libdir)/%.so: $(TGTDIR)/%.so | $(DESTDIR)$(libdir)
-	$(call pretty_print_installation)$(__bobRSYNC) $<* $(dir $@)
+	$(call pretty_print_installation)$(__bob.cmd.rsync) $<* $(dir $@)
 
 $(DESTDIR)$(libdir)/%.a: $(TGTDIR)/%.a | $(DESTDIR)$(libdir)
 	$(call pretty_print_installation)$(INSTALL_DATA) $< $@

@@ -43,7 +43,7 @@ bobshell:
 __buildinfofile := buildinfo.txt
 distclean clean: __remove_buildinfofile
 __remove_buildinfofile:
-	@$(__bobRM) $(__buildinfofile)
+	@$(__bob.cmd.rm) $(__buildinfofile)
 buildinfo: export __name     := $(__name)
 buildinfo: export __version  := $(__version)
 buildinfo: export __release  := $(__release)
@@ -82,7 +82,7 @@ distclean clean: __remove_packagefile
 __remove_packagefile:
 	@if [ -e $(__pkgdir)/$(__pkgfile) ]; then \
 		echo "$(T_PREFIX) Removing package file ..."; \
-		$(__bobRM) $(__pkgdir)/$(__pkgfile); \
+		$(__bob.cmd.rm) $(__pkgdir)/$(__pkgfile); \
 	fi;
 
 # The package target depends on the package file, of course. Though the package
@@ -104,7 +104,7 @@ package: $$(__pkgdir)/$(__pkgfile)
 		linkeddir=0;                            \
 	fi;                                       \
 	echo "$(T_PREFIX) TARFILE $@";            \
-	$(__bobTAR) $(__pkgflags) $@              \
+	$(__bob.cmd.tar) $(__pkgflags) $@         \
 	$(__excludetgtobj)                        \
 	--exclude '.svn'                          \
 	--exclude '.git'                          \
@@ -127,16 +127,16 @@ endif
 ifdef __bob_have_feature_rpm
 
 # Check prerequisites
-ifeq "$(__bobAWK)" ""
+ifeq "$(__bob.cmd.awk)" ""
 $(error Must have gawk)
 endif
 
-ifeq "$(__bobTAR)" ""
+ifeq "$(__bob.cmd.tar)" ""
 $(error Must have tar)
 endif
 
 ifndef RPM_USER_ROOT
-RPM_USER_ROOT := $(shell $(__bobRPM) --eval %_topdir)
+RPM_USER_ROOT := $(shell $(__bob.cmd.rpm) --eval %_topdir)
 endif
 
 # The rpm specfile shall have the same name as the project.
@@ -144,7 +144,7 @@ __rpmspecfile := $(__name).spec
 
 # Reset package if we have rpm. Obs do not move this line above the tar package
 # definition section.
-__pkgdir := $(shell $(__bobRPM) --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
+__pkgdir := $(shell $(__bob.cmd.rpm) --define '_topdir $(RPM_USER_ROOT)' --eval %_sourcedir)
 
 # Target rpm is like package just a bit more complex. Depends on package file,
 # but also on some flags being defined. RELEASENAME and RPMFLAGS.
@@ -161,12 +161,12 @@ $(__rpmspecfile): awkvars := $(addprefix -v,$(foreach t,name version release gro
 $(__rpmspecfile): $(__rpmspecfile).in __always_build__
 	@if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) SPECFILE $@ : $(awkvars)"; \
-		$(__bobAWK) $(awkvars) -f $(BOBHOME)/specreplace.awk $< > $@; fi
+		$(__bob.cmd.awk) $(awkvars) -f $(BOBHOME)/specreplace.awk $< > $@; fi
 
 # Remove the specfile when doing clean or distclean
 distclean clean: __remove_specfile
 __remove_specfile:
-	@$(__bobRM) $(__rpmspecfile)
+	@$(__bob.cmd.rm) $(__rpmspecfile)
 
 comma := ,
 rpm: $(__pkgdir)/$(__pkgfile)
@@ -180,7 +180,7 @@ rpm: override RPM_BUILD_FLAGS += $(if $(__bob.buildarch),--target=$(__bob.builda
 rpm: $(__rpmspecfile) | rpmenvironment
 	@+if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) RPMFILE : $(RPM_BUILD_FLAGS)"; \
-		$(__bobRPMBUILD) $(RPM_BUILD_FLAGS) $(__rpmspecfile); fi
+		$(__bob.cmd.rpmbuild) $(RPM_BUILD_FLAGS) $(__rpmspecfile); fi
 
 # RPM build environment in users home and all the directories needed.  Some
 # directories must exist for the rpmbuild command to work. Install these.
@@ -196,7 +196,7 @@ rpmenvironment: $(__rpmmacrofile) $(__rpmdirectories)
 
 # Clean rpm environment. Mostly for debugging.
 rpmenvironment.clean:
-	@$(__bobRMDIR) $(__rpmmacrofile) $(__rpmdirectories)
+	@$(__bob.cmd.rmdir) $(__rpmmacrofile) $(__rpmdirectories)
 
 .PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 

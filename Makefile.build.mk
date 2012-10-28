@@ -43,18 +43,18 @@ __bobBUILDSTAGE := 1
 # rules to the same target if they need to. Neither clean nor install should
 # need any such rules... but who knows.
 clean-tgt:
-	@-$(__bobRMDIR) $(TGTBASE)
+	@-$(__bob.cmd.rmdir) $(TGTBASE)
 clean-obj:
-	@-$(__bobRMDIR) $(OBJBASE)
+	@-$(__bob.cmd.rmdir) $(OBJBASE)
 
 clean: clean-tgt clean-obj
 
-$(if $(__bobFIND), \
-	$(eval FINDRM := $(__bobFIND) . \( -name "*~" -or -name "\#*" \) -print -exec $(__bobRM) {} \;),\
+$(if $(__bob.cmd.find), \
+	$(eval FINDRM := $(__bob.cmd.find) . \( -name "*~" -or -name "\#*" \) -print -exec $(__bob.cmd.rm) {} \;),\
 	$(eval FINDRM := echo Command \'find\' not available))
 distclean:
 	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"; \
-	$(__bobRMDIR) $(TGTBASE) $(OBJBASE); \
+	$(__bob.cmd.rmdir) $(TGTBASE) $(OBJBASE); \
 	$(FINDRM)
 
 
@@ -69,7 +69,7 @@ software-install: \
 	override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
 software-install: all
 	@-$(MAKE) install prefix=$(prefix); \
-	cd $(prefix)/.. && $(__bobRM) latest && $(__bobLN) $(__latest) latest
+	cd $(prefix)/.. && $(__bob.cmd.rm) latest && $(__bob.cmd.ln) $(__latest) latest
 
 
 # Doc targets
@@ -79,7 +79,7 @@ DOXYGEN_FILE ?= Doxyfile
 DOXYGEN_OPTS ?= 
 doc:
 	@if [ -r $(DOXYGEN_FILE) ]; then \
-		$(__bobDOXYGEN) $(DOXYGEN_FILE); \
+		$(__bob.cmd.doxygen) $(DOXYGEN_FILE); \
 	else \
 		echo "No doxygen input file: $(DOXYGEN_FILE)"; \
 		echo "Create a $(DOXYGEN_FILE) using 'doxygen -g'"; \
@@ -89,7 +89,7 @@ doc:;
 endif
 distclean: clean-doc
 clean-doc:
-	@-$(__bobRMDIR) $(DOCDIR)
+	@-$(__bob.cmd.rmdir) $(DOCDIR)
 
 ifdef __bob_have_feature_cppcheck
 cppcheck:;
