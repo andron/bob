@@ -44,7 +44,7 @@ help-plugins:
 	@echo
 	@echo -e "   ** Available plugins **"; \
 	idx=1; for i in \
-		$(filter-out README,$(notdir $(sort $(wildcard $(__bobPLUGINDIR)/*)))); do \
+		$(filter-out README,$(notdir $(sort $(wildcard $(__bob.plugin.dir)/*)))); do \
 		echo "     $$idx: $$i "; \
 		idx=`expr $$idx + 1`; \
 	done; \

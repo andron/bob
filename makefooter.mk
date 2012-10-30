@@ -21,7 +21,7 @@ ifneq "$(TARGETS)" ""
 # Prevent archive targets
 $(if $(filter lib%.a,$(TARGETS)),\
 	$(eval TARGETS := $(filter-out lib%.a,$(TARGETS)))\
-	$(info $(W_PREFIX) Archives are created automatically, update $(_MODULE)/$(RULES)))
+	$(info $(W_PREFIX) Archives are created automatically, update $(_MODULE)/$(__bob.file.rules)))
 
 # Copy target to all targets list so that different processing can be done
 # depending on plugins and such stuff. Operations which should be untouched by
@@ -43,7 +43,7 @@ endif
 
 # Call plugin footers.
 ifdef BOBPLUGINS
--include $(__bobPLUGINSFOOTERS)
+-include $(__bob.plugin.footers)
 endif
 
 

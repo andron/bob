@@ -12,12 +12,12 @@
 # Meta build differs from ordinary build, clean, distclean targets etc.
 
 # Find all sub-project makerules files.
-__subprojectrules := $(wildcard $(addsuffix /$(RULES),$(wildcard *)))
+__subprojectrules := $(wildcard $(addsuffix /$(__bob.file.rules),$(wildcard *)))
 # Find all sub-project info files, which contains build info.
-__subprojectinfos := $(wildcard $(addsuffix /$(INFOS),$(wildcard *)))
+__subprojectinfos := $(wildcard $(addsuffix /$(__bob.file.infos),$(wildcard *)))
 # Filter out sub-projects from the makerules.mk list if they have an info file.
 __subprojectrules := \
-	$(filter-out $(subst $(INFOS),$(RULES),$(__subprojectinfos)),$(__subprojectrules))
+	$(filter-out $(subst $(__bob.file.infos),$(__bob.file.rules),$(__subprojectinfos)),$(__subprojectrules))
 
 
 # Use different prefix in meta mode.
@@ -37,8 +37,8 @@ export prefix := $(abspath $(META_BUILD_ROOT)/install)
 # Only enable some plugins in meta builds.
 BOBPLUGINS := dotgraph
 ifdef BOBPLUGINS
-BOBPLUGINS := $(addprefix $(__bobPLUGINDIR)/,$(BOBPLUGINS))
--include $(wildcard $(addsuffix /$(__bobPLUGININIT),$(BOBPLUGINS)))
+BOBPLUGINS := $(addprefix $(__bob.plugin.dir)/,$(BOBPLUGINS))
+-include $(wildcard $(addsuffix /$(__bob.plugin.init),$(BOBPLUGINS)))
 endif
 
 
@@ -95,8 +95,8 @@ help:
 # Include all sub-project files, using a info header for the parsing. Instead of
 # the normal build headers used by the build-stage.
 
-HEADER := $(HEADER_INFO)
-FOOTER := $(FOOTER_INFO)
+HEADER := $(__bob.file.headeri)
+FOOTER := $(__bob.file.footeri)
 include $(__subprojectinfos)
 include $(__subprojectrules)
 
@@ -164,5 +164,5 @@ $(foreach n,$(LIST_NAMES),\
 # Do all post processing for plugins
 # ******************************************************************************
 ifdef BOBPLUGINS
--include $(wildcard $(addsuffix /$(__bobPLUGINPOST),$(BOBPLUGINS)))
+-include $(wildcard $(addsuffix /$(__bob.plugin.post),$(BOBPLUGINS)))
 endif

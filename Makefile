@@ -20,11 +20,11 @@ endif
 .PHONY: $(BOBHOME)/Makefile
 
 # Enabled plugins and plugin files.
-__bobPLUGINDIR  := $(BOBHOME)/plugins
-__bobPLUGININIT := makeinit.mk
-__bobPLUGINPOST := makepostprocess.mk
-__bobPLUGINHEAD := makeheader.mk
-__bobPLUGINFOOT := makefooter.mk
+__bob.plugin.dir  := $(BOBHOME)/plugins
+__bob.plugin.init := makeinit.mk
+__bob.plugin.post := makepostprocess.mk
+__bob.plugin.head := makeheader.mk
+__bob.plugin.foot := makefooter.mk
 BOBPLUGINS      := $(BOBPLUGINS) dotgraph test qacpp xsd
 
 # Other configuration variables.
@@ -33,19 +33,19 @@ override space := $(empty) $(empty)
 override comma := ,
 
 # Files used for various purposes.
-HEADER_BUILD := $(BOBHOME)/makeheader.mk
-FOOTER_BUILD := $(BOBHOME)/makefooter.mk
-HEADER_INFO  := $(BOBHOME)/makeheader_info.mk
-FOOTER_INFO  := $(BOBHOME)/makefooter_info.mk
-RULES        := makerules.mk
-INFOS        := makeinfo.mk
+__bob.file.headerb := $(BOBHOME)/makeheader.mk
+__bob.file.footerb := $(BOBHOME)/makefooter.mk
+__bob.file.headeri := $(BOBHOME)/makeheader_info.mk
+__bob.file.footeri := $(BOBHOME)/makefooter_info.mk
+__bob.file.rules := makerules.mk
+__bob.file.infos := makeinfo.mk
 
 # Make these files phony, we don't want make to consider these.
 .PHONY: \
-	$(HEADER_BUILD) \
-	$(FOOTER_BUILD) \
-	$(HEADER_INFO) \
-	$(FOOTER_INFO)
+	$(__bob.file.headerb) \
+	$(__bob.file.footerb) \
+	$(__bob.file.headeri) \
+	$(__bob.file.footeri)
 # ******************************************************************************
 
 
@@ -287,7 +287,7 @@ else
 # file. If that file does not exist. Try finding makerules.mk files in
 # subdirectories, then start a meta build project.
 # ******************************************************************************
-ifneq "$(firstword $(wildcard $(RULES)))" ""
+ifneq "$(firstword $(wildcard $(__bob.file.rules)))" ""
 .PHONY: $(BOBHOME)/Makefile.build.mk
 include $(BOBHOME)/Makefile.build.mk
 else

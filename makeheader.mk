@@ -56,12 +56,12 @@ HAVE_MOCFILES :=
 HAVE_FRMFILES :=
 
 ifdef BOBPLUGINS
--include $(__bobPLUGINSHEADERS)
+-include $(__bob.plugin.headers)
 endif
 
 # Include the info file if such exist, and only if we are at the top level.
 ifeq "$(_MODULE_FULLNAME)" "."
-_MAKEFINFO := $(wildcard $(INFOS))
+_MAKEFINFO := $(wildcard $(__bob.file.infos))
 ifneq "$(_MAKEFINFO)" ""
 # Header and footer files must be empty in this case, the contents of the info
 # file needs to have a header and a footer injections in the meta case for
@@ -70,7 +70,7 @@ HEADER :=
 FOOTER :=
 include $(_MAKEFINFO)
 $(call setup_requires)
-HEADER := $(HEADER_BUILD)
-FOOTER := $(FOOTER_BUILD)
+HEADER := $(__bob.file.headerb)
+FOOTER := $(__bob.file.footerb)
 endif
 endif

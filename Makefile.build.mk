@@ -27,15 +27,15 @@ export DOCDIR := $(DOCBASE)/generated
 # and footer to prevent traversing the tree of makerules.mk files.
 HEADER :=
 FOOTER :=
-include $(RULES)
+include $(__bob.file.rules)
 __name     := $(NAME)
 __version  := $(VERSION)
 __release  := $(RELEASE)
 __group    := Other
 __requires := $(REQUIRES)
 # Revert variables back to real files.
-HEADER := $(HEADER_BUILD)
-FOOTER := $(FOOTER_BUILD)
+HEADER := $(__bob.file.headerb)
+FOOTER := $(__bob.file.footerb)
 
 __bobBUILDSTAGE := 1
 
@@ -146,14 +146,14 @@ endif
 # they would be in-effective since it is the init-file that enables the plugin.
 # ******************************************************************************
 ifdef BOBPLUGINS
-__bob_plugins := $(addprefix $(__bobPLUGINDIR)/,$(BOBPLUGINS))
-override __bobPLUGINSINITS   := $(wildcard $(addsuffix /$(__bobPLUGININIT),$(__bob_plugins)))
-override __bobPLUGINSHEADERS := $(wildcard $(addsuffix /$(__bobPLUGINHEAD),$(__bob_plugins)))
-override __bobPLUGINSFOOTERS := $(wildcard $(addsuffix /$(__bobPLUGINFOOT),$(__bob_plugins)))
-override __bobPLUGINSPOSTS   := $(wildcard $(addsuffix /$(__bobPLUGINPOST),$(__bob_plugins)))
-.PHONY: $(__bobPLUGINSINITS) $(__bobPLUGINSHEADERS) $(__bobPLUGINSFOOTERS) $(__bobPLUGINSPOSTS)
+__bob_plugins := $(addprefix $(__bob.plugin.dir)/,$(BOBPLUGINS))
+override __bob.plugin.inits   := $(wildcard $(addsuffix /$(__bob.plugin.init),$(__bob_plugins)))
+override __bob.plugin.headers := $(wildcard $(addsuffix /$(__bob.plugin.head),$(__bob_plugins)))
+override __bob.plugin.footers := $(wildcard $(addsuffix /$(__bob.plugin.foot),$(__bob_plugins)))
+override __bob.plugin.posts   := $(wildcard $(addsuffix /$(__bob.plugin.post),$(__bob_plugins)))
+.PHONY: $(__bob.plugin.inits) $(__bob.plugin.headers) $(__bob.plugin.footers) $(__bob.plugin.posts)
 MAKEFILE_LIST :=
--include $(__bobPLUGINSINITS)
+-include $(__bob.plugin.inits)
 endif
 
 
@@ -169,13 +169,13 @@ $(if $(filter $(disablecheckfor) \
 	$(eval __bobDISABLECHECKREQUIREMENTS := yes))
 # If distclean is requested disable further inclusion of makerules files.
 $(if $(filter distclean,$(MAKECMDGOALS)),\
-	$(eval RULES :=))
+	$(eval __bob.file.rules :=))
 
 
 # Include the first rules file, this is where the parsing begins.
 # ******************************************************************************
 MAKEFILE_LIST :=
--include $(RULES)
+-include $(__bob.file.rules)
 
 
 # Include "global" target specifications. This file mostly includes targets
@@ -220,5 +220,5 @@ endif
 # ******************************************************************************
 ifdef BOBPLUGINS
 MAKEFILE_LIST :=
--include $(__bobPLUGINSPOSTS)
+-include $(__bob.plugin.posts)
 endif

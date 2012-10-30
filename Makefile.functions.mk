@@ -391,7 +391,7 @@ endef
 # $1: Module name -- $2: List of submodules
 # ******************************************************************************
 define __bob_include_submodules
-$(eval __submodules := $(wildcard $(addsuffix /$(RULES),$(addprefix $($1_SRCDIR),$2))))
+$(eval __submodules := $(wildcard $(addsuffix /$(__bob.file.rules),$(addprefix $($1_SRCDIR),$2))))
 .PHONY: $(__submodules)
 -include $(__submodules)
 endef
