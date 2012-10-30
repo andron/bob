@@ -64,6 +64,15 @@ $(if $(findstring qt4,$(__bobLIST_REQUIRES)),\
 		$(eval UI_STYLE := qt4)))
 endif
 
+
+# Implicit x_SRCS if only one target and no SRCS.
+ifeq "$(words $(ALL_TARGETS))" "1"
+$(if $($(ALL_TARGETS)_SRCS),,\
+	$(eval $(ALL_TARGETS)_SRCS := \
+		$(call getsource_recursive,src,*.c) $(call getsource_recursive,src,*.cpp)))
+endif
+
+
 # Call a lot of macros to check, hmm... "stuff"
 $(foreach t,$(ALL_TARGETS),                                   \
 	$(eval $t_INCL += $(_INCL))                                 \
