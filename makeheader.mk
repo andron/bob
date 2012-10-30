@@ -49,12 +49,6 @@ _LINK :=
 # The full module name, i.e. the name reflects a complete path.
 _MODULE_FULLNAME := $(subst /,-,$(patsubst %/,%,$(_SRCDIR)))
 
-# These are used to control the insertion of moc and uic rules into the
-# module. Less such rules should hopefully speed up parsing. They are set in the
-# source checking part of the footer.
-HAVE_MOCFILES :=
-HAVE_FRMFILES :=
-
 ifdef BOBPLUGINS
 -include $(__bob.plugin.headers)
 endif
