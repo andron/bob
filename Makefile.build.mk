@@ -97,10 +97,6 @@ endif
 verify:;
 	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"
 
-# Display version for the project.
-version:
-	@echo $(__name) $(__version)
-
 # Mark all non-file targets as phony.
 .PHONY: \
 	all doc verify install software-install distclean \
