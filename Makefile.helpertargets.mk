@@ -166,7 +166,10 @@ $(__rpmspecfile): $(__rpmspecfile).in __always_build__
 # Remove the specfile when doing clean or distclean
 distclean clean: __remove_specfile
 __remove_specfile:
-	@$(__bob.cmd.rm) $(__rpmspecfile)
+	@if [ -e $(__rpmspecfile) ]; then \
+		echo "$(T_PREFIX) Removing $(__rpmspecfile) ..."; \
+		$(__bob.cmd.rm) $(__rpmspecfile); \
+	fi;
 
 comma := ,
 rpm: $(__pkgdir)/$(__pkgfile)
