@@ -95,6 +95,7 @@ export __bob.cmd.awk           ?= $(firstword $(shell type -p gawk) $(shell type
 export __bob.cmd.rm            ?= $(shell type -p rm) -f
 export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
 export __bob.cmd.doxygen       ?= $(shell type -p doxygen)
+export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
 export __bob.cmd.install       ?= $(shell type -p install)
 export __bob.cmd.install_hdr   ?= $(__bob.cmd.install) -Dm644
 export __bob.cmd.moc3          ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
@@ -281,6 +282,14 @@ bob.info:
 	@echo -e \
 	"$(__bob.prefix) Path:    $(BOBHOME)\n"\
 	"$(__bob.prefix) Plugins: $(strip $(sort $(BOBPLUGINS)))"
+
+ifneq "$(__bob.cmd.asciidoc)" ""
+bob.doc: DOCS.html
+DOCS.html: DOCS
+	@echo "$(__bob.prefix) Creating Asciidoc from $<"; \
+	$(__bob.cmd.asciidoc) -d article -b html5 $<
+
+endif
 
 else
 # Extract name, version and release, the N,V,R tuple, from the makerules.mk
