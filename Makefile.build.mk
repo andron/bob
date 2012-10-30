@@ -63,10 +63,8 @@ install: all
 
 
 # "Software install"
-software-install: \
-	__latest := $(__name)-$(__version)
-software-install: \
-	override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
+software-install: __latest := $(__name)-$(__version)
+software-install: override prefix := $(software-prefix)/$(__name)/$(__name)-$(__version)
 software-install: all
 	@-$(MAKE) install prefix=$(prefix); \
 	cd $(prefix)/.. && $(__bob.cmd.rm) latest && $(__bob.cmd.ln) $(__latest) latest
@@ -111,10 +109,12 @@ version:
 # The default all target, no rules.
 all: | $(TGTDIR)
 
+
 # Functions for building rules, setting up dependencies etc.
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.functions.mk
 include $(BOBHOME)/Makefile.functions.mk
+
 
 # Include a recipe file
 # ******************************************************************************
