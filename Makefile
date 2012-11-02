@@ -287,7 +287,7 @@ ifneq "$(__bob.cmd.asciidoc)" ""
 bob.doc: DOCS.html
 DOCS.html: DOCS
 	@echo "$(__bob.prefix) Creating Asciidoc from $<"; \
-	$(__bob.cmd.asciidoc) -d article -b html5 $<
+	$(__bob.cmd.asciidoc) -a toc -a max-width=85ex -d article -b html5 $<;
 
 endif
 

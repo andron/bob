@@ -1,9 +1,534 @@
-Bob
-===
+// -*- fill-column:78 -*-
+
+Bob User Guide - TBD
+====================
 :Author:	Anders Ronnbrant
-:Email:		anders.ronnbrant gmail com
+:Email:		anders.ronnbrant@gmail.com
 :Date:		2012-10-30
 :Revision:	1
 
-== Introduction
-TBD (as always).
+
+== Description 
+
+Bob is a build system based on macros and variables in GNU `make', mainly
+targeted at; building the source code as parallel (fast) as possible, and
+streamlining the build setup process by defining a rigid and simple source
+code layout which is described through assignment of fixed variables.
+Convention over configuration.
+
+
+== Getting started
+
+
+== Manpage
+
+.SYNOPSIS
+
+----
+make [ -f makefile ] [ options ] ... [ variables ] ... [ targets ] ...
+----
+
+.VERIFYING
+
+----
+make verify [ recipe=path ]
+----
+
+.BUILDING
+
+----
+make [ recipe=path ]
+----
+
+.INSTALLING
+
+----
+make install [ prefix=path ]
+make software-install [ software-prefix=path ]
+----
+
+.PACKAGING
+`make { package | rpm } [ rpm options ]`
+
+.CLEANING
+`make { clean | distclean }`
+
+
+=== OPTIONS
+
+Same options as GNU `make', since it is GNU `make'. No restrictions to what
+options are allowed is imposed by Bob. There are some recommended options
+which are handy during frequent usage though.
+
++-s+:: To enable silent mode which prevent compile and link commands to be
+echoed to stdout. Instead compile and link *errors* will be spotted easily.
+
++-r+:: To prevent the usage of built-in implicit rules which can, in some
+cases, improve speed.
+
++-j<N>+:: To enable parallel builds, which WILL improve speed in all cases. N
+should be the amount of available cores in the computer, or perhaps +1 +2 when
+using *fast* file systems. Over NFS the optimal value is the number of cores,
+no more no less.
+
+.Example
+----
+make -srj8
+----
+
+
+=== VARIABLES
+
+Flags are all command line arguments of the form *key=value*. Flags are
+completely arbitrary, that is any combination is allowed. This is simply
+*variable assigment* in make and a variable assigned on the command line is
+globally accessable in all files included by the make process. That is in all
+makerules.mk files and files included from there.
+
+Most flags tweaks the functionality of a specific target and are documented
+together with that target, the following flags are more generic.
+
++prefix+::
+
+Installation prefix according to GNU installation directives.
+
++software-prefix+::
+
+Installation directory prefix for *software* installation of a group of
+projects, a so called meta build. This prefix sets which directory should be
+the base of the whole installation structure. The underlying directory
+structure is preset and defined for use with the +SOFTWARE_HOMES+ variable.
+
++recipe+::
+
+Defines the path to the recipe file which provides information about external
+software required by the project software. That is install paths and
+versions. See section *RECIPES* for information about how recipes are
+constructed.
+
++buildtype+::
+
+Sets the type of build to perform and is selected from a predefined set of
+buildtypes. Essentially each type is a set of compiler and link-flags which
+alters the level of debug/profiling/optimization etc. Default value:
+*release*.
+
++buildarch+::
+
+Sets the build architecture explicitly. Valid values are +i686+ or
++x86_64+. Its only required to set the architecture when building 32-bit
+software on 64-bit platforms.
+
++linktype+::
+
+Can be set to *noundefined* to force the linker to not accept undefined
+symbols when linking dynamic libraries. (What is happening is that the flag
+*-Wl,-z,defs* is added to the link command, when GNU ld is used).
+
++SOFTWARE_HOMES+::
+
+Specifies a path which will be added to the compile command
+as an include search path and to the link command as library search path. Both
+are appended at the very end and will act as a default fall back for those
+x_HOME which are undefined. If this flag (environment variable) is set the
+error checking for missing x_HOME's is disabled, and it is up to the developer
+to make sure that all non-specified x_HOME's can be replaced with the content
+of __ALL_HOME. The path pointed to by __ALL_HOME must contain a lib and a
+include-directory. A warning is emitted if that is not the case.
+
+
+==== Examples
+
+----
+make help-buildtypes
+
+make buildtype=profiling
+
+make SOFTWARE_HOMES=/var/tmp/installs
+
+make -srj10 recipe=../recipes/fooproduct-2.0-recipe.mk
+----
+
+
+=== TARGETS [ targets ] ...
+
+Targets are ordinary targets in `make'. That is, something that should happen
+when running make. The default target is 'all' which means build
+everything. All artifacts are dependencies of target 'all'.
+
+All strings assigned to the TARGETS variable in any of the makerules.mk, or
+any target explicitly defined by the user, as an ordinary target, in any of
+these files becomes a target. Besides the user specified artifact targets
+there is also a set of special targets for example 'install' and 'rpm'.  See
+respective section for more information. Besides the more obvious targets Bob
+also have a lot of helper targets which can be called explicitly if needed.
+
+The following sub sections describes the major target types in the order in
+which they most often should be invoked to complete a full
+compile-install-package cycle.
+
+==== Verifying
+
+Verifying the environment prior to starting a build detects errors which would
+make the build fail. This is not necessary but will save time in those cases
+the build processes takes time. A build could fail after 45 minutes because of
+a missing dependency. For example missing to specify the location of Qt or
+Boost.  The +-k+ flag forces make to continue despite failing dependency
+checks. This will reveil all dependency errors and not just the first.
+
+----
+make verify
+make -k verify
+make -k verify recipe=recipe.mk
+----
+
+
+==== Building
+Building does not need an explict target since 'all' is the
+default. It is possible to specify one or several artifacts as
+targets. The target name of the artifact is the same name assigned to
+the TARGETS variable in the makerules.mk file.
+
+----
+make libfoo.so appbar
+make -srj2 libfoo.so recipe=recipe.mk
+----
+
+
+==== INSTALLING
+
+Installs all targets specified in the project. This target depends on 'all',
+and means that everything will first be built and then installed. Thus calling
+the build stage before hand is not really necessary when an installation is
+performed.
+
+There are two types of installs, a "ordinary" install and a component
+install. The difference between the two is that the ordinary install installs
+all artifacts into the same file structure. The component install is a little
+special, it only works when several projects are built at the same time, in
+the so-called meta mode. In this case each project/component is installed into
+a separate directory containing name and version number for the project.
+
++prefix+:: Top directory for the ordinary installation. The directory
+structure of the installaton is fixed and cannot be changed. Default value:
+/opt/saab
+
++software-prefix+:: Top directory for the component install. Default value:
+<empty>
+
+----
+make install
+make install recipe=recipe.mk
+make install-libfoo.so prefix=installdir
+make component-install component-prefix=installdir
+----
+
+
+==== PACKAGING
+Packaging is for creating rpm-packages of the artifacts for installation. The
+spec.in-file is used as input for this process and is required for the
+packaging to work. Name and version information is fetched from the top
+makerules.mk file.  A helper target called +package+ can be called explicitly
+if a source only package in form of a tar-package is wanted.
+
+RPM_USER_ROOT (+$HOME/rpmbuild+):: The root directory for all rpm operations.
+
+RPM_BUILD_DEFINES (empty):: Defines which will be sent to the rpmbuild
+command. A comma separated list of key=value pairs.
+
+RPM_BUILD_OPTION (+-bb+):: Type of rpm build to perform, see rpmbuild(8) for
+more information.
+
+with_compiled (empty):: Defining this on the command line, that is setting it
+to a non-empty string, makes the packaging process include built object files
+and artifacts in the source package which will speed up the rpm build
+process. This is mainly/only for testing rpm packaging.
+
+----
+make rpm
+make rpm recipe=recipe.mk
+make rpm RPM_USER_ROOT=/var/tmp/rpmbuild
+make rpm RPM_BUILD_DEFINES=config=foo,setting=bar
+make package RPM_USER_ROOT=/var/tmp/packageonly
+make rpm with_compiled=yes
+----
+
+
+==== CLEANING
+Simply cleans the workspace from all generated files. Bob puts all generated
+files in the OBJDIR (a variable) and all artifacts in TGTDIR (also a variable)
+to not clutter the source code tree with object files etc. The clean targets
+simply removes these directories.
+
+----
+make clean
+make distclean
+make -j distclean
+----
+
+
+TIP: There is a slight differens between clean and distclean. The distclean
+target also sweeps the workspace for tilde-files and other junk-files from
+various editors. This is not necessary todo that often so prefer using clean
+which is faster.
+
+
+=== OTHER TARGETS
+Besides the above typed targets there is also a set of misc targets which
+performs less frequently needed operations but which are very good to have
+incorporated into the build system.
+
+==== help
+Help information about Bob.
+
+==== doc
+Simple target that wrapps 'doxygen'. If a file named Doxyfile is found in the
+projects top level directory (same as the makerules.mk file) doxygen is
+executed. The configuration of Doxyfile is up the developer.
+
+==== buildinfo
+Creates a file named buildinfo.txt which contains information about the
+current build environment.
+
+==== requiregraph (META)
+Generates a graphviz dot-file of the require tree for a set of projects. This
+only works in meta mode since requirements can only occur between
+projects. There are two (currently) versions of the target which generates
+different kind of output, requiregraph.png and requiregraph.ps. PNG-file and
+postscript-file output.
+
+targets:: Comma separated list of targets to include in the graph.
+
+requires:: Comma separated list of requirements to include in the graph. This
+will only print those projects which require the specied project.
+
+----
+make requiregraph targets=foo
+make requiregraph requires=bar
+make requiregraph.png
+----
+
+
+==== linkgraph
+Similar to requiregraph but generates a graph of all the artifacts and their
+respective link dependencies within a project. This target must be called
+within a project. Takes the same flags as requiregraph.
+
+
+=== BOBSHELL
+
+The purpose of the bobshell is to minimize the command line hazzle and support
+a more strict build environment. The bobshell target invokes a new shell with
+an environment containing most needed variables, especially those given on the
+command line. Within the bobshell the only command necessary to run is 'make'
+and occasionally 'make clean' since everything else is already defined and
+setup via the environment, recipe buildtype etc.
+
+Other support that is given is that the PATH and LD_LIBRARY_PATH variables are
+setup so that all required libraries (and binaries) are available without the
+need to specify an absolute path. Together with the __ALL_HOME flag, which
+also effects PATH and LD_LIBRARY_PATH, a complete environment is created for
+running the artifacts within the project.
+
+If the __ALL_HOME flag is set Bob looks for an executable file named 'run'
+within the __ALL_HOME-directory and creates an alias to that file. Systems
+which are started via such a file can therefore be pointed out by __ALL_HOME.
+
+
+=== RECIPES
+Recipes are just collections of variables which needs some sort of
+configuration management to define a product which other software shall be
+built upon. They could equally well be provided via the command line as a
+flag, though that is not newbie friendly and tedious and errorprone in the
+long run. It is also very hard to CM.
+
+TODO: recipe file example
+
+
+=== makerules.mk
+TODO: makerules.mk file example
+
+
+=== SEE ALSO
+make(1) rpm(8) rpmbuild(8)
+
+
+=== NOTES
+None
+
+
+=== AUTHOR
+Anders Ronnbrant
+
+
+=== BUGS
+
+There might still be some issues, meaning that Bob does not suite all
+different ways of building source code.
+
+Does not yet support arbitrary compilers... and probably never will, since the
+compiler flags are always unknown for any arbitrary compiler. (A way of
+selecting different compilers is available though).
+
+Does not yet support arbitrary operating systems. Requirements are a working
+GNU Make version 3.81 or later and a reasonably sane compiler with a not to
+exotic set of compiler flags. Also a set of GNU tools are required, which
+might not always be availble on "the other platform". This will be addressed
+when the need arises.
+
+
+// ------------------------------------------------------------
+
+== Directory layout
+A "good" layout.
+
+----
+Makefile
+makerules.mk
+foobar.spec.in
+include/interface_foo.h
+include/interface_bar.h
+src/implementation_foo.cpp
+src/implementation_bar.cpp
+src/main.cpp
+ui/a.ui
+ui/b.ui
+----
+
+External interfaces put in the include directory are automatically installed
+and provided to other targets (which are using/depending on the
+library). Having the ui-files in a separate directory makes it easy to list
+them for inclusing in the project. A user macro can be called to list all
+files dynamically so that new files are automatically used when created.
+
+----
+foo_SRCS     := $(call getsource,src,*.cpp)
+foo_SRCS_FRM := $(call getsource,ui,*.ui)
+----
+
+
+== Files (and examples)
+
+=== Makefile
+The Makefile for a Bob project is pretty simple and will never need to contain
+anything more than
+----
+include $(BOBHOME)/Makefile
+----
+
+=== makeinfo.mk 
+
+A separate file is used for including project specific information. This
+information could also be put in the makerules.mk-file but it has some
+drawbacks having todo with the limitations of the GNU `make` language (it is
+not possible todo "everything"). Having this information in a separate file
+makes the parsing of the data faster and eaiser.
+
+----
+include $(HEADER)
+
+NAME     := foo
+VERSION  := 1.0.0
+RELEASE  := 1
+REQUIRES := qt4 boost gtest
+
+include $(FOOTER)
+----
+
+
+=== makerules.mk
+The +makerules.mk+ file contains the target specifications. Source files for
+each target, compiler and link flags.
+
+.Single target
+----
+include $(HEADER)
+
+TARGETS := foo
+
+foo_SRCS := $(call getsource,src,*.cpp)
+foo_USES := qt4 boost
+foo_LINK := QtCore boost_program_options
+
+include $(FOOTER)
+----
+
+.Multiple targets
+----
+include $(HEADER)
+
+TARGETS := libbarfy.so foo
+
+libbarfy.so_SRCS := src/barfy.cpp src/barfy_util.cpp
+libbarfy.so_USES := qt4
+libbarfy.so_LINK := QtCore
+
+foo_SRCS := src/foomain.cpp
+foo_USES := qt4
+foo_LINK := QtCore barfy
+
+include $(FOOTER)
+----
+
+
+=== <foo>.spec.in 
+
+The <foo>.spec.in-file is an ordinary rpm spec file with a small alteration
+regarding name, version and release. These are extracted from makeinfo.mk and
+with the <foo>.spec.in file used to create the real <foo>.spec file.
+
+
+----
+Summary: Foo application doing foo stuff
+Name: @name@
+Version: @version@
+Release: @release@
+License: GPLv3
+Group: none
+URL: none
+Source0: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+
+%description
+Foo application for doing foo stuff is a parser for bar files...
+
+
+%package devel
+Summary: Development package for %{name}
+
+%description devel
+Development package for %{name}
+
+
+%prep
+%setup -q
+
+%build
+%{__make}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%{makeinstall}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%files
+%defattr(-,root,root,-)
+%doc COPYING DOCS
+%{_bindir}/*
+%{_libdir}/*.so.*
+
+%files devel
+%defattr(644,root,root,2755)
+%doc COPYING DOCS-API
+%{_includedir}/*
+%{_libdir}/*.a
+%{_libdir}/*.so
+
+
+%changelog
+
+----
