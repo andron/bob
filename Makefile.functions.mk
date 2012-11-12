@@ -167,9 +167,11 @@ endef
 # ******************************************************************************
 define setup_uic_depend_rules
 $(if $($1_SRCS_FRM),\
-	$(eval \
-		$(call __bob_dirprefix,$2,$(call __bob_uic_objects,$1)): \
-		$(call __bob_dirprefix,$2,$(call __bob_uic_headers,$1))) \
+	$(eval uic_objects := $(call __bob_uic_objects,$1)) \
+	$(if $(uic_objects),\
+		$(eval \
+			$(call __bob_dirprefix,$2,$(uic_objects)): \
+			$(call __bob_dirprefix,$2,$(call __bob_uic_headers,$1)))) \
 	$(eval $1_CXXFLAGS += $(_I)$2) \
 	$(eval $1_CFLAGS += $(_I)$2))
 endef
@@ -181,7 +183,7 @@ endef
 define setup_uic_depend_rules_srcs
 $(if $(strip $($1_SRCS_FRM)), \
 	$(eval \
-		$(call __bob_src_objects,$1) \
+		$(call __bob_dirprefix,$2,$(call __bob_src_objects,$1)) \
 		$(call __bob_dirprefix,$2,$(call __bob_moc_objects,$1)): \
 		$(call __bob_dirprefix,$2,$(call __bob_to_uic_header,$(notdir $($1_SRCS_FRM))))))
 endef
