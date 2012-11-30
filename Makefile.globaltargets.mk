@@ -74,7 +74,7 @@ $(TGTDIR)/%: $$($$(notdir $$@)_SRCDIR)/%.adb | $$(@D)._INSTALL_DIRECTORY
 	@echo "$(L_PREFIX) Building and linking $(notdir $@)"; \
 	mkdir -p $($(@F)_OBJDIR); \
 	cd $($(@F)_OBJDIR) && gnatmake -c $(GNATFLAGS) $(__target_GNATFLAGS) $($(@F)_INCL) $(_I)$(abspath $($(@F)_SRCDIR)) $(_I)$(abspath $($(@F)_SRCDIR))/include $(_I)$(abspath $($(@F)_SRCDIR))/include_internal $(__ALL_INCL) -gnato -gnatf -gnatn $(@F); \
-	cd $($(@F)_OBJDIR) && gnatbind $(@F); \
+	cd $($(@F)_OBJDIR) && gnatmake -b $(GNATFLAGS) $(@F); \
 	cd $($(@F)_OBJDIR) && gnatlink $(GNATFLAGS) $(__target_GNATFLAGS) -o $(abspath $@) $(@F).ali -L$(TGTDIR) $($(notdir $@)_LDFLAGS) $($(notdir $@)_LIBS) $($(notdir $@)_LINK) $(__ALL_LIBS)
 
 
