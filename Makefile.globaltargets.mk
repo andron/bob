@@ -51,12 +51,13 @@ $(TGTDIR)/%plugin.so: | $$(@D)._INSTALL_DIRECTORY
 
 # *** SHARED LIBRARIES ***
 # Target for building a shared library from .o-files
-$(TGTDIR)/%.so: SOBASE  = $(if $(findstring file,$(origin $(notdir $@)_SOBASE)),$($(notdir $@)_SOBASE),$(notdir $@))
+$(TGTDIR)/%.so: SOBASE  = $(if $(findstring undefined,$(origin $(notdir $@)_SOBASE)),$(notdir $@),$($(notdir $@)_SOBASE))
 $(TGTDIR)/%.so: SOMAJOR = $(word 1,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOMINOR = $(word 2,$(subst ., ,$($(notdir $@)_VERSION)))
 $(TGTDIR)/%.so: SOPATCH = $(word 3,$(subst ., ,$($(notdir $@)_VERSION)))
+$(TGTDIR)/%.so: SONAME  = $(if $(findstring undefined,$(origin $(notdir $@)_SONAME)),$(SOBASE).$(SOMAJOR),$($(notdir $@)_SONAME))
 $(TGTDIR)/%.so: | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(L_PREFIX) DSO     $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SOBASE).$(SOMAJOR)) $(filter %.o,$^) $(__target_LDFLAGS);
+	$(if $(__bobSILENT),echo "$(L_PREFIX) DSO     $(notdir $@)";) $(LINK.cc) $(__target_IMOPTFLAGS) $(DYNAMICLIBFLAG) $(_o) $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) $(SONAMEFLAG:<soname>=$(SONAME)) $(filter %.o,$^) $(__target_LDFLAGS);
 	@[ -e $@.$(SOMAJOR).$(SOMINOR).$(SOPATCH) ] \
 	&& $(__bob.cmd.ln) $(notdir $@).$(SOMAJOR).$(SOMINOR).$(SOPATCH) $@.$(SOMAJOR) \
 	&& $(__bob.cmd.ln) $(notdir $@).$(SOMAJOR) $@;
