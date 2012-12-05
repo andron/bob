@@ -63,6 +63,18 @@ I_PREFIX := $(__bob.prefix) >># Install
 T_PREFIX := $(__bob.prefix)   # Text output
 X_PREFIX := $(__bob.prefix) TT# Test output
 V_PREFIX := $(__bob.prefix) VV# Test output
+
+ifdef buildarch
+__bob.buildarch := $(buildarch)
+else
+__bob.buildarch := $(shell uname -m)
+endif
+
+ifeq "$(__bob.buildarch)" "x86_64"
+__bob.archlib := lib64
+else
+__bob.archlib := lib
+endif
 # ******************************************************************************
 
 
