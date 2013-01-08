@@ -32,15 +32,15 @@
 # the builtin implicit rules needs modification. The __target_CXXFLAGS are
 # dependents of each specific target which are setup by macros during parsing.
 $(OBJDIR)/%.o:$(OBJDIR)/%.cpp | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(CXX) $(__target_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 $(OBJDIR)/%.o:$(OBJDIR)/%.c   | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(COMPILE.c) $(__target_CFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [OBJDIR] [generated] $(@F)";) $(CC) $(__target_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 $(OBJDIR)/%.o:%.cpp | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(CXX) $(__target_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 $(OBJDIR)/%.o:%.cc  | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.cpp) $(__target_CXXFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(CXX) $(__target_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 $(OBJDIR)/%.o:%.c   | $$(@D)._INSTALL_DIRECTORY
-	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(COMPILE.c) $(__target_CFLAGS) $(_o) $@ $<
+	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(CC) $(__target_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 
 # *** SHARED PLUGIN LIBRARIES ***
 # Target for building plugins, almost as ordinary DSOs. Plugins does not have a
