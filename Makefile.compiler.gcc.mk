@@ -22,6 +22,13 @@ COMPILER_BUILDTYPES := release debug pedantic profiling
 COMPILER_LINKTYPES  := default noundefined
 # ********************************************************************************
 
+# Target architecture optimizations
+# ********************************************************************************
+ifeq "$(findstring i686, $(shell $(CXX) -dumpmachine))" "i686"
+export TARGET_ARCH ?= -mtune=generic -msse2 -mfpmath=sse
+endif
+# ********************************************************************************
+
 # Build types
 # ********************************************************************************
 # Compiler flags for the different buildtypes, common for both C and C++. If
