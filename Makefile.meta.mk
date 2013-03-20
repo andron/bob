@@ -114,7 +114,7 @@ $(addprefix check_,$(LIST_FEATNAMES)): check_%: test_%
 
 # Building something is to use a submake (make -C) but no target.
 $(addprefix build_,$(LIST_FEATNAMES)): build_%:
-	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY)
+	+$(MAKE) -C $($*_DIRECTORY)
 
 # Installing: Submake with target install. Installing one self implies first
 # building one self. This must be so to prevent build and install to become two
