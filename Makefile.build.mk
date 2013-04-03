@@ -17,8 +17,8 @@
 TGTBASE := $(abspath $(builddir)/tgt)
 OBJBASE := $(abspath $(builddir)/obj)
 DOCBASE := $(abspath $(builddir)/doc)
-export TGTDIR := $(TGTBASE)/$(PLATFORM)/$(__bob.buildtype)_$(__bob.compiler)
-export OBJDIR := $(OBJBASE)/$(PLATFORM)/$(__bob.buildtype)_$(__bob.compiler)
+export TGTDIR := $(TGTBASE)/$(__bob.buildtypedir)
+export OBJDIR := $(OBJBASE)/$(__bob.buildtypedir)
 export DOCDIR := $(DOCBASE)/generated
 # ******************************************************************************
 

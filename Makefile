@@ -198,6 +198,10 @@ override srcdir := $(abspath $(if $(srcdir),$(srcdir),.))
 override builddir := $(abspath $(if $(builddir),$(builddir)/$(notdir $(realpath .)),.))
 # ******************************************************************************
 
+# Template directory variable for target and object directory. Used in
+# Makefile.build.mk to set what directory temporary object files and artifacts
+# shall end up.
+export __bob.buildtypedir := $(PLATFORM)/$(__bob.buildtype)_$(__bob.compiler)
 
 # Installation directory configuration
 # ******************************************************************************
