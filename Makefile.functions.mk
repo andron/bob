@@ -432,7 +432,7 @@ $(if $(SOFTWARE_HOMES),\
 			$(eval homevariable := $(call __uc,$x)_HOME)\
 			$(if $($(homevariable)),,\
 				$(eval y := $(firstword $(dir $(wildcard $s/$x/include $s/$x/latest/include))))\
-				$(if $y,$(eval $(homevariable) := $y))))))\
+				$(if $y,$(eval $(homevariable) := $(realpath $y)))))))\
 $(foreach r,$(sort $(REQUIRES)),\
 	$(eval R := $(call __uc,$(call __get_name,$r)))\
 	$(eval __inclflag := $(_I))\
@@ -445,7 +445,7 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval home := $($R_HOME))\
 		$(eval homelibdir := $(call __gethomelibdir))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
-		$(eval export $R_INCL := $(__inclflag)$(home)/include)\
+		$(eval export $R_INCL := $(__inclflag)$(realpath $(home)/include))\
 		$(eval export $R_LIBS := $(_L)$(homelibdir) $(__bobRPATHLINKFLAG)$(homelibdir))\
 		$(eval export __bobALLREQINCL += $($R_INCL))\
 		$(eval export __bobALLREQLINK += $($R_LIBS))))\
