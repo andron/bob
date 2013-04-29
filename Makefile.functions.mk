@@ -435,13 +435,17 @@ $(if $(SOFTWARE_HOMES),\
 				$(if $y,$(eval $(homevariable) := $y))))))\
 $(foreach r,$(sort $(REQUIRES)),\
 	$(eval R := $(call __uc,$(call __get_name,$r)))\
+	$(eval __inclflag := $(_I))\
+	$(foreach s,$(sort $(SYSTEM_HEADERS)),\
+		$(if $(findstring $r,$s),\
+			$(eval __inclflag := $(_isystem)),))\
 	$(if $(findstring undefined,$(origin $R_HOME)),\
 		$(eval requirement_verification_error := yes)\
 		$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" "$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME")),\
 		$(eval home := $($R_HOME))\
 		$(eval homelibdir := $(call __gethomelibdir))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
-		$(eval export $R_INCL := $(_I)$(home)/include)\
+		$(eval export $R_INCL := $(__inclflag)$(home)/include)\
 		$(eval export $R_LIBS := $(_L)$(homelibdir) $(__bobRPATHLINKFLAG)$(homelibdir))\
 		$(eval export __bobALLREQINCL += $($R_INCL))\
 		$(eval export __bobALLREQLINK += $($R_LIBS))))\

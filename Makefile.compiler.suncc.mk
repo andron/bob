@@ -65,6 +65,7 @@ _l := -l
 _o := -o
 _D := -D
 _I := -I
+_isystem := -I
 _L := -L
 
 DYNAMICLIBFLAG := -G
