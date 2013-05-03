@@ -1,6 +1,6 @@
 # -*- mode:makefile; tab-width:2; -*-
 
-# Copyright (C) 2011, 2012, Saab AB
+# Copyright (C) 2011, 2012, 2013, Saab AB
 # All rights reserved.
 #
 # Copying and distribution of this file, with or without modification,
