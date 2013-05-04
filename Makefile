@@ -25,7 +25,7 @@ __bob.plugin.init := makeinit.mk
 __bob.plugin.post := makepostprocess.mk
 __bob.plugin.head := makeheader.mk
 __bob.plugin.foot := makefooter.mk
-BOBPLUGINS      := $(BOBPLUGINS) dotgraph test qacpp xsd
+BOBPLUGINS      := $(BOBPLUGINS) dotgraph test xsd
 
 # Other configuration variables.
 override empty :=
