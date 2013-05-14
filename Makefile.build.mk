@@ -43,9 +43,9 @@ __bobBUILDSTAGE := 1
 # rules to the same target if they need to. Neither clean nor install should
 # need any such rules... but who knows.
 clean-tgt:
-	@-$(__bob.cmd.rmdir) $(TGTBASE)
+	@-$(__bob.cmd.rmdir) $(TGTDIR)
 clean-obj:
-	@-$(__bob.cmd.rmdir) $(OBJBASE)
+	@-$(__bob.cmd.rmdir) $(OBJDIR)
 
 clean: clean-tgt clean-obj
 
