@@ -124,15 +124,6 @@ ifneq "$(__bob.cmd.cppcheck)" ""
 override __bob_have_feature_cppcheck := 1
 export CPPCHECKFLAGS ?= -q --enable=style --suppress="missingInclude"
 endif
-
-# Exceptions for SunOS.
-ifeq "$(PLATFORM)" "SunOS"
-export INSTALL          := $(shell type -p ginstall)
-export __bob.cmd.find        := $(shell type -p gfind)
-ifeq "$(firstword $(INSTALL))" "no"
-$(error No ginstall available)
-endif
-endif
 # ******************************************************************************
 
 
