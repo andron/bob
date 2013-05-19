@@ -112,24 +112,6 @@ all: | $(TGTDIR)
 include $(BOBHOME)/Makefile.functions.mk
 
 
-# Include a recipe file
-# ******************************************************************************
-ifdef recipe
-override __bobRECIPE := $(abspath $(recipe))
-override __bobRECIPE_ORIGIN := $(origin recipe)
-$(if $(wildcard $(__bobRECIPE)),,\
-	$(info $(W_PREFIX) Specified recipe does not exist!)\
-	$(info $(W_PREFIX)    origin: [$(__bobRECIPE_ORIGIN)])\
-	$(info $(W_PREFIX)    file:   $(__bobRECIPE))\
-	$(error Missing file error))
-override RECIPE_DIR := $(dir $(abspath $(recipe)))
-include $(__bobRECIPE)
-# Parse the recipe and make *some* magic happen, not to much this time, to not
-# confuse user etc.
-$(call __bob_setup_recipe)
-endif
-
-
 # Turn on second expansion.
 # ******************************************************************************
 .SECONDEXPANSION:

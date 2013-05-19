@@ -29,7 +29,6 @@ bobshell:
 		export PATH=$${PATH//::/:}; \
 		export TEST_INCLUDES="$(__bobLISTHOMEINCL)"; \
 		export BOBBUILDBASH=1; \
-		export RECIPEFILE=$(recipe); \
 		export MAKELEVEL=0; \
 		bash --noprofile --rcfile $(BOBHOME)/bobbashrc $(BOBSHELL_BASH_ARGV); \
 	fi;

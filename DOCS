@@ -31,13 +31,13 @@ make [ -f makefile ] [ options ] ... [ variables ] ... [ targets ] ...
 .VERIFYING
 
 ----
-make verify [ recipe=path ]
+make verify
 ----
 
 .BUILDING
 
 ----
-make [ recipe=path ]
+make
 ----
 
 .INSTALLING
@@ -99,13 +99,6 @@ projects, a so called meta build. This prefix sets which directory should be
 the base of the whole installation structure. The underlying directory
 structure is preset and defined for use with the +SOFTWARE_HOMES+ variable.
 
-+recipe+::
-
-Defines the path to the recipe file which provides information about external
-software required by the project software. That is install paths and
-versions. See section *RECIPES* for information about how recipes are
-constructed.
-
 +buildtype+::
 
 Sets the type of build to perform and is selected from a predefined set of
@@ -146,7 +139,7 @@ make buildtype=profiling
 
 make SOFTWARE_HOMES=/var/tmp/installs
 
-make -srj10 recipe=../recipes/fooproduct-2.0-recipe.mk
+make -srj10
 ----
 
 
@@ -179,7 +172,6 @@ checks. This will reveil all dependency errors and not just the first.
 ----
 make verify
 make -k verify
-make -k verify recipe=recipe.mk
 ----
 
 
@@ -191,7 +183,7 @@ the TARGETS variable in the makerules.mk file.
 
 ----
 make libfoo.so appbar
-make -srj2 libfoo.so recipe=recipe.mk
+make -srj2 libfoo.so
 ----
 
 
@@ -218,7 +210,6 @@ structure of the installaton is fixed and cannot be changed. Default value:
 
 ----
 make install
-make install recipe=recipe.mk
 make install-libfoo.so prefix=installdir
 make component-install component-prefix=installdir
 ----
@@ -246,7 +237,6 @@ process. This is mainly/only for testing rpm packaging.
 
 ----
 make rpm
-make rpm recipe=recipe.mk
 make rpm RPM_USER_ROOT=/var/tmp/rpmbuild
 make rpm RPM_BUILD_DEFINES=config=foo,setting=bar
 make package RPM_USER_ROOT=/var/tmp/packageonly
@@ -322,7 +312,7 @@ a more strict build environment. The bobshell target invokes a new shell with
 an environment containing most needed variables, especially those given on the
 command line. Within the bobshell the only command necessary to run is 'make'
 and occasionally 'make clean' since everything else is already defined and
-setup via the environment, recipe buildtype etc.
+setup via the environment, buildtype etc.
 
 Other support that is given is that the PATH and LD_LIBRARY_PATH variables are
 setup so that all required libraries (and binaries) are available without the
@@ -333,16 +323,6 @@ running the artifacts within the project.
 If the __ALL_HOME flag is set Bob looks for an executable file named 'run'
 within the __ALL_HOME-directory and creates an alias to that file. Systems
 which are started via such a file can therefore be pointed out by __ALL_HOME.
-
-
-=== RECIPES
-Recipes are just collections of variables which needs some sort of
-configuration management to define a product which other software shall be
-built upon. They could equally well be provided via the command line as a
-flag, though that is not newbie friendly and tedious and errorprone in the
-long run. It is also very hard to CM.
-
-TODO: recipe file example
 
 
 === makerules.mk

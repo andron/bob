@@ -226,16 +226,6 @@ applicationsdir ?= $(datadir)/applications
 # ******************************************************************************
 
 
-# Fix recipe path. The recipe is a file taken on the command line, and might
-# as such not always exist, and due to technical problems the base path were
-# the file is actually used might vary because of meta or build mode. thus we
-# must provide an absolute path as soon as possible.
-# ******************************************************************************
-ifdef recipe
-MAKEOVERRIDES := $(patsubst recipe=%,recipe=$(abspath $(recipe)),$(MAKEOVERRIDES))
-endif
-
-
 # Default target definitions
 # ******************************************************************************
 # Default target is to say that there is no such target.

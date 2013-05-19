@@ -365,7 +365,7 @@ endef
 
 
 # Setup a list of bin and lib suffixed paths for export to bobshell. The
-# basedirs (homes) can come from either recipe or environment.
+# basedirs (homes) can come from either makerules-files or environment.
 #
 # $: N/A
 # ******************************************************************************
@@ -398,43 +398,6 @@ $(eval __submodules := $(wildcard $(addsuffix /$(__bob.file.rules),$(addprefix $
 -include $(__submodules)
 endef
 # ******************************************************************************
-
-
-# Utilize the variables from a recipe.
-# ******************************************************************************
-define __bob_setup_recipe
-$(if $(RECIPE_PROVIDES),,\
-	$(info $(W_PREFIX) Recipe does not provide/enable any subprojects!) \
-	$(info $(W_PREFIX) The variable RECIPE_PROVIDES defines what the recipe provides.) \
-	$(info $(W_PREFIX) Make sure that variable is set and relates to valid software.) \
-	$(error Recipe-is-borked error ($(__bobRECIPE)))) \
-$(if $(with_verbose),\
-	$(info $(V_PREFIX) $(shell printf "%-18s %s" "Recipe:" "$(__bobRECIPE)"))\
-	$(info $(V_PREFIX) $(shell printf "%-18s %s" "Provides:" "$(RECIPE_PROVIDES)"))\
-	$(info $(V_PREFIX) $(shell printf "%-18s %s" "Installed paths:" "$(INSTALLED_PATH)")))\
-$(foreach p,$(sort $(RECIPE_PROVIDES)),\
-	$(eval P := $(call __uc,$p)) \
-	$(if $($P_HOME),,
-		$(info $(W_PREFIX) HOME variable for $p is NOT defined!) \
-		$(info $(W_PREFIX) Each provided/enabled item in RECIPE_PROVIDES must have their) \
-		$(info $(W_PREFIX) HOME variable defined (somewhere). Either in recipe or in the) \
-		$(info $(W_PREFIX) environment. In this case it is no where.) \
-		$(error Miss-configured-recipe error ($(__bobRECIPE))))\
-	$(if $(or \
-					$(findstring undefined,$(origin $P_HOME)),\
-					$(wildcard $($P_HOME)/include)),,\
-		$(if $(with_verbose),\
-			$(info $(V_PREFIX) Recipe $P_HOME = '$($P_HOME)' is missing include directory)))\
-	$(eval export $P_HOME := $(firstword $(dir $(wildcard $(abspath \
-		$($P_HOME)/include \
-		$(addsuffix /$p/$($P_VERSION)/include,$(INSTALLED_PATH))))) \
-		$($P_HOME))) \
-	$(eval __bobLISTALLHOMES += $($P_HOME)) \
-	$(if $(with_verbose),\
-		$(info $(V_PREFIX) $(shell printf "%-18s %s" "$P_HOME" "$($P_HOME)")))) \
-$(if $($(__name)_DEFINES),\
-	$(eval DEFINES := $($(__name)_DEFINES)))
-endef
 
 
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
