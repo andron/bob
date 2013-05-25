@@ -36,7 +36,8 @@ endef
 #
 # $1: Target name -- $2: Target object directory
 define __bob_target_dfiles
-$(wildcard $(addprefix $2,$(addsuffix .d,$(basename $(sort $($1_SRCS))))))
+$(wildcard $(addsuffix *.d,$(addprefix $2,$(sort $(dir $($1_SRCS)))))) \
+$(if $($1_SRCS_RCC),$(wildcard $(addsuffix *.d,$2)))
 endef
 
 # ******************************************************************************
