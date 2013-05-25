@@ -103,7 +103,7 @@ verify:;
 	clean clean-obj clean-tgt
 
 # The default all target, no rules.
-all: | $(TGTDIR)
+all: | $(TGTDIR) $(OBJDIR)
 
 
 # Functions for building rules, setting up dependencies etc.
