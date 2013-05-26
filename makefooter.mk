@@ -13,6 +13,13 @@
 TARGETS    := $(strip $(sort $(TARGETS)))
 SUBMODULES := $(strip $(sort $(SUBMODULES) test))
 
+# Ensure the build flags, which are prepended and can thus only be used for
+# controling generic aspects of the build, are not duplicated etc
+# etc... Multiple += may lead to several -pendantic's etc.
+CFLAGS   := $(strip $(sort $(CFLAGS)))
+CXXFLAGS := $(strip $(sort $(CXXFLAGS)))
+LDFLAGS  := $(strip $(sort $(LDFLAGS)))
+
 # Skip all this stuff if there are not targets. Some might create makerules
 # files of this kind to tie directories together.
 # TARGETS ----------------------------------------------------------------------
