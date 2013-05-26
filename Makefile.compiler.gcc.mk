@@ -37,8 +37,9 @@ __buildarch_x86_64    := -m64
 # Re-assign and clear with := is to make sure the flags are treated as
 # immediate variabels by make. (Subsequent += will assign the value
 # immediately).
-CFLAGS   := $(__buildarch_$(__bob.buildarch))
-CXXFLAGS := $(__buildarch_$(__bob.buildarch))
+CFLAGS    := $(__buildarch_$(__bob.buildarch))
+CXXFLAGS  := $(__buildarch_$(__bob.buildarch))
+GNATFLAGS := $(__buildarch_$(__bob.buildarch))
 # Add default compiler flags for all modes.
 CFLAGS   += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
 CXXFLAGS += -pipe -fPIC -Wextra -Wall -Wno-long-long -MMD -fno-strict-aliasing -D$(PLATFORM)
