@@ -374,7 +374,9 @@ endef
 # ******************************************************************************
 define pp_setup_libbin_paths
 $(eval export __bobLISTHOMELIBS := \
-	$(abspath $(addsuffix /lib,$(sort $(__bobLISTALLHOMES)))))\
+	$(abspath \
+		$(addsuffix /lib,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))\
+		$(addsuffix /lib64,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
 $(eval export __bobLISTHOMEBINS := \
 	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)))))\
 $(eval export __bobLISTHOMEINCL := \
@@ -403,6 +405,17 @@ endef
 # ******************************************************************************
 
 
+# Helper for finding out what library directory to use, in case of 32 and 64-bit
+# compilations. Some tools are installed with lib and lib64 directories for 32
+# and 64-bit repspectively.
+#
+# $1: Home directory
+define __gethomelibdir
+$(if $(findstring x86_64,$(__bob.buildarch)),\
+	$(firstword $(wildcard $(home)/lib64 $(home)/lib)),\
+	$(firstword $(wildcard $(home)/lib $(home)/lib64)))
+endef
+
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
 # cannot build this software and that is an error.
 # ******************************************************************************
@@ -426,9 +439,10 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval requirement_verification_error := yes)\
 		$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" "$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME")),\
 		$(eval home := $($R_HOME))\
+		$(eval homelibdir := $(call __gethomelibdir))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(_I)$(home)/include)\
-		$(eval export $R_LIBS := $(_L)$(home)/lib $(__bobRPATHLINKFLAG)$(home)/lib)\
+		$(eval export $R_LIBS := $(_L)$(homelibdir) $(__bobRPATHLINKFLAG)$(homelibdir))\
 		$(eval export __bobALLREQINCL += $($R_INCL))\
 		$(eval export __bobALLREQLINK += $($R_LIBS))))\
 $(if $(requirement_verification_error),\

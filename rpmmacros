@@ -14,3 +14,9 @@
 %_datarootdir   %{_prefix}/share
 %_datadir       %{_datarootdir}
 %_localstatedir %{_prefix}/var
+%bobmakeinstall %{makeinstall}
+# Do not terminate on missing build id.
+%__bobmake \
+  LDFLAGS="${LDFLAGS} %{?_missing_build_ids_terminate_build:-Wl,--build-id}"; \
+  export LDFLAGS; \
+  %{__make}
