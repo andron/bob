@@ -157,7 +157,7 @@ __pkgdir := $(shell $(__bob.cmd.rpm) --define '_topdir $(RPM_USER_ROOT)' --eval 
 # The specfile is created by running spec.in through awk. We modify the release
 # if code is from trunk or a branch.
 $(__rpmspecfile): awkvars := $(addprefix -v,$(foreach t,name version release group,$t=$(__$t)))
-$(__rpmspecfile): $(__rpmspecfile).in __always_build__
+$(__rpmspecfile): $(__rpmspecfile).in $(__rpmmacrofile) __always_build__
 	@if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) SPECFILE $@ : $(awkvars)"; \
 		$(__bob.cmd.awk) $(awkvars) -f $(BOBHOME)/specreplace.awk $< > $@; fi
