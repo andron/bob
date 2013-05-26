@@ -476,10 +476,10 @@ $(eval __target_d_files := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
 .PHONY: $(__target_d_files)
 -include $(__target_d_files)
 # Target compile flags
-$(TGTDIR)/$1: __target_CFLAGS    = $$($1_CFLAGS)   $(_CFLAGS)   $(CFLAGS)   $(call __target_def,$1,$2) $(call __target_inc,$1,$2)
-$(TGTDIR)/$1: __target_CXXFLAGS  = $$($1_CXXFLAGS) $(_CXXFLAGS) $(CXXFLAGS) $(call __target_def,$1,$2) $(call __target_inc,$1,$2)
-$(TGTDIR)/$1: __target_LDFLAGS   = $$($1_LDFLAGS)  $(_CXXFLAGS) $(CXXFLAGS) $(_LDFLAGS) $(LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK)
-$(TGTDIR)/$1: __target_GNATFLAGS = $$($1_GNATFLAGS)
+$(TGTDIR)/$1: __target_CFLAGS    = $(strip $$($1_CFLAGS)   $(_CFLAGS)   $(CFLAGS)   $(call __target_def,$1,$2) $(call __target_inc,$1,$2))
+$(TGTDIR)/$1: __target_CXXFLAGS  = $(strip $$($1_CXXFLAGS) $(_CXXFLAGS) $(CXXFLAGS) $(call __target_def,$1,$2) $(call __target_inc,$1,$2))
+$(TGTDIR)/$1: __target_LDFLAGS   = $(strip $$($1_LDFLAGS)  $(_CXXFLAGS) $(CXXFLAGS) $(_LDFLAGS) $(LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK))
+$(TGTDIR)/$1: __target_GNATFLAGS = $(strip $$($1_GNATFLAGS))
 # Depend on .o-files
 $(TGTDIR)/$1: $($1_OBJS)
 # DSOs needs special care:
