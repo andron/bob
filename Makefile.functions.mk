@@ -476,12 +476,14 @@ $(if $($1_LINK),\
 	$(eval $1_LINK := $(addprefix $(_l),$($1_LINK))) \
 	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bobALLREQLINK))))
 # Target .d-files
-$(eval __target_d_files := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
-.PHONY: $(__target_d_files)
--include $(__target_d_files)
+$(eval __dfiles := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
+.PHONY: $(__dfiles)
+-include $(__dfiles)
 # Target compile flags
-$(TGTDIR)/$1: __target.cflags    = $(_CFLAGS)   $(strip $$($1_CFLAGS)   $(call __target_def,$1,$2) $(call __target_inc,$1,$2))
-$(TGTDIR)/$1: __target.cxxflags  = $(_CXXFLAGS) $(strip $$($1_CXXFLAGS) $(call __target_def,$1,$2) $(call __target_inc,$1,$2))
+$(eval __defines := $(call __setup_target_def,$1,$2))
+$(eval __include := $(call __setup_target_inc,$1,$2))
+$(TGTDIR)/$1: __target.cflags    = $(_CFLAGS)   $(strip $$($1_CFLAGS)   $(__include) $(__defines))
+$(TGTDIR)/$1: __target.cxxflags  = $(_CXXFLAGS) $(strip $$($1_CXXFLAGS) $(__include) $(__defines))
 $(TGTDIR)/$1: __target.ldflags   = $(_LDFLAGS) $(CXXFLAGS) $(_CXXFLAGS) $(strip $$($1_LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK))
 $(TGTDIR)/$1: __target.gnatflags = $(strip $$($1_GNATFLAGS))
 # Depend on .o-files
@@ -510,7 +512,7 @@ endef
 # assignment.
 #
 # $1: Target, $2: Module
-define __target_inc
+define __setup_target_inc
 $(addprefix $(_I), $(wildcard \
 	$($2_SRCDIR) \
 	$($2_SRCDIR)src \
@@ -522,8 +524,8 @@ $($1_INCL)
 endef
 # Helper for target defines flags
 # $1: Target, $2: Module
-define __target_def
-$(addprefix $(_D),$(sort $($1_DEFINES) $(DEFINES)))
+define __setup_target_def
+$(addprefix $(_D),$(sort $($1_DEFINES) $(_DEFINES) $(DEFINES)))
 endef
 # ******************************************************************************
 
