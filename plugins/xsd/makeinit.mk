@@ -29,7 +29,7 @@ endef
 # *** XSD RULES ***
 $(OBJDIR)/%.xsd.h $(OBJDIR)/%.xsd.cpp:%.xsd $$(@D)/.stamp
 	@echo "$(C_PREFIX) [$(dir $<))] Generating $(@F)"
-	$(XSDCXX) cxx-tree $(__target_XSDFLAGS) \
+	$(XSDCXX) cxx-tree $(__target.xsdflags) \
 	--hxx-suffix .xsd.h --cxx-suffix .xsd.cpp --output-dir $(dir $@) $<
 
 # *** SCHEMA INSTALL RULES ***

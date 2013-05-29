@@ -30,7 +30,7 @@ $(foreach t,$(TARGETS),\
 		$(eval $(__bob_xsd_o) : $(__bob_xsd_h)) \
 		$(eval $t_INCL += $(_I)$(_OBJDIR)) \
 		$(eval $(TGTDIR)/$t : $(__bob_xsd_h) $(__bob_xsd_o)) \
-		$(eval $(TGTDIR)/$t : __target_XSDFLAGS := $($t_XSDFLAGS) $(_XSDFLAGS))))
+		$(eval $(TGTDIR)/$t : __target.xsdflags := $($t_XSDFLAGS) $(_XSDFLAGS))))
 
 # Clear the global xsd flags variable. We justed used it and the next time we
 # will see it it will be either empty again or have a value but then it must
