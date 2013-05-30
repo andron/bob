@@ -34,7 +34,7 @@ help-plugins:
 	@echo "------------------------------------------------------------------------"
 
 	@echo 
-	@echo -e "   ** Loaded plugins **"; \
+	@echo -e "   Loaded"; \
 	idy=1; for i in \
 		$(sort $(BOBPLUGINS)); do \
 		echo "     $$idy: $$i "; \
@@ -42,7 +42,7 @@ help-plugins:
 	done; \
 
 	@echo
-	@echo -e "   ** Available plugins **"; \
+	@echo -e "   Available"; \
 	idx=1; for i in \
 		$(filter-out README,$(notdir $(sort $(wildcard $(__bob.plugin.dir)/*)))); do \
 		echo "     $$idx: $$i "; \
@@ -62,40 +62,28 @@ help-buildtypes:
 	@echo ""
 	@echo "Buildtypes"
 	@echo "------------------------------------------------------------------------"
-	@echo ""
-	@echo " By running make with buildtype set to one of the options below you can "
-	@echo " control what sort of build you want                                    "
 	@echo
-	@echo "  release   - Normal release build"
-	@echo "  $(__compiler_name) $(__$(__compiler_name)_release)"
-	@echo
-	@echo "  profiling - Like normal release but enables profiling"
-	@echo "  $(__compiler_name) $(__$(__compiler_name)_profiling)"
-	@echo
-	@echo "  pedantic  - Like normal release but be more \"pedantic\""
-	@echo "              (If your code builds here, you rule!)"
-	@echo "  $(__compiler_name) $(__$(__compiler_name)_pedantic)"
-	@echo
-	@echo "  debug     - No inlining, DEBUG defined, no optimization and ggdb3 format"
-	@echo "  $(__compiler_name) $(__$(__compiler_name)_debug)"
+	@echo " By running make with 'buildtype' set to one of the options below you"
+	@echo " can control what sort additional compile flags to use"
+	@echo -e "$(foreach b,$(COMPILER_BUILDTYPES),\n   $b\t$(__buildtype_$b))"
 	@echo
 
 
 
 help-compiler:
 	@echo
-	@echo " *** Compiler ***"
+	@echo "Compiler"
 	@echo "------------------------------------------------------------------------"
 	@echo "C-files compiler (with default flags):"
-	-$(COMPILE.c) $(COMPILERVERSIONFLAG)
+	@-echo $(COMPILE.c)
 	@echo
 	@echo "C++-files compiler (with default flags):"
-	-$(COMPILE.cpp) $(COMPILERVERSIONFLAG)
+	@-echo $(COMPILE.cpp)
 	@echo
-	@echo " *** Linking ***"
+	@echo "Linking"
 	@echo "------------------------------------------------------------------------"
 	@echo "C++-style files linker (with default flags):";
-	-$(LINK.cpp) $(COMPILERVERSIONFLAG)
+	@-echo $(LINK.cpp)
 	@echo
 ifeq "$(CC)" "CC"
 	@echo " ... Notice the error? See the strength of open source now?"
@@ -105,7 +93,7 @@ endif
 
 help-paths:
 	@echo
-	@echo " *** Paths ***"
+	@echo "Paths"
 	@echo "------------------------------------------------------------------------"
 	@echo "   srcdir       $(srcdir)"
 	@echo
@@ -133,7 +121,7 @@ help-paths:
 
 help-make:
 	@echo
-	@echo " *** Make specific stuff ***"
+	@echo "Make specific stuff"
 	@echo "------------------------------------------------------------------------"
 	@echo "Textual output types used by Bob."
 	@echo "  Debug        $(D_PREFIX)"
@@ -155,15 +143,15 @@ help-make:
 
 help-targets:
 	@echo
-	@echo " *** Available targets ***"
+	@echo "Targets"
 	@echo "------------------------------------------------------------------------"
-	@echo -e " ** Shared libraries **"; \
+	@echo -e "Shared libraries"; \
 	idx=1; for i in \
 		$(sort $(filter %.so,$(__bobLIST_TARGETS))); do \
 		echo "   $$idx. $$i"; \
 		idx=`expr $$idx + 1`; \
 	done; \
-	echo -e "\n ** Executables **"; \
+	echo -e "\nExecutables"; \
 	idx=1; for i in \
 		$(sort $(filter-out %.a,$(filter-out %.so,$(__bobLIST_TARGETS)))); do \
 		echo "   $$idx. $$i"; \
