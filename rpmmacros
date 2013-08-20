@@ -10,6 +10,7 @@
 %_srcrpmdir     %{_rpmtopdir}/SRPMS
 %_tmppath       %{_rpmtopdir}/TEMP
 %_vartmp        /var/tmp
+%_prefix        /opt/saab
 %_sysconfdir    %{_prefix}/etc
 %_datarootdir   %{_prefix}/share
 %_datadir       %{_datarootdir}
