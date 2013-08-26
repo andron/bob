@@ -125,9 +125,7 @@ as an include search path and to the link command as library search path. Both
 are appended at the very end and will act as a default fall back for those
 x_HOME which are undefined. If this flag (environment variable) is set the
 error checking for missing x_HOME's is disabled, and it is up to the developer
-to make sure that all non-specified x_HOME's can be replaced with the content
-of __ALL_HOME. The path pointed to by __ALL_HOME must contain a lib and a
-include-directory. A warning is emitted if that is not the case.
+to make sure that all non-specified x_HOME's exists.
 
 
 ==== Examples
@@ -392,12 +390,18 @@ foo_SRCS_FRM := $(call getsource,ui,*.ui)
 === Makefile
 The Makefile for a Bob project is pretty simple and will never need to contain
 anything more than
+
 ----
 include $(BOBHOME)/Makefile
 ----
 
-=== makeinfo.mk 
+In some cases it might be usefull putting additional variables en definitions
+here. A variable that is used by multiple submodules, or a highly specific
+macro perhaps. It is not recommend however to use this technique as a default
+way of controlling a project. It will get out-of-hand.
 
+
+=== makeinfo.mk
 A separate file is used for including project specific information. This
 information could also be put in the makerules.mk-file but it has some
 drawbacks having todo with the limitations of the GNU `make` language (it is
@@ -414,6 +418,27 @@ REQUIRES := qt4 boost gtest
 
 include $(FOOTER)
 ----
+
+The variables are more or less self-explainatory, except perhaps for
+REQUIRES. The REQUIRES variable is used in a specific (and fairly simple)
+way. Each item in the list is upper cased and suffixed with _HOME. Each
+variable name, for example QT4_HOME, is evaluated and the result must be
+non-empty. If the variable is undefined or empty an error is emitted and the
+build process is stopped. This is regarded as a requirement error. The
+_HOME-variable is then used for deriving the path to the include/header-files
+and possibly existing libraries used for linking but the simple schema
+
+----
+$(X_HOME)/include
+$(X_HOME)/lib
+----
+
+This requires that all requirements have this file structure. To some
+annoyance but it is not hard to achive by using symbolic links in those cases
+this schema is not used. The benefit is that all detection and file finding
+can be automated. Bob also installs its own projects according to this
+schema. For those opposing: 'Sloppyness and unstructured installation of
+software should not be encouraged'.
 
 
 === makerules.mk
