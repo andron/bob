@@ -457,6 +457,10 @@ The <foo>.spec.in-file is an ordinary rpm spec file with a small alteration
 regarding name, version and release. These are extracted from makeinfo.mk and
 with the <foo>.spec.in file used to create the real <foo>.spec file.
 
+Note the special __bobmake-macro in the build stage. This is not always
+required, but unless you know what you are doing use the __bobmake-macro. It
+is defined in the rpmmacros file and is used for adding specific options to
+the build process when needed.
 
 ----
 Summary: Foo application doing foo stuff
@@ -485,7 +489,7 @@ Development package for %{name}
 %setup -q
 
 %build
-%{__make}
+%{__bobmake}
 
 %install
 rm -rf $RPM_BUILD_ROOT
