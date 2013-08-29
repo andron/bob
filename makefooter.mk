@@ -62,16 +62,6 @@ $(_MODULE)_TARGETS := $(addprefix $(TGTDIR)/,$(TARGETS))
 $(if $(_DEFINES),$(foreach t,$(ALL_TARGETS),$(eval $t_DEFINES += $(_DEFINES))))
 
 
-# Set a default ui-style depending on requirements.
-ifeq "$(UI_STYLE)" ""
-$(if $(findstring qt4,$(__bobLIST_REQUIRES)),\
-	$(eval UI_STYLE := qt4),\
-	$(if $(findstring qt,$(__bobLIST_REQUIRES)),\
-		$(eval UI_STYLE := qt3),\
-		$(eval UI_STYLE := qt4)))
-endif
-
-
 # Implicit x_SRCS if only one target and no SRCS.
 ifeq "$(words $(ALL_TARGETS))" "1"
 $(if $($(ALL_TARGETS)_SRCS),,\
@@ -79,6 +69,10 @@ $(if $($(ALL_TARGETS)_SRCS),,\
 		$(call getsource_recursive,src,*.c) $(call getsource_recursive,src,*.cpp)))
 endif
 
+# Default ui-style unless specified.
+ifeq "$(UI_STYLE)" ""
+$(eval UI_STYLE := qt4)
+endif
 
 # Call a lot of macros to check, hmm... "stuff"
 $(foreach t,$(ALL_TARGETS),                                   \
@@ -106,9 +100,8 @@ ifdef __bob_have_feature_cppcheck
 $(eval $(call setup_cppcheck,$(strip $(ALL_TARGETS)),$(_MODULE)))
 endif
 
-# The variable can be reset here, to force qt3 components to explicitly set
-# their style. This should be removed as soon as possible.
-#UI_STYLE :=
+# Reset ui-style here to force qt3 code to explicitly set their style.
+$(eval UI_STYLE :=)
 
 # Module rules
 # ******************************************************************************
