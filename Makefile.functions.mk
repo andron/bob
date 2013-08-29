@@ -419,8 +419,8 @@ endef
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
 # cannot build this software and that is an error.
 # ******************************************************************************
-__bobALLREQINCL :=
-__bobALLREQLINK :=
+__bob_ALLREQ_INCLPATH :=
+__bob_ALLREQ_RLNKPATH :=
 define setup_requires
 $(call setup)
 endef
@@ -447,8 +447,11 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
 		$(eval export $R_INCL := $(__inclflag)$(realpath $(home)/include))\
 		$(eval export $R_LIBS := $(_L)$(homelibdir) $(__bobRPATHLINKFLAG)$(homelibdir))\
-		$(eval export __bobALLREQINCL += $($R_INCL))\
-		$(eval export __bobALLREQLINK += $($R_LIBS))))\
+		$(eval export $R_LIBSPATH := $(_L)$(homelibdir))\
+		$(eval export $R_RLNKPATH := $(__bobRPATHLINKFLAG)$(homelibdir))\
+		$(eval export $R_LIBS := $($R_LIBSPATH) $($R_RLNKPATH))\
+		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
+		$(eval export __bob_ALLREQ_RLNKPATH += $($R_RLNKPATH))))\
 $(if $(requirement_verification_error),\
 	$(info $(W_PREFIX) ********************************************************************)\
 	$(info $(W_PREFIX) There are missing build requirements, see the messages above.)\
@@ -471,10 +474,12 @@ define setup_target
 $1: $(TGTDIR)/$1
 # Transform _USES to include directives
 $(if $($1_USES),$(eval $1_INCL += $(foreach u,$($1_USES),$($(call __uc,$u)_INCL))))
-# Implicit _LINKPATH if _LINK
+# Append only rpath directives derived from _USES.
+$(if $($1_USES),$(eval $1_LIBS += $(__bob_ALLREQ_RLNKPATH)))
+# Implicit _LINKPATH if _LINK, derive the link path from the uses variable.
 $(if $($1_LINK),\
 	$(eval $1_LINK := $(addprefix $(_l),$($1_LINK))) \
-	$(if $($1_LINKPATH),,$(eval $1_LINKPATH += $(__bobALLREQLINK))))
+	$(eval $1_LINKPATH += $(foreach u,$($1_USES),$($(call __uc,$u)_LIBSPATH))))
 # Target .d-files
 $(eval __dfiles := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
 .PHONY: $(__dfiles)
@@ -484,7 +489,7 @@ $(eval __defines := $(call __setup_target_def,$1,$2))
 $(eval __include := $(call __setup_target_inc,$1,$2))
 $(TGTDIR)/$1: __target.cflags    = $(_CFLAGS)   $(strip $$($1_CFLAGS)   $(__include) $(__defines))
 $(TGTDIR)/$1: __target.cxxflags  = $(_CXXFLAGS) $(strip $$($1_CXXFLAGS) $(__include) $(__defines))
-$(TGTDIR)/$1: __target.ldflags   = $(_LDFLAGS) $(CXXFLAGS) $(_CXXFLAGS) $(strip $$($1_LDFLAGS) $$($1_LIBS) $$($1_LINKPATH) $$($1_LINK))
+$(TGTDIR)/$1: __target.ldflags   = $(_LDFLAGS) $(CXXFLAGS) $(_CXXFLAGS) $(strip $$($1_LDFLAGS) $$($1_LINKPATH) $$($1_LINK) $$($1_LIBS))
 $(TGTDIR)/$1: __target.gnatflags = $(strip $$($1_GNATFLAGS))
 # Depend on .o-files
 $(TGTDIR)/$1: $($1_OBJS)
