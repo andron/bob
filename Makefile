@@ -90,7 +90,7 @@ export MACHINE  ?= $(shell uname -m)
 # External programs configuration.
 # ******************************************************************************
 # First of all we must have a proper shell!
-override SHELL := $(shell which bash)
+override SHELL := $(shell which bash) --norc --noprofile
 ifeq "$(SHELL)" ""
 $(error Cannot find bash! Bob must have a proper shell, sorry)
 endif
