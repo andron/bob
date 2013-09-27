@@ -146,7 +146,11 @@ endef
 #
 # $1: Target -- $2: Module source directory.
 define __bob_expand_src_wildcard
-$(eval $1_SRCS := $(patsubst $(srcdir)/%,%,$(sort $(wildcard $(abspath $(addprefix $2,$(filter-out /%,$($1_SRCS))))))))
+$(eval abspath_sources := $(filter /%,$($1_SRCS))) \
+$(if $(abspath_sources), \
+	$(info $(W_PREFIX) $1: Ignoring absolute path sources $(abspath_sources))) \
+$(eval $1_SRCS := $(patsubst $(srcdir)/%,%,$(sort \
+	$(wildcard $(abspath $(addprefix $2,$(filter-out /%,$($1_SRCS))))))))
 endef
 # ******************************************************************************
 
