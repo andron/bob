@@ -192,24 +192,27 @@ and means that everything will first be built and then installed. Thus calling
 the build stage before hand is not really necessary when an installation is
 performed.
 
-There are two types of installs, a "ordinary" install and a component
+There are two types of installs, a ordinary install and a "special" software
 install. The difference between the two is that the ordinary install installs
-all artifacts into the same file structure. The component install is a little
-special, it only works when several projects are built at the same time, in
-the so-called meta mode. In this case each project/component is installed into
-a separate directory containing name and version number for the project.
+all artifacts into a single file layout structure. The software install is a
+little special, it only works when several projects are built at the same
+time, in the so-called meta mode. In this case each project is installed into
+a separate directory containing name and version number for each project. This
+layout can then be used by Bob for finding requirements when building other
+projects via the SOFTWARE_HOMES variable, which only needs to point to the
+base directory of the installation. The rest is handled automatically.
 
 +prefix+:: Top directory for the ordinary installation. The directory
-structure of the installaton is fixed and cannot be changed. Default value:
+structure of the installation is fixed and cannot be changed. Default value:
 /opt/saab
 
-+software-prefix+:: Top directory for the component install. Default value:
++software-prefix+:: Top directory for the software install. Default value:
 <empty>
 
 ----
 make install
 make install-libfoo.so prefix=installdir
-make component-install component-prefix=installdir
+make software-install software-prefix=installdir
 ----
 
 
