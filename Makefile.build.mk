@@ -93,14 +93,17 @@ ifdef __bob_have_feature_cppcheck
 cppcheck:;
 endif
 
+
 # Empty target, just to get the parsing going.
 verify:;
 	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"
 
+
 # Mark all non-file targets as phony.
 .PHONY: \
 	all doc verify install software-install distclean \
-	clean clean-obj clean-tgt
+	clean clean-doc clean-obj clean-tgt
+
 
 # The default all target, no rules.
 all: | $(TGTDIR) $(OBJDIR)
