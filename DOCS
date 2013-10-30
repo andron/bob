@@ -11,10 +11,10 @@ Bob User Guide - TBD
 == Description 
 
 Bob is a build system based on macros and variables in GNU `make', mainly
-targeted at; building the source code as parallel (fast) as possible, and
-streamlining the build setup process by defining a rigid and simple source
-code layout which is described through assignment of fixed variables.
-Convention over configuration.
+targeted at; building the source code (C/C++ and ADA) as parallel (fast) as
+possible, and streamlining the build setup process by defining a rigid and
+simple source code layout which is described through assignment of fixed
+variables.  Convention over configuration.
 
 
 == Getting started
@@ -120,12 +120,12 @@ symbols when linking dynamic libraries. (What is happening is that the flag
 
 +SOFTWARE_HOMES+::
 
-Specifies a path which will be added to the compile command
-as an include search path and to the link command as library search path. Both
-are appended at the very end and will act as a default fall back for those
-x_HOME which are undefined. If this flag (environment variable) is set the
-error checking for missing x_HOME's is disabled, and it is up to the developer
-to make sure that all non-specified x_HOME's exists.
+Specifies a path which will be added to the compile command as an include
+search path and to the link command as library search path. Both are appended
+at the very end and will act as a default fall back for those x_HOME which are
+undefined. If this flag (environment variable) is set the error checking for
+missing x_HOME's is disabled, and it is up to the developer to make sure that
+all non-specified x_HOME's exists.
 
 
 ==== Examples
@@ -160,17 +160,24 @@ compile-install-package cycle.
 
 ==== Verifying
 
-Verifying the environment prior to starting a build detects errors which would
-make the build fail. This is not necessary but will save time in those cases
-the build processes takes time. A build could fail after 45 minutes because of
-a missing dependency. For example missing to specify the location of Qt or
-Boost.  The +-k+ flag forces make to continue despite failing dependency
-checks. This will reveal all dependency errors and not just the first.
+Verifying the environment prior to starting a build detects requirement
+problems which would make the build fail. This is not necessary but will save
+time in those cases the build process takes time. A build could fail after 45
+minutes because of a missing dependency. For example missing to specify the
+location of Qt or Boost.  The +-k+ flag forces make to continue despite
+failing dependency checks. This will reveal all dependency errors and not just
+the first.
 
 ----
 make verify
 make -k verify
 ----
+
+If missing requirement are detected the only thing that needs to be done is to
+define the x_HOME variables to point to the installation directory of the
+missing requirements. Or if the requirement is no longer valid, remove it from
+the top makerules.mk files REQUIRES-variable. (Forgetting to adjust the
+REQUIRES-variable when alterning the source code is not uncommon).
 
 
 ==== Building
@@ -211,8 +218,8 @@ structure of the installation is fixed and cannot be changed. Default value:
 
 ----
 make install
-make install-libfoo.so prefix=installdir
 make software-install software-prefix=installdir
+make install-libfoo.so prefix=installdir
 ----
 
 
@@ -367,11 +374,13 @@ A "good" layout.
 Makefile
 makerules.mk
 foobar.spec.in
-include/interface_foo.h
-include/interface_bar.h
+include/interface_foo.hh
+include/interface_bar.hh
 src/implementation_foo.cpp
 src/implementation_bar.cpp
 src/main.cpp
+src/utilities.cpp
+src/utilities.hh
 ui/a.ui
 ui/b.ui
 ----
@@ -383,8 +392,8 @@ them for inclusion in the project. A user macro can be called to list all
 files dynamically so that new files are automatically used when created.
 
 ----
-foo_SRCS     := $(call getsource,src,*.cpp)
-foo_SRCS_FRM := $(call getsource,ui,*.ui)
+foo_SRCS     := src/*.cpp
+foo_SRCS_FRM := ui/*.ui
 ----
 
 
@@ -544,3 +553,5 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 
 ----
+
+== Full example step-by-step
