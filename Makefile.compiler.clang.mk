@@ -60,17 +60,12 @@ _I       := -I
 _isystem := -isystem
 _L       := -L
 
-# Always have TGTDIR in the link path.
-__bobLDFLAGS += $(_L)$(TGTDIR)
-
 ifeq "$(PLATFORM)" "Linux"
 SONAMEFLAG					:= -Wl,-h<soname>
 WHOLEEXTRACTFLAG		:= -Wl,-whole-archive
 NO_WHOLEEXTRACTFLAG	:= -Wl,-no-whole-archive
 DYNAMICLINKFLAG			:= -Wl,-Bdynamic
 STATICLINKFLAG			:= -Wl,-Bstatic
-# Linux linker demands -rpath-link do find second order library dependencies
-__bobLDFLAGS				+= -Wl,-rpath-link=$(TGTDIR)
 __clang_rpathnolink		:= -Wl,-rpath=
 __clang_rpath					:= -Wl,-rpath-link=
 endif
@@ -81,7 +76,6 @@ WHOLEEXTRACTFLAG		:= -z allextract
 NO_WHOLEEXTRACTFLAG	:= -z defaultextract
 DYNAMICLINKFLAG			:= -Wl,-Bdynamic
 STATICLINKFLAG			:= -Wl,-Bstatic
-__bobLDFLAGS				+= -Wl,-R,$(TGTDIR)
 __clang_rpathnolink		:= -Wl,-R,
 __clang_rpath					:= -Wl,-R,
 endif

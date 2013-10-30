@@ -61,8 +61,8 @@ CXXFLAGS += $(__buildtype_$(__bob.buildtype))
 # object directory is search for libraries, becasue all the libraries built
 # will end up there. Re-assignment is for handling += without overwriting user
 # specified flag.
-__linktype_default     := -L$(TGTDIR) $(LDFLAGS)
-__linktype_noundefined := -L$(TGTDIR) $(LDFLAGS) -Wl,-z,defs
+__linktype_default     := $(LDFLAGS)
+__linktype_noundefined := $(LDFLAGS) -Wl,-z,defs
 LDFLAGS :=
 LDFLAGS += $(__linktype_$(__bob.linktype))
 # ********************************************************************************
@@ -103,8 +103,6 @@ DYNAMICLINKFLAG     := -Wl,-Bdynamic
 STATICLINKFLAG      := -Wl,-Bstatic
 __bobRPATHLINKFLAG  := -Wl,-R,
 endif
-
-# Linux linker demands -rpath-link do find second order library dependencies
-override LDFLAGS := $(__bobRPATHLINKFLAG)$(TGTDIR) $(LDFLAGS)
 # ********************************************************************************
+
 endif

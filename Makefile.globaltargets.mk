@@ -42,6 +42,11 @@ $(OBJDIR)/%.o:%.cc  | $$(@D)._INSTALL_DIRECTORY
 $(OBJDIR)/%.o:%.c   | $$(@D)._INSTALL_DIRECTORY
 	$(if $(__bobSILENT),echo "$(C_PREFIX) [$(dir $<)] $(@F)";) $(CC) $(__target.cflags) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(_o) $@ $<
 
+
+# Extra default linkflags
+$(TGTDIR)/%: LDFLAGS += $(_L)$(TGTDIR) $(if $(__bobRPATHLINKFLAG),$(__bobRPATHLINKFLAG)$(TGTDIR))
+
+
 # *** SHARED PLUGIN LIBRARIES ***
 # Target for building plugins, almost as ordinary DSOs. Plugins does not have a
 # so-name containing the version number.
