@@ -342,7 +342,7 @@ $(eval __all_dst_include_files := \
 __module-install-$1: __module-install-include-files-$1
 __module-install-include-files-$1: $(__all_dst_include_files)
 $(__all_dst_include_files): $(DESTDIR)$(includedir)/%:$($1_SRCDIR)include/%
-	@$(__bob.cmd.install_hdr) $$< $$@
+	@$(__bob.cmd.install) -Dm644 $$< $$@
 endef
 # ******************************************************************************
 

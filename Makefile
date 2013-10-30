@@ -111,7 +111,6 @@ export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
 export __bob.cmd.doxygen       ?= $(shell type -p doxygen)
 export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
 export __bob.cmd.install       ?= $(shell type -p install)
-export __bob.cmd.install_hdr   ?= $(__bob.cmd.install) -Dm644
 export __bob.cmd.moc3          ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
 export __bob.cmd.uic3          ?= $(firstword $(wildcard $(QT_HOME)/bin/uic)  $(shell type -p uic-qt3))
 export __bob.cmd.moc4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))
