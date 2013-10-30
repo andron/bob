@@ -22,6 +22,14 @@ export OBJDIR := $(OBJBASE)/$(__bob.buildtypedir)
 export DOCDIR := $(DOCBASE)/generated
 # ******************************************************************************
 
+# Commands used in build mode
+# ******************************************************************************
+__bob.cmd.moc3 ?= $(firstword $(wildcard $(QT_HOME)/bin/moc) $(shell type -p moc-qt3))
+__bob.cmd.uic3 ?= $(firstword $(wildcard $(QT_HOME)/bin/uic) $(shell type -p uic-qt3))
+__bob.cmd.moc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))
+__bob.cmd.uic4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic $(QT4_HOME)/$(__bob.archlib)/qt4/bin/uic $(shell type -p uic-qt4)))
+__bob.cmd.rcc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/rcc $(shell type -p rcc-qt4)))
+# ******************************************************************************
 
 # Extract version information by including the makerules.mk with empty header
 # and footer to prevent traversing the tree of makerules.mk files.
