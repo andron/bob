@@ -24,6 +24,10 @@ export DOCDIR := $(DOCBASE)/generated
 
 # Commands used in build mode
 # ******************************************************************************
+ifneq "$(filter rpm%,$(MAKECMDGOALS))" ""
+__bob.cmd.rpmbuild ?= $(shell type -p rpmbuild)
+__bob.cmd.rpm      ?= $(shell type -p rpm)
+endif
 __bob.cmd.moc3 ?= $(firstword $(wildcard $(QT_HOME)/bin/moc) $(shell type -p moc-qt3))
 __bob.cmd.uic3 ?= $(firstword $(wildcard $(QT_HOME)/bin/uic) $(shell type -p uic-qt3))
 __bob.cmd.moc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))

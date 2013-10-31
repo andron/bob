@@ -99,8 +99,6 @@ endif
 
 export __bob.cmd.rsync         ?= $(shell type -p rsync) -quplr
 export __bob.cmd.rsync_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
-export __bob.cmd.rpmbuild      ?= $(shell type -p rpmbuild)
-export __bob.cmd.rpm           ?= $(shell type -p rpm)
 export __bob.cmd.cppcheck      ?= $(shell type -p cppcheck)
 export __bob.cmd.tar           ?= $(shell type -p tar)
 export __bob.cmd.ln            ?= $(shell type -p ln) -sf
@@ -118,9 +116,6 @@ export INSTALL_FILES           ?= $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
 
 # Havings and no havings. The existance of some commands turns on some extra
 # targets, not really necessary for normal operaion.
-ifneq "$(__bob.cmd.rpmbuild)" ""
-override __bob_have_feature_rpm := 1
-endif
 ifneq "$(__bob.cmd.tar)" ""
 override __bob_have_feature_tar := 1
 endif

@@ -25,7 +25,7 @@ __bob.prefix := " [bob]"
 
 
 # Default prefix for installation of everything.
-META_BUILD_ROOT := $(builddir)/bobuild/$(PLATFORM)
+export META_BUILD_ROOT := $(builddir)/bobuild/$(PLATFORM)
 export prefix := $(abspath $(META_BUILD_ROOT)/install)
 
 
@@ -57,14 +57,7 @@ endif
 
 
 # All main targets for a meta build.
-MAIN_TARGETS := all install software-install $(PASS_TARGETS)
-
-
-# Have rpm or not.
-ifdef __bob_have_feature_rpm
-export RPM_USER_ROOT := $(abspath $(META_BUILD_ROOT)/rpm)
-MAIN_TARGETS += rpm
-endif
+MAIN_TARGETS := all install rpm software-install $(PASS_TARGETS)
 
 
 # Make these phony targets so that Make won't look for files names like this.
@@ -127,10 +120,8 @@ $(addprefix software-install_,$(LIST_FEATNAMES)): software-install_%: install
 	@+$(MAKE) --no-print-directory -C $($*_DIRECTORY) software-install
 
 # Rpm(ing): Submake with target rpm.
-ifdef __bob_have_feature_rpm
 $(addprefix rpm_,$(LIST_FEATNAMES)): rpm_%: build_%
 	@+$(MAKE) -C $($*_DIRECTORY) rpm
-endif
 
 # A pass through target is a target that is "passed through". This is just a
 # conveniance for reducing repeted code. Build, install etc are special cases
