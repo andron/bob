@@ -27,7 +27,10 @@ export DOCDIR := $(DOCBASE)/generated
 ifneq "$(filter rpm%,$(MAKECMDGOALS))" ""
 __bob.cmd.rpmbuild ?= $(shell type -p rpmbuild)
 __bob.cmd.rpm      ?= $(shell type -p rpm)
+__bob.cmd.awk      ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
 endif
+__bob.cmd.find     ?= $(shell type -p find)
+__bob.cmd.ln       ?= $(shell type -p ln) -sf
 __bob.cmd.moc3 ?= $(firstword $(wildcard $(QT_HOME)/bin/moc) $(shell type -p moc-qt3))
 __bob.cmd.uic3 ?= $(firstword $(wildcard $(QT_HOME)/bin/uic) $(shell type -p uic-qt3))
 __bob.cmd.moc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))

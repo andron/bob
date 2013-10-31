@@ -101,9 +101,6 @@ export __bob.cmd.rsync         ?= $(shell type -p rsync) -quplr
 export __bob.cmd.rsync_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
 export __bob.cmd.cppcheck      ?= $(shell type -p cppcheck)
 export __bob.cmd.tar           ?= $(shell type -p tar)
-export __bob.cmd.ln            ?= $(shell type -p ln) -sf
-export __bob.cmd.find          ?= $(shell type -p find)
-export __bob.cmd.awk           ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
 export __bob.cmd.rm            ?= $(shell type -p rm) -f
 export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
 export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
