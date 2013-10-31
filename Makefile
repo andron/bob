@@ -108,7 +108,6 @@ export __bob.cmd.find          ?= $(shell type -p find)
 export __bob.cmd.awk           ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
 export __bob.cmd.rm            ?= $(shell type -p rm) -f
 export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
-export __bob.cmd.doxygen       ?= $(shell type -p doxygen)
 export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
 export __bob.cmd.install       ?= $(shell type -p install)
 export INSTALL                 ?= $(__bob.cmd.install)
@@ -124,9 +123,6 @@ override __bob_have_feature_rpm := 1
 endif
 ifneq "$(__bob.cmd.tar)" ""
 override __bob_have_feature_tar := 1
-endif
-ifneq "$(__bob.cmd.doxygen)" ""
-override __bob_have_feature_doxygen := 1
 endif
 ifneq "$(__bob.cmd.cppcheck)" ""
 override __bob_have_feature_cppcheck := 1

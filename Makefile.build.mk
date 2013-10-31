@@ -80,7 +80,8 @@ software-install: all
 
 # Doc targets
 # Simple doxygen implementation. If doxyfile is present run doxygen.
-ifdef __bob_have_feature_doxygen
+__bob.cmd.doxygen ?= $(shell type -p doxygen)
+ifdef __bob.cmd.doxygen
 DOXYGEN_FILE ?= Doxyfile
 DOXYGEN_OPTS ?= 
 doc:
@@ -91,7 +92,8 @@ doc:
 		echo "Create a $(DOXYGEN_FILE) using 'doxygen -g'"; \
 	fi;
 else
-doc:;
+doc:
+	@echo "No doxygen command available";
 endif
 distclean: clean-doc
 clean-doc:
