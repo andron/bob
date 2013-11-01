@@ -545,8 +545,8 @@ define setup_cppcheck
 $(foreach t,$1,
 cppcheck: $t.cppcheck
 $t.cppcheck:
-	@echo "$(X_PREFIX) $$(@F)"; \
-	$(__bob.cmd.cppcheck) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($2_SRCDIR))
+	@echo "$(X_PREFIX) $$(@F)";
+	$(__bob.cmd.cppcheck) $(CPPCHECKFLAGS) -I$($2_SRCDIR) $($t_SRCS))
 endef
 
 

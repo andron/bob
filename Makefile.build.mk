@@ -106,8 +106,16 @@ distclean: clean-doc
 clean-doc:
 	@-$(__bob.cmd.rmdir) $(DOCDIR)
 
-ifdef __bob_have_feature_cppcheck
+
+ifneq "$(filter cppcheck %.cppcheck,$(MAKECMDGOALS))" ""
+__bob.cmd.cppcheck ?= $(shell type -p cppcheck)
+ifneq "$(__bob.cmd.cppcheck)" ""
+override __bob_have_feature_cppcheck := 1
+CPPCHECKFLAGS ?= -rp --enable=style,performance,portability --inconclusive
 cppcheck:;
+else
+$(info No cppcheck command available)
+endif
 endif
 
 
@@ -119,7 +127,7 @@ verify:;
 # Mark all non-file targets as phony.
 .PHONY: \
 	all doc verify install software-install distclean \
-	clean clean-doc clean-obj clean-tgt
+	clean clean-doc clean-obj clean-tgt cppcheck
 
 
 # The default all target, no rules.

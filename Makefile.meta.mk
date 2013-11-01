@@ -45,15 +45,9 @@ endif
 # Define a set of main targets which are supported at the top level.
 PASS_TARGETS := \
 	clean clean-tgt clean-obj distclean \
-	doc verify linkgraph versioninfo \
+	doc verify linkgraph versioninfo cppcheck \
 	test   test.reg  test.tdd  test.bdd  test.mod  test.tmp \
 	check check.reg check.tdd check.bdd check.mod check.tmp
-
-
-# Have cppcheck or not.
-ifdef __bob_have_feature_cppcheck
-PASS_TARGETS += cppcheck
-endif
 
 
 # All main targets for a meta build.
