@@ -88,7 +88,7 @@ software-install: all
 # Doc targets
 # Simple doxygen implementation. If doxyfile is present run doxygen.
 __bob.cmd.doxygen ?= $(shell type -p doxygen)
-ifdef __bob.cmd.doxygen
+ifneq "$(__bob.cmd.doxygen)" ""
 DOXYGEN_FILE ?= Doxyfile
 DOXYGEN_OPTS ?= 
 doc:
@@ -120,8 +120,8 @@ endif
 
 
 # Empty target, just to get the parsing going.
-verify:;
-	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"
+verify:
+	@printf "%-30s %s\n" "$(T_PREFIX)" "$@"
 
 
 # Mark all non-file targets as phony.
