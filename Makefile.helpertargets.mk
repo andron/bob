@@ -123,7 +123,19 @@ endif
 # ******************************************************************************
 # Rules for build and creating rpm files. Requires a rpmbuild command to be
 # installed on the system.
-ifdef __bob_have_feature_rpm
+# Remove the specfile when doing clean or distclean
+
+# The rpm specfile shall have the same name as the project. Must reside
+# outside the condition of the rpmbuild command for clean targets to work.
+__rpmspecfile := $(__name).spec
+distclean clean: __remove_specfile
+__remove_specfile:
+	@if [ -e $(__rpmspecfile) ]; then \
+		echo "$(T_PREFIX) Removing $(__rpmspecfile) ..."; \
+		$(__bob.cmd.rm) $(__rpmspecfile); \
+	fi;
+
+ifneq "$(__bob.cmd.rpmbuild)" ""
 
 # Check prerequisites
 ifeq "$(__bob.cmd.awk)" ""
@@ -134,12 +146,17 @@ ifeq "$(__bob.cmd.tar)" ""
 $(error Must have tar)
 endif
 
+ifeq "$(__bob.cmd.rpm)" ""
+$(error Must have rpm)
+endif
+
+ifdef META_BUILD_ROOT
+RPM_USER_ROOT := $(abspath $(META_BUILD_ROOT)/rpm)
+endif
+
 ifndef RPM_USER_ROOT
 RPM_USER_ROOT := $(shell $(__bob.cmd.rpm) --eval %_topdir)
 endif
-
-# The rpm specfile shall have the same name as the project.
-__rpmspecfile := $(__name).spec
 
 # Reset package if we have rpm. Obs do not move this line above the tar package
 # definition section.
@@ -161,14 +178,6 @@ $(__rpmspecfile): $(__rpmspecfile).in $(__rpmmacrofile) __always_build__
 	@if [ -e "$<" ]; then \
 		echo "$(T_PREFIX) SPECFILE $@ : $(awkvars)"; \
 		$(__bob.cmd.awk) $(awkvars) -f $(BOBHOME)/specreplace.awk $< > $@; fi
-
-# Remove the specfile when doing clean or distclean
-distclean clean: __remove_specfile
-__remove_specfile:
-	@if [ -e $(__rpmspecfile) ]; then \
-		echo "$(T_PREFIX) Removing $(__rpmspecfile) ..."; \
-		$(__bob.cmd.rm) $(__rpmspecfile); \
-	fi;
 
 comma := ,
 rpm: $(__pkgdir)/$(__pkgfile)
@@ -202,6 +211,9 @@ rpmenvironment.clean:
 
 .PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 
+else
+rpm:
+	@echo "No rpmbuild command available";
 endif
 # ******************************************************************************
 

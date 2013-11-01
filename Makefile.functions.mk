@@ -342,7 +342,7 @@ $(eval __all_dst_include_files := \
 __module-install-$1: __module-install-include-files-$1
 __module-install-include-files-$1: $(__all_dst_include_files)
 $(__all_dst_include_files): $(DESTDIR)$(includedir)/%:$($1_SRCDIR)include/%
-	@$(__bob.cmd.install_hdr) $$< $$@
+	@$(__bob.cmd.install) -Dm644 $$< $$@
 endef
 # ******************************************************************************
 
@@ -545,8 +545,8 @@ define setup_cppcheck
 $(foreach t,$1,
 cppcheck: $t.cppcheck
 $t.cppcheck:
-	@echo "$(X_PREFIX) $$(@F)"; \
-	$(__bob.cmd.cppcheck) $(CPPCHECKFLAGS) $(call __target_inc,$t,$2) $($2_SRCDIR))
+	@echo "$(X_PREFIX) $$(@F)";
+	$(__bob.cmd.cppcheck) $(CPPCHECKFLAGS) -I$($2_SRCDIR) $($t_SRCS))
 endef
 
 

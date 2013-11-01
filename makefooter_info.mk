@@ -84,7 +84,7 @@ ifdef __bob_have_feature_cppcheck
 $(_MODULE).cppcheck: cppcheck_$($(NAME)_FEATNAME)
 endif
 
-ifdef __bob_have_feature_rpm
+ifneq "$(__bob.cmd.rpmbuild)" ""
 $(_MODULE).rpm: rpm_$($(NAME)_FEATNAME)
 endif
 

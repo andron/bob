@@ -99,24 +99,11 @@ endif
 
 export __bob.cmd.rsync         ?= $(shell type -p rsync) -quplr
 export __bob.cmd.rsync_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
-export __bob.cmd.rpmbuild      ?= $(shell type -p rpmbuild)
-export __bob.cmd.rpm           ?= $(shell type -p rpm)
-export __bob.cmd.cppcheck      ?= $(shell type -p cppcheck)
 export __bob.cmd.tar           ?= $(shell type -p tar)
-export __bob.cmd.ln            ?= $(shell type -p ln) -sf
-export __bob.cmd.find          ?= $(shell type -p find)
-export __bob.cmd.awk           ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
 export __bob.cmd.rm            ?= $(shell type -p rm) -f
 export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
-export __bob.cmd.doxygen       ?= $(shell type -p doxygen)
 export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
 export __bob.cmd.install       ?= $(shell type -p install)
-export __bob.cmd.install_hdr   ?= $(__bob.cmd.install) -Dm644
-export __bob.cmd.moc3          ?= $(firstword $(wildcard $(QT_HOME)/bin/moc)  $(shell type -p moc-qt3))
-export __bob.cmd.uic3          ?= $(firstword $(wildcard $(QT_HOME)/bin/uic)  $(shell type -p uic-qt3))
-export __bob.cmd.moc4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))
-export __bob.cmd.uic4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic $(QT4_HOME)/$(__bob.archlib)/qt4/bin/uic $(shell type -p uic-qt4)))
-export __bob.cmd.rcc4          ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/rcc $(shell type -p rcc-qt4)))
 export INSTALL                 ?= $(__bob.cmd.install)
 export INSTALL_EXEC            ?= $(__bob.cmd.install) -Dm755
 export INSTALL_DATA            ?= $(__bob.cmd.install) -Dm644
@@ -125,18 +112,8 @@ export INSTALL_FILES           ?= $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
 
 # Havings and no havings. The existance of some commands turns on some extra
 # targets, not really necessary for normal operaion.
-ifneq "$(__bob.cmd.rpmbuild)" ""
-override __bob_have_feature_rpm := 1
-endif
 ifneq "$(__bob.cmd.tar)" ""
 override __bob_have_feature_tar := 1
-endif
-ifneq "$(__bob.cmd.doxygen)" ""
-override __bob_have_feature_doxygen := 1
-endif
-ifneq "$(__bob.cmd.cppcheck)" ""
-override __bob_have_feature_cppcheck := 1
-export CPPCHECKFLAGS ?= -q --enable=style --suppress="missingInclude"
 endif
 # ******************************************************************************
 

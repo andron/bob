@@ -22,6 +22,21 @@ export OBJDIR := $(OBJBASE)/$(__bob.buildtypedir)
 export DOCDIR := $(DOCBASE)/generated
 # ******************************************************************************
 
+# Commands used in build mode
+# ******************************************************************************
+ifneq "$(filter rpm%,$(MAKECMDGOALS))" ""
+__bob.cmd.rpmbuild ?= $(shell type -p rpmbuild)
+__bob.cmd.rpm      ?= $(shell type -p rpm)
+__bob.cmd.awk      ?= $(firstword $(shell type -p gawk) $(shell type -p awk))
+endif
+__bob.cmd.find     ?= $(shell type -p find)
+__bob.cmd.ln       ?= $(shell type -p ln) -sf
+__bob.cmd.moc3 ?= $(firstword $(wildcard $(QT_HOME)/bin/moc) $(shell type -p moc-qt3))
+__bob.cmd.uic3 ?= $(firstword $(wildcard $(QT_HOME)/bin/uic) $(shell type -p uic-qt3))
+__bob.cmd.moc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/moc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/moc $(shell type -p moc-qt4)))
+__bob.cmd.uic4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/uic $(QT4_HOME)/$(__bob.archlib)/qt4/bin/uic $(shell type -p uic-qt4)))
+__bob.cmd.rcc4 ?= $(firstword $(wildcard $(QT4_HOME)/bin/rcc $(QT4_HOME)/$(__bob.archlib)/qt4/bin/rcc $(shell type -p rcc-qt4)))
+# ******************************************************************************
 
 # Extract version information by including the makerules.mk with empty header
 # and footer to prevent traversing the tree of makerules.mk files.
@@ -72,7 +87,8 @@ software-install: all
 
 # Doc targets
 # Simple doxygen implementation. If doxyfile is present run doxygen.
-ifdef __bob_have_feature_doxygen
+__bob.cmd.doxygen ?= $(shell type -p doxygen)
+ifneq "$(__bob.cmd.doxygen)" ""
 DOXYGEN_FILE ?= Doxyfile
 DOXYGEN_OPTS ?= 
 doc:
@@ -83,26 +99,35 @@ doc:
 		echo "Create a $(DOXYGEN_FILE) using 'doxygen -g'"; \
 	fi;
 else
-doc:;
+doc:
+	@echo "No doxygen command available";
 endif
 distclean: clean-doc
 clean-doc:
 	@-$(__bob.cmd.rmdir) $(DOCDIR)
 
-ifdef __bob_have_feature_cppcheck
+
+ifneq "$(filter cppcheck %.cppcheck,$(MAKECMDGOALS))" ""
+__bob.cmd.cppcheck ?= $(shell type -p cppcheck)
+ifneq "$(__bob.cmd.cppcheck)" ""
+override __bob_have_feature_cppcheck := 1
+CPPCHECKFLAGS ?= -rp --enable=style,performance,portability --inconclusive
 cppcheck:;
+else
+$(info No cppcheck command available)
+endif
 endif
 
 
 # Empty target, just to get the parsing going.
-verify:;
-	@-printf "%-30s %s\n" "$(T_PREFIX)" "$@"
+verify:
+	@printf "%-30s %s\n" "$(T_PREFIX)" "$@"
 
 
 # Mark all non-file targets as phony.
 .PHONY: \
 	all doc verify install software-install distclean \
-	clean clean-doc clean-obj clean-tgt
+	clean clean-doc clean-obj clean-tgt cppcheck
 
 
 # The default all target, no rules.
