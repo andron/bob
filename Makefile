@@ -102,7 +102,6 @@ export __bob.cmd.rsync_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --
 export __bob.cmd.tar           ?= $(shell type -p tar)
 export __bob.cmd.rm            ?= $(shell type -p rm) -f
 export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
-export __bob.cmd.asciidoc      ?= $(shell type -p asciidoc)
 export __bob.cmd.install       ?= $(shell type -p install)
 export INSTALL                 ?= $(__bob.cmd.install)
 export INSTALL_EXEC            ?= $(__bob.cmd.install) -Dm755
@@ -251,12 +250,12 @@ bob.info:
 	"$(__bob.prefix) Path:    $(BOBHOME)\n"\
 	"$(__bob.prefix) Plugins: $(strip $(sort $(BOBPLUGINS)))"
 
+__bob.cmd.asciidoc := $(shell type -p asciidoc)
 ifneq "$(__bob.cmd.asciidoc)" ""
 bob.doc: DOCS.html
 DOCS.html: DOCS
 	@echo "$(__bob.prefix) Creating Asciidoc from $<"; \
 	$(__bob.cmd.asciidoc) -a toc -a max-width=85ex -d article -b html5 $<;
-
 endif
 
 else
