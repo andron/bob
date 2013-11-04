@@ -108,12 +108,6 @@ export INSTALL_EXEC            ?= $(__bob.cmd.install) -Dm755
 export INSTALL_DATA            ?= $(__bob.cmd.install) -Dm644
 export INSTALL_DIRS            ?= $(__bob.cmd.install) -d
 export INSTALL_FILES           ?= $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
-
-# Havings and no havings. The existance of some commands turns on some extra
-# targets, not really necessary for normal operaion.
-ifneq "$(__bob.cmd.tar)" ""
-override __bob_have_feature_tar := 1
-endif
 # ******************************************************************************
 
 

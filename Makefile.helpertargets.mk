@@ -69,14 +69,13 @@ $(__buildinfofile):
 # its operations. Which must be specified by the dependee target. I.e. the
 # target that depends on a tar.gz file must define the variable.  (It is very
 # unusual that a developer would need to use this directly).
-ifdef __bob_have_feature_tar
+.PHONY: __remove_packagefile package
 
-.PHONY: package __remove_packagefile
+ifneq "$(__bob.cmd.tar)" ""
 
 __pkgdir  := $(HOME)/bobpackages
 __pkgname := $(__name)-$(__version)
 __pkgfile := $(__pkgname).tar.gz
-
 distclean clean: __remove_packagefile
 __remove_packagefile:
 	@if [ -e $(__pkgdir)/$(__pkgfile) ]; then \
@@ -115,6 +114,9 @@ package: $$(__pkgdir)/$(__pkgfile)
 		rm -f ../$(__pkgname); fi;              \
 	if [ ! -r $@ ]; then echo "$(W_PREFIX) failed to create $@"; exit 1; fi;
 
+else
+package:
+	@echo "No package (tar) command available";
 endif
 # ******************************************************************************
 
@@ -122,11 +124,11 @@ endif
 # Package/Rpm target
 # ******************************************************************************
 # Rules for build and creating rpm files. Requires a rpmbuild command to be
-# installed on the system.
-# Remove the specfile when doing clean or distclean
+# installed on the system. Specfile is removed when doing clean or distclean
+.PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 
-# The rpm specfile shall have the same name as the project. Must reside
-# outside the condition of the rpmbuild command for clean targets to work.
+# Clean target for specfile outside the if-def because rpm commands are only
+# enabled when an rpm-target is in MAKECMDGOALS.
 __rpmspecfile := $(__name).spec
 distclean clean: __remove_specfile
 __remove_specfile:
@@ -208,8 +210,6 @@ rpmenvironment: $(__rpmmacrofile) $(__rpmdirectories)
 # Clean rpm environment. Mostly for debugging.
 rpmenvironment.clean:
 	@$(__bob.cmd.rmdir) $(__rpmmacrofile) $(__rpmdirectories)
-
-.PHONY: __remove_specfile rpm rpmenvironment rpmenvironment.clean
 
 else
 rpm:
