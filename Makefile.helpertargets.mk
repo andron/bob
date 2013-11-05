@@ -27,7 +27,6 @@ bobshell:
 		PATH=$$PATH:$(abspath $(TGTDIR)):$${__bobLISTHOMEBINS// /:}; \
 		export LD_LIBRARY_PATH=$${LD_LIBRARY_PATH//::/:}; \
 		export PATH=$${PATH//::/:}; \
-		export TEST_INCLUDES="$(__bobLISTHOMEINCL)"; \
 		export BOBBUILDBASH=1; \
 		export MAKELEVEL=0; \
 		bash --noprofile --rcfile $(BOBHOME)/bobbashrc $(BOBSHELL_BASH_ARGV); \

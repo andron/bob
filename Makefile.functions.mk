@@ -382,9 +382,7 @@ $(eval export __bobLISTHOMELIBS := \
 		$(addsuffix /lib,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))\
 		$(addsuffix /lib64,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
 $(eval export __bobLISTHOMEBINS := \
-	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)))))\
-$(eval export __bobLISTHOMEINCL := \
-	$(addprefix $(_I),$(abspath $(addsuffix /include,$(sort $(__bobLISTALLHOMES))))))
+	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)))))
 endef
 
 
