@@ -324,13 +324,7 @@ setup via the environment, buildtype etc.
 
 Other support that is given is that the PATH and LD_LIBRARY_PATH variables are
 setup so that all required libraries (and binaries) are available without the
-need to specify an absolute path. Together with the __ALL_HOME flag, which
-also effects PATH and LD_LIBRARY_PATH, a complete environment is created for
-running the artifacts within the project.
-
-If the __ALL_HOME flag is set Bob looks for an executable file named 'run'
-within the __ALL_HOME-directory and creates an alias to that file. Systems
-which are started via such a file can therefore be pointed out by __ALL_HOME.
+need to specify an absolute path.
 
 
 === makerules.mk
