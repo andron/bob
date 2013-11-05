@@ -379,8 +379,8 @@ endef
 define pp_setup_libbin_paths
 $(eval export __bobLISTHOMELIBS := \
 	$(abspath \
-		$(addsuffix /lib,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))\
-		$(addsuffix /lib64,$(sort $(__bobLISTALLHOMES)) $(__ALL_HOME))))\
+		$(addsuffix /lib,$(sort $(__bobLISTALLHOMES))) \
+		$(addsuffix /lib64,$(sort $(__bobLISTALLHOMES))))) \
 $(eval export __bobLISTHOMEBINS := \
 	$(abspath $(addsuffix /bin,$(sort $(__bobLISTALLHOMES)))))
 endef
