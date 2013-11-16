@@ -10,7 +10,7 @@
 
 
 # *** XSD VARIABLES ***
-XSDCXX ?= $(firstword $(wildcard $(shell type -p xsd) $(shell type -p xsdcxx)))
+XSDCXX := $(firstword $(wildcard $(shell type -p xsd) $(shell type -p xsdcxx)))
 
 # *** XSD MACROS ***
 # Create headers according to transformation rules.
