@@ -83,8 +83,8 @@ endif
 # Store some makeflags into a bob variable.
 $(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
 $(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
-export PLATFORM ?= $(shell uname -s)
-export MACHINE  ?= $(shell uname -m)
+export PLATFORM := $(shell uname -s)
+export MACHINE  := $(shell uname -m)
 
 
 # External programs configuration.
@@ -97,17 +97,17 @@ else
 .SHELLFLAGS := --norc --noprofile -ec
 endif
 
-export __bob.cmd.rsync         ?= $(shell type -p rsync) -quplr
-export __bob.cmd.rsync_exclude ?= --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
-export __bob.cmd.tar           ?= $(shell type -p tar)
-export __bob.cmd.rm            ?= $(shell type -p rm) -f
-export __bob.cmd.rmdir         ?= $(shell type -p rm) -rf
-export __bob.cmd.install       ?= $(shell type -p install)
-export INSTALL                 ?= $(__bob.cmd.install)
-export INSTALL_EXEC            ?= $(__bob.cmd.install) -Dm755
-export INSTALL_DATA            ?= $(__bob.cmd.install) -Dm644
-export INSTALL_DIRS            ?= $(__bob.cmd.install) -d
-export INSTALL_FILES           ?= $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
+export __bob.cmd.rsync         := $(shell type -p rsync) -quplr
+export __bob.cmd.rsync_exclude := --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
+export __bob.cmd.tar           := $(shell type -p tar)
+export __bob.cmd.rm            := $(shell type -p rm) -f
+export __bob.cmd.rmdir         := $(shell type -p rm) -rf
+export __bob.cmd.install       := $(shell type -p install)
+export INSTALL                 := $(__bob.cmd.install)
+export INSTALL_EXEC            := $(__bob.cmd.install) -Dm755
+export INSTALL_DATA            := $(__bob.cmd.install) -Dm644
+export INSTALL_DIRS            := $(__bob.cmd.install) -d
+export INSTALL_FILES           := $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
 # ******************************************************************************
 
 
