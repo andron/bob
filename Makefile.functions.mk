@@ -413,8 +413,8 @@ endef
 # $1: Home directory
 define __gethomelibdir
 $(if $(findstring x86_64,$(__bob.buildarch)),\
-	$(firstword $(wildcard $(home)/lib64 $(home)/lib)),\
-	$(firstword $(wildcard $(home)/lib $(home)/lib64)))
+	$(firstword $(wildcard $1/lib64 $1/lib)),\
+	$(firstword $(wildcard $1/lib $1/lib64)))
 endef
 
 # Check requirements. This means that a <R>_HOME variable must exist. Else we
@@ -444,15 +444,17 @@ $(foreach r,$(sort $(REQUIRES)),\
 		$(eval requirement_verification_error := yes)\
 		$(info $(shell printf "%s %s -> %-12s -- %s undefined\n" "$(W_PREFIX)" "$(NAME)" "$r" "$R_HOME")),\
 		$(eval home := $($R_HOME))\
-		$(eval homelibdir := $(call __gethomelibdir))\
 		$(eval __bobLISTALLHOMES += $($R_HOME))\
-		$(eval export $R_INCL := $(__inclflag)$(realpath $(home)/include))\
-		$(eval export $R_LIBS := $(_L)$(homelibdir) $(__bobRPATHLINKFLAG)$(homelibdir))\
-		$(eval export $R_LIBSPATH := $(_L)$(homelibdir))\
-		$(eval export $R_RLNKPATH := $(__bobRPATHLINKFLAG)$(homelibdir))\
-		$(eval export $R_LIBS := $($R_LIBSPATH) $($R_RLNKPATH))\
-		$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL))\
-		$(eval export __bob_ALLREQ_RLNKPATH += $($R_RLNKPATH))))\
+		$(eval homeincdir := $(realpath $(home)/include))\
+		$(if $(homeincdir),\
+			$(eval export $R_INCL := $(__inclflag)$(homeincdir))\
+			$(eval export __bob_ALLREQ_INCLPATH += $($R_INCL)))\
+		$(eval homelibdir := $(call __gethomelibdir,$(home)))\
+		$(if $(homelibdir),\
+			$(eval export $R_LIBSPATH := $(_L)$(homelibdir))\
+			$(eval export $R_RLNKPATH := $(__bobRPATHLINKFLAG)$(homelibdir))\
+			$(eval export $R_LIBS := $($R_LIBSPATH) $($R_RLNKPATH))\
+			$(eval export __bob_ALLREQ_RLNKPATH += $($R_RLNKPATH)))))\
 $(if $(requirement_verification_error),\
 	$(info $(W_PREFIX) ********************************************************************)\
 	$(info $(W_PREFIX) There are missing build requirements, see the messages above.)\
