@@ -363,7 +363,7 @@ $(foreach t,$1,\
 		$(eval $(addprefix $(TGTDIR)/,$t):$(addprefix $(TGTDIR)/,$(__bob_libinternal))) \
 		$(eval __bob_$t_internalincl := \
 			$(sort $(foreach dep,$(__bob_libinternal),$(foreach dir,$(__$(dep)_interfacedirs),$(_I)$(dir))))) \
-		$(eval $t_INCL             += $(sort $(__bob_$t_internalincl))) \
+		$(eval __bob_$t_ppincl     += $(sort $(__bob_$t_internalincl))) \
 		$(eval __bobLISTALLINTINCL += $(sort $(__bob_$t_internalincl)))) \
 	$(if $(__bob_libexternal),\
 		$(eval __bob_$t_externaldeps := $(__bob_libexternal))))
@@ -490,8 +490,8 @@ $(eval __dfiles := $(call __bob_target_dfiles,$1,$($2_OBJDIR)))
 # Target compile flags
 $(eval __defines := $(call __setup_target_def,$1))
 $(eval __include := $(call __setup_target_inc,$1,$2))
-$(TGTDIR)/$1: __target.cflags    = $(_CFLAGS)   $(strip $$($1_CFLAGS)   $(__include) $$($1_INCL) $(__defines))
-$(TGTDIR)/$1: __target.cxxflags  = $(_CXXFLAGS) $(strip $$($1_CXXFLAGS) $(__include) $$($1_INCL) $(__defines))
+$(TGTDIR)/$1: __target.cflags    = $(_CFLAGS)   $(strip $$($1_CFLAGS)   $(__include) $($1_INCL) $(__defines))
+$(TGTDIR)/$1: __target.cxxflags  = $(_CXXFLAGS) $(strip $$($1_CXXFLAGS) $(__include) $($1_INCL) $(__defines))
 $(TGTDIR)/$1: __target.ldflags   = $(_LDFLAGS) $(CXXFLAGS) $(_CXXFLAGS) $(strip $$($1_LDFLAGS) $$($1_LINKPATH) $$($1_LINK) $$($1_LIBS))
 $(TGTDIR)/$1: __target.gnatflags = $(strip $$($1_GNATFLAGS))
 # Depend on .o-files
@@ -526,7 +526,8 @@ $(addprefix $(_I),$(wildcard \
 	$($2_SRCDIR)src \
 	$($2_SRCDIR)include \
 	$($2_SRCDIR)include_internal \
-	.))
+	.)) \
+$$$$(__bob_$1_ppincl)
 endef
 # Helper for target defines flags
 # $1: Target
