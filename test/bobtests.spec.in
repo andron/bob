@@ -1,0 +1,37 @@
+Summary: Bob test applications
+Name: @name@
+Version: @version@
+Release: @release@
+License: FreeBSD
+Source0: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%description
+A set of applications built only to test feature in bob.
+
+
+%prep
+%setup -q
+
+%build
+%{__bobmake}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%{makeinstall}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%files
+%defattr(-,root,root,-)
+%doc
+%{_bindir}/*
+%{_libdir}/*
+%{_includedir}/*
+
+
+%changelog
+* Wed Nov 20 2013 Anders Ro <anders.ronnbrant@gmail.com> - 
+- Initial build.
