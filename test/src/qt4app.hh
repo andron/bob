@@ -6,6 +6,8 @@
 #include <QtGui/QMainWindow>
 
 #include "ui_qt4app.h"
+#include "ui_qt4widget1.h"
+#include "ui_qt4widget2.h"
 
 namespace Ui {
 class MainWindow;
