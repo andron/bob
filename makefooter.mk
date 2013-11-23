@@ -80,7 +80,9 @@ $(foreach t,$(ALL_TARGETS),                                   \
 	$(eval $t_LIBS += $(_LIBS))                                 \
 	$(eval $t_USES += $(_USES))                                 \
 	$(eval $t_LINK += $(_LINK))                                 \
-	$(call __bob_expand_src_wildcard,$t,$($(_MODULE)_SRCDIR))   \
+	$(call __bob_expand_src_wildcard,$t,$($(_MODULE)_SRCDIR),SRCS)     \
+	$(call __bob_expand_src_wildcard,$t,$($(_MODULE)_SRCDIR),SRCS_MOC) \
+	$(call __bob_expand_src_wildcard,$t,$($(_MODULE)_SRCDIR),SRCS_FRM) \
 	$(call __bob_append_src_objects,$t,$($(_MODULE)_OBJDIR))    \
 	$(call __bob_append_uic_objects,$t,$($(_MODULE)_OBJDIR))    \
 	$(call __bob_append_moc_objects,$t,$($(_MODULE)_OBJDIR))    \
