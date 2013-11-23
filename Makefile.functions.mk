@@ -569,17 +569,6 @@ endef
 # ******************************************************************************
 
 
-# Same as getsource but recursive.
-#
-# $1: Directory -- $2: Source specification
-# ******************************************************************************
-define getsource_recursive
-$(if $1,$(eval dir:=$1),$(eval dir:=.)) \
-$(shell $(__bob.cmd.find) $(dir) -name "$2")
-endef
-# ******************************************************************************
-
-
 # Get all moc sources
 #
 # $1: Directory -- $2: Source specification

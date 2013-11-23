@@ -64,9 +64,8 @@ $(if $(_DEFINES),$(foreach t,$(ALL_TARGETS),$(eval $t_DEFINES += $(_DEFINES))))
 
 # Implicit x_SRCS if only one target and no SRCS.
 ifeq "$(words $(ALL_TARGETS))" "1"
-$(if $($(ALL_TARGETS)_SRCS),,\
-	$(eval $(ALL_TARGETS)_SRCS := \
-		$(call getsource_recursive,src,*.c) $(call getsource_recursive,src,*.cpp)))
+$(eval t := $(firstword $(ALL_TARGETS))) \
+$(if $($t_SRCS),,$(eval $t_SRCS := src/*.cpp src/*.c))
 endif
 
 # Default ui-style unless specified.
