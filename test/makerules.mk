@@ -13,10 +13,10 @@ $(call setup)
 TARGETS := foobar libfoppa.so qt4app
 
 _CXXFLAGS := -std=c++11 -pedantic
+_LDFLAGS  := -Wl,-rpath,$(TGTDIR)
 
 foobar_SRCS := src/foobar.cpp
 foobar_LINK := foppa
-foobar_LDFLAGS := -Wl,-rpath,$(TGTDIR)
 
 libfoppa.so_SRCS := src/foppa1.cpp src/foppa2.cpp
 
