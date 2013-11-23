@@ -144,13 +144,13 @@ endef
 
 # Expand source file wildcard patterns. Also verifies the existence of files.
 #
-# $1: Target -- $2: Module source directory.
+# $1: Target -- $2: Module source directory -- $3: Varible
 define __bob_expand_src_wildcard
-$(eval abspath_sources := $(filter /%,$($1_SRCS))) \
+$(eval abspath_sources := $(filter /%,$($1_$3))) \
 $(if $(abspath_sources), \
 	$(info $(W_PREFIX) $1: Ignoring absolute path sources $(abspath_sources))) \
-$(eval $1_SRCS := $(patsubst $(srcdir)/%,%,$(sort \
-	$(wildcard $(abspath $(addprefix $2,$(filter-out /%,$($1_SRCS))))))))
+$(eval $1_$3 := $(patsubst $(srcdir)/%,%,$(sort \
+	$(wildcard $(abspath $(addprefix $2,$(filter-out /%,$($1_$3))))))))
 endef
 # ******************************************************************************
 
