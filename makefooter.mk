@@ -124,10 +124,6 @@ $(eval UI_STYLE :=)
 	$($(_MODULE)_OBJDIR)%$(subst .cpp,.o,$(__ui-moc-cpp))
 
 # TARGETS ----------------------------------------------------------------------
-else
-ifdef BOB.DEBUG
-$(info No targets in $($(_MODULE)_SRCDIR))
-endif
 endif
 
 # Phony target in module.

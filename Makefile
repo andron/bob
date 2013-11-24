@@ -213,11 +213,7 @@ applicationsdir ?= $(datadir)/applications
 	@echo " $(__bob.prefix) No target \"$@\""
 # Default is to build the all entry, to which all default targets shall be
 # connected. Target 'install' depends on 'all' etc.
-ifdef BOB.BUILD_TEST
-default: all test
-else
 default: all
-endif
 # ******************************************************************************
 
 
