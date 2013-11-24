@@ -24,7 +24,12 @@
 #
 # $1: Directory name -- $2: Name list to be prepended
 define __bob_dirprefix
-$(if $1,$(addprefix $1/,$2),$(addprefix ./,$2))
+$(call __bob_clean_path,$(if $1,$(addprefix $1/,$2),$(addprefix ./,$2)))
+endef
+
+# Clean a path from multiple //
+define __bob_clean_path
+$(subst /./,/,$(subst //,/,$1))
 endef
 
 # Target .d-files
@@ -35,6 +40,7 @@ $(eval __objdir := $(addprefix $(OBJDIR)/,$(sort $(dir $($1_SRCS))))) \
 $(wildcard $(addsuffix *.d,$(__objdir))) \
 $(if $($1_SRCS_RCC),$(wildcard $(addsuffix *.d,$2)))
 endef
+
 # ******************************************************************************
 
 
