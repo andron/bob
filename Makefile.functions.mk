@@ -522,12 +522,12 @@ endef
 #
 # $1: Target, $2: Module
 define __setup_target_inc
+$(_I)$($2_SRCDIR) \
 $(addprefix $(_I),$(wildcard \
-	$($2_SRCDIR) \
 	$($2_SRCDIR)src \
 	$($2_SRCDIR)include \
-	$($2_SRCDIR)include_internal \
-	.)) \
+	$($2_SRCDIR)include_internal)) \
+$(_I). \
 $$$$(__bob_$1_ppincl)
 endef
 # Helper for target defines flags
