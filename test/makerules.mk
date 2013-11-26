@@ -1,4 +1,4 @@
-# -*- mode:make; tab-width:2; -*-
+# -*- mode:makefile; tab-width:2; -*-
 
 include $(HEADER)
 

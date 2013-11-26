@@ -57,15 +57,7 @@ __execute.%: test.%
 	if [ $$retval != 0 ]; then exit -1; fi;
 
 
-.PHONY: help-plugin-test test check \
+.PHONY: test check \
 	$(addprefix test.,$(__bob_test_classes)) \
 	$(addprefix check.,$(__bob_test_classes)) \
 	$(addprefix __execute.,$(__bob_test_classes))
-
-
-# Help
-help-plugin-test:
-	@echo -e \
-	"\n TEST plugin"                                                             \
-	"\n------------------------------------------------------------------------" \
-	"\n"

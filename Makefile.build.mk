@@ -134,16 +134,23 @@ verify:
 all: | $(TGTDIR) $(OBJDIR)
 
 
+# Turn on second expansion.
+# ******************************************************************************
+.SECONDEXPANSION:
+.ONESHELL:
+
+
 # Functions for building rules, setting up dependencies etc.
 # ******************************************************************************
 .PHONY: $(BOBHOME)/Makefile.functions.mk
 include $(BOBHOME)/Makefile.functions.mk
 
 
-# Turn on second expansion.
+# Test targets setup. (Goes into separate file to not kludge up this file).
 # ******************************************************************************
-.SECONDEXPANSION:
-.ONESHELL:
+.PHONY: $(BOBHOME)/Makefile.testtargets.mk
+include $(BOBHOME)/Makefile.testtargets.mk
+
 
 # Init plugins. Plugins shall not provide base functionally and shall thus be
 # inited until after all default files. And since plugins might provide target
