@@ -63,28 +63,7 @@ I_PREFIX := $(__bob.prefix) >># Install
 T_PREFIX := $(__bob.prefix)   # Text output
 X_PREFIX := $(__bob.prefix) TT# Test output
 V_PREFIX := $(__bob.prefix) VV# Test output
-
-ifdef buildarch
-__bob.buildarch := $(buildarch)
-else
-__bob.buildarch := $(shell uname -m)
-endif
-
-ifeq "$(__bob.buildarch)" "x86_64"
-__bob.archlib := lib64
-else
-__bob.archlib := lib
-endif
 # ******************************************************************************
-
-
-# Options and environment configuration.
-# ******************************************************************************
-# Store some makeflags into a bob variable.
-$(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
-$(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
-export PLATFORM := $(shell uname -s)
-export MACHINE  := $(shell uname -m)
 
 
 # External programs configuration.
@@ -111,11 +90,30 @@ export INSTALL_FILES           := $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
 # ******************************************************************************
 
 
+# Options and environment configuration.
+# ******************************************************************************
+# Store some makeflags into a bob variable.
+$(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
+$(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
+export PLATFORM := $(shell uname -s)
+export MACHINE  := $(shell uname -m)
+
+
 # Build architecture
 # ******************************************************************************
 # Variable buildarch have no default, default is to use machine arch. Its use
 # is mostly/only for building 32-bit software on 64-bit machines.
-export __bob.buildarch ?= $(buildarch)
+ifdef buildarch
+__bob.buildarch := $(buildarch)
+else
+__bob.buildarch := $(shell uname -m)
+endif
+
+ifeq "$(__bob.buildarch)" "x86_64"
+__bob.archlib := lib64
+else
+__bob.archlib := lib
+endif
 # ******************************************************************************
 
 
@@ -134,7 +132,7 @@ export __bob.buildtype := $(buildtype)
 export __bob.linktype  := $(linktype)
 
 # Include compiler file, complain if it does not exist.
-__bob_compiler_file := $(wildcard $(BOBHOME)/Makefile.compiler.$(compiler).mk)
+__bob_compiler_file := $(wildcard $(BOBHOME)/Makefile.compiler.$(__bob.compiler).mk)
 ifdef __bob_compiler_file
 include $(__bob_compiler_file)
 else
