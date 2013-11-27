@@ -76,6 +76,7 @@ else
 .SHELLFLAGS := --norc --noprofile -ec
 endif
 
+export __bob.cmd.uname         := $(shell type -p uname)
 export __bob.cmd.rsync         := $(shell type -p rsync) -quplr
 export __bob.cmd.rsync_exclude := --exclude=.git --exclude=.svn --exclude=CVS --exclude=RCS
 export __bob.cmd.tar           := $(shell type -p tar)
@@ -95,8 +96,8 @@ export INSTALL_FILES           := $(__bob.cmd.rsync) $(__bob.cmd.rsync_exclude)
 # Store some makeflags into a bob variable.
 $(if $(findstring s,$(MAKEFLAGS)),$(eval __bobSILENT:=1))
 $(if $(findstring k,$(MAKEFLAGS)),$(eval __bobKEEPGO:=1))
-export PLATFORM := $(shell uname -s)
-export MACHINE  := $(shell uname -m)
+export PLATFORM := $(shell $(__bob.cmd.uname) -s)
+export MACHINE  := $(shell $(__bob.cmd.uname) -m)
 
 
 # Build architecture
@@ -106,7 +107,7 @@ export MACHINE  := $(shell uname -m)
 ifdef buildarch
 __bob.buildarch := $(buildarch)
 else
-__bob.buildarch := $(shell uname -m)
+__bob.buildarch := $(shell $(__bob.cmd.uname) -m)
 endif
 
 ifeq "$(__bob.buildarch)" "x86_64"
